@@ -256,11 +256,11 @@ var TOOL={
     {label:"Amount differs",v:R.mism.length,text:U.fmt(R.mism.length),color:"var(--warn)"},
     {label:"Not in ledger",v:R.onlyS.length,text:U.fmt(R.onlyS.length),color:"var(--bad)"}])});
   var top=R.onlyS.slice().sort(function(a,b){return b.amt-a.amt;}).slice(0,10);
-  if(top.length) S.push({title:"Received, not recorded: largest first",cap:"Money in your account that your ledger does not show",html:U.table(["Date","Reference","Payer","Amount"],top.map(function(x){return [x.day,x.rawRef||"—",U.mask(x.rawParty),U.rwf(x.amt)];}),[3])});
+  if(top.length) S.push({title:"Received, not recorded: largest first",cap:U.of("Money in your account that your ledger does not show",10,R.onlyS.length),html:U.table(["Date","Reference","Payer","Amount"],top.map(function(x){return [x.day,x.rawRef||"—",U.mask(x.rawParty),U.rwf(x.amt)];}),[3])});
   var topL=R.onlyL.slice().sort(function(a,b){return b.amt-a.amt;}).slice(0,10);
-  if(topL.length) S.push({title:"Recorded, never received",cap:"Ledger entries with no matching payment in the statement",html:U.table(["Date","Reference","Party","Amount"],topL.map(function(x){return [x.day,x.rawRef||"—",U.mask(x.rawParty),U.rwf(x.amt)];}),[3])});
-  if(R.mism.length) S.push({title:"Amounts that differ",cap:"Same reference, different amount",html:U.table(["Reference","Statement","Ledger","Difference"],R.mism.slice().sort(function(a,b){return Math.abs(b[0].amt-b[1].amt)-Math.abs(a[0].amt-a[1].amt);}).slice(0,10).map(function(p){return [p[0].rawRef,U.rwf(p[0].amt),U.rwf(p[1].amt),{t:U.rwf(p[0].amt-p[1].amt),cls:"flag"}];}),[1,2,3])});
-  if(R.fuzzy.length) S.push({title:"Matched on amount and date",cap:"References that differ between the two files; worth a look at how they are keyed",html:U.table(["Statement ref","Ledger ref","Amount","Hours apart"],R.fuzzy.slice(0,8).map(function(p){return [p[0].rawRef||"—",p[1].rawRef||"—",U.rwf(p[0].amt),U.fmt(Math.abs(p[1].t-p[0].t)/3.6e6,1)];}),[2,3])});
+  if(topL.length) S.push({title:"Recorded, never received",cap:U.of("Ledger entries with no matching payment in the statement",10,R.onlyL.length),html:U.table(["Date","Reference","Party","Amount"],topL.map(function(x){return [x.day,x.rawRef||"—",U.mask(x.rawParty),U.rwf(x.amt)];}),[3])});
+  if(R.mism.length) S.push({title:"Amounts that differ",cap:U.of("Same reference, different amount",10,R.mism.length),html:U.table(["Reference","Statement","Ledger","Difference"],R.mism.slice().sort(function(a,b){return Math.abs(b[0].amt-b[1].amt)-Math.abs(a[0].amt-a[1].amt);}).slice(0,10).map(function(p){return [p[0].rawRef,U.rwf(p[0].amt),U.rwf(p[1].amt),{t:U.rwf(p[0].amt-p[1].amt),cls:"flag"}];}),[1,2,3])});
+  if(R.fuzzy.length) S.push({title:"Matched on amount and date",cap:U.of("References that differ between the two files; worth a look at how they are keyed",8,R.fuzzy.length),html:U.table(["Statement ref","Ledger ref","Amount","Hours apart"],R.fuzzy.slice(0,8).map(function(p){return [p[0].rawRef||"—",p[1].rawRef||"—",U.rwf(p[0].amt),U.fmt(Math.abs(p[1].t-p[0].t)/3.6e6,1)];}),[2,3])});
   if(R.dL.length||R.dS.length) S.push({title:"Duplicated references",cap:"The same reference more than once in a file",html:'<p class="note-s">'+(R.dL.length?"<b>Ledger:</b> "+R.dL.slice(0,12).map(U.esc).join(", ")+(R.dL.length>12?" …":""):"")+(R.dS.length?"<br><b>Statement:</b> "+R.dS.slice(0,12).map(U.esc).join(", "):"")+'</p>'});
   var T=[]; T.push("COLLECTIONS RECONCILIATION — "+ctx.name.toUpperCase()); T.push(U.fmt(nS)+" statement payments, "+U.fmt(R.L.length)+" ledger entries   |   Prepared by Frutos"); T.push("");
   T.push("FINDING"); T.push("- Matched: "+U.pct(matched,nS)+"% ("+U.fmt(R.exact.length)+" by reference, "+U.fmt(R.fuzzy.length)+" by amount and date within "+R.win+" day(s))");
@@ -284,6 +284,7 @@ var U={};
 U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
 U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
 U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.of=function(c,k,n){ return n>k ? c+" \u00b7 "+k+" of "+U.fmt(n)+" shown" : c; };
 U.MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 U.dd=function(t,noYear){ var d=new Date(t); return d.getDate()+" "+U.MON[d.getMonth()]+(noYear?"":" "+d.getFullYear()); };
 U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };

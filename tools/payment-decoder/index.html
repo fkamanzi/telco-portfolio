@@ -313,14 +313,14 @@ var TOOL={
   var S=[], order=["ok","customer","account","issuer","setup","tech","unknown","pending"], col={ok:"var(--accent)",customer:"var(--dim)",account:"var(--accent2)",issuer:"var(--warn)",setup:"color-mix(in srgb, var(--warn) 55%, var(--bad))",tech:"var(--bad)",unknown:"var(--line)",pending:"var(--panel2)"};
   S.push({title:"Every attempt, by outcome",cap:"Each attempt in the file, grouped by what its code says",html:U.stack(order.filter(function(k){return c[k];}).map(function(k){return {label:CAT[k][0],v:c[k],text:U.fmt(c[k]),color:col[k]};}))});
   var head=["#","Code","Meaning","Area","Count","Share"], cum=0; if(R.hasA) head.push("Value");
-  S.push({title:"Failure codes, ranked",cap:"Share of all failed attempts",html:U.table(head,list.slice(0,14).map(function(x,i){ var r=[String(i+1),famLabel(x),x.name,CAT[x.cat][0],U.fmt(x.n),U.pct(x.n,fail)+"%"]; if(R.hasA) r.push(U.rwf(x.amt)); if(x.cat==="tech") r[3]={t:r[3],cls:"flag"}; return r; }),R.hasA?[0,4,5,6]:[0,4,5])+(R.fams["8583-93"]?'<p class="note-s">Three-digit codes (ISO 8583:1993 action codes) are ranked but not decoded in this trial.</p>':"")});
+  S.push({title:"Failure codes, ranked",cap:U.of("Share of all failed attempts",14,list.length),html:U.table(head,list.slice(0,14).map(function(x,i){ var r=[String(i+1),famLabel(x),x.name,CAT[x.cat][0],U.fmt(x.n),U.pct(x.n,fail)+"%"]; if(R.hasA) r.push(U.rwf(x.amt)); if(x.cat==="tech") r[3]={t:r[3],cls:"flag"}; return r; }),R.hasA?[0,4,5,6]:[0,4,5])+(R.fams["8583-93"]?'<p class="note-s">Three-digit codes (ISO 8583:1993 action codes) are ranked but not decoded in this trial.</p>':"")});
   if(R.hasP&&cps.length>1){ var byN=cps.slice().sort(function(a,b){return b.n-a.n;});
-    S.push({title:"By counterparty",cap:"Share that went through, and technical failures, per issuer, bank or wallet",html:U.bars(byN.slice(0,10).map(function(o){ var p=Math.round(o.ok/o.n*1000)/10; return {label:o.k,w:p,text:p+"% · "+U.fmt(o.tech)+" technical",cls:(wc&&o.k===wc.k)?"bad":""}; }))}); }
+    S.push({title:"By counterparty",cap:U.of("Share that went through, and technical failures, per issuer, bank or wallet",10,byN.length),html:U.bars(byN.slice(0,10).map(function(o){ var p=Math.round(o.ok/o.n*1000)/10; return {label:o.k,w:p,text:p+"% · "+U.fmt(o.tech)+" technical",cls:(wc&&o.k===wc.k)?"bad":""}; }))}); }
   if(R.hasCh){ var chs=Object.keys(R.chs).map(function(k){return R.chs[k];}).sort(function(a,b){return b.n-a.n;});
     if(chs.length>1) S.push({title:"By channel",cap:"Share that went through, per channel",html:U.bars(chs.map(function(o){ var p=Math.round(o.ok/o.n*1000)/10; return {label:o.k,w:p,text:p+"% · "+U.fmt(o.n)+" attempts"}; }))}); }
   if(R.hasT&&tech) S.push({title:"Technical failures through the day",cap:"Technical failures by hour",html:U.heat(R.hours,"count")});
   var tk=Object.keys(R.terms).sort(function(a,b){return R.terms[b]-R.terms[a];});
-  if(R.hasTe&&tk.length) S.push({title:"Terminals with the most technical failures",cap:"Where to send the field team first",html:U.table(["Terminal","Technical failures"],tk.slice(0,8).map(function(k){return [k,U.fmt(R.terms[k])];}),[1])});
+  if(R.hasTe&&tk.length) S.push({title:"Terminals with the most technical failures",cap:U.of("Where to send the field team first",8,tk.length),html:U.table(["Terminal","Technical failures"],tk.slice(0,8).map(function(k){return [k,U.fmt(R.terms[k])];}),[1])});
   var L=[]; L.push("PAYMENT FAILURES — "+ctx.name.toUpperCase()); L.push(U.fmt(T)+" attempts   |   Prepared by Frutos"); L.push("");
   L.push("FINDING"); L.push("- Went through: "+U.pct(ok,T)+"%  |  failed: "+U.fmt(fail)+(pend?"  |  no final status: "+U.fmt(pend):""));
   L.push("- Technical: "+U.pct(tech,fail)+"% of failures"+(R.hasA?" ("+U.rwf(techAmt)+" not moved"+(R.hasU?"; "+U.rwf(R.recAmt)+" recovered on retry within "+R.W+" min":"")+")":""));
@@ -347,6 +347,7 @@ var U={};
 U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
 U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
 U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.of=function(c,k,n){ return n>k ? c+" \u00b7 "+k+" of "+U.fmt(n)+" shown" : c; };
 U.MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 U.dd=function(t,noYear){ var d=new Date(t); return d.getDate()+" "+U.MON[d.getMonth()]+(noYear?"":" "+d.getFullYear()); };
 U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };

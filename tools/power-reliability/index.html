@@ -252,7 +252,7 @@ var TOOL={
   var tiles=[U.tile("SAIFI",U.fmt(SAIFI,2),"interruptions per "+unit),U.tile("SAIDI",U.fmt(SAIDI,0)+" min","per "+unit,SAIDI>0?"warn":"good"),
     U.tile("CAIDI",U.fmt(CAIDI,0)+" min","per interruption"),U.tile("ASAI",U.fmt(ASAI,3)+"%","supply available")];
   var S=[], head=["Feeder","Sustained interruptions","Customers interrupted","Customer-minutes","Share"]; if(R.hasSv) head.push("SAIDI, min");
-  S.push({title:"Feeders by "+unit+"-minutes lost",cap:"Sustained interruptions only (longer than "+R.mom+" minutes)",html:U.table(head,Fs.filter(function(o){return o.cmi>0;}).slice(0,12).map(function(o,i){
+  S.push({title:"Feeders by "+unit+"-minutes lost",cap:U.of("Sustained interruptions only (longer than "+R.mom+" minutes)",12,Fs.filter(function(o){return o.cmi>0;}).length),html:U.table(head,Fs.filter(function(o){return o.cmi>0;}).slice(0,12).map(function(o,i){
     var r=[o.k,U.fmt(o.ev),U.fmt(o.ci),U.fmt(o.cmi,0),{t:U.pct(o.cmi,R.SCMI||1)+"%",cls:i===0&&Fs.length>1?"flag":""}]; if(R.hasSv) r.push(o.sv?U.fmt(o.cmi/o.sv,0):"—"); return r; }),R.hasSv?[1,2,3,4,5]:[1,2,3,4])});
   if(R.hasK){ var ks=Object.keys(R.causes).sort(function(a,b){return R.causes[b]-R.causes[a];}), km=ks.length?R.causes[ks[0]]:0;
     S.push({title:"What causes the minutes",cap:unit.charAt(0).toUpperCase()+unit.slice(1)+"-minutes lost, by recorded cause",html:U.bars(ks.map(function(k,i){return {label:k,w:km?R.causes[k]/km*100:0,text:U.pct(R.causes[k],R.SCMI||1)+"%",cls:i===0?"bad":""};}))}); }
@@ -284,6 +284,7 @@ var U={};
 U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
 U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
 U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.of=function(c,k,n){ return n>k ? c+" \u00b7 "+k+" of "+U.fmt(n)+" shown" : c; };
 U.MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 U.dd=function(t,noYear){ var d=new Date(t); return d.getDate()+" "+U.MON[d.getMonth()]+(noYear?"":" "+d.getFullYear()); };
 U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };
