@@ -264,13 +264,13 @@ var TOOL={
     {label:"2xx success",v:R.cls[2]||0,text:U.fmt(R.cls[2]||0),color:"var(--accent)"},{label:"3xx redirect",v:R.cls[3]||0,text:U.fmt(R.cls[3]||0),color:"var(--accent2)"},
     {label:"4xx client error",v:c4,text:U.fmt(c4),color:"var(--warn)"},{label:"429 throttled",v:R.thr,text:U.fmt(R.thr),color:"color-mix(in srgb, var(--warn) 55%, var(--bad))"},
     {label:"5xx server error",v:e5,text:U.fmt(e5),color:"var(--bad)"},{label:"Unreadable",v:R.cls[0]||0,text:U.fmt(R.cls[0]||0),color:"var(--line)"}])});
-  if(R.hasE) S.push({title:"Endpoints, worst first",cap:"Server errors, 95th-percentile time and share over "+U.fmt(R.slow)+" ms",html:U.table(["Endpoint","Requests","Server errors","95th pct","Slow"],eps.slice(0,12).map(function(E){
+  if(R.hasE) S.push({title:"Endpoints, worst first",cap:U.of("Server errors, 95th-percentile time and share over "+U.fmt(R.slow)+" ms",12,eps.length),html:U.table(["Endpoint","Requests","Server errors","95th pct","Slow"],eps.slice(0,12).map(function(E){
     return [E.k,U.fmt(E.n),{t:U.pct(E.e5,E.n)+"%",cls:E.e5/E.n>allow?"flag":""},E.p95===null?"—":U.fmt(E.p95/1000,2)+" s",U.pct(E.slow,E.d.length||1)+"%"]; }),[1,2,3,4])});
   if(R.hasD){ var q=[50,90,95,99].map(function(p){return U.pctl(R.durs,p);});
     S.push({title:"How long requests take",cap:U.fmt(R.durs.length)+" timed requests",html:'<div class="lat">'+["Median","90th pct","95th pct","99th pct"].map(function(k,i){return '<div class="lc"><div class="lk">'+k+'</div><div class="lv">'+U.fmt(q[i]/1000,2)+'<small class="u"> s</small></div></div>';}).join("")+'</div>'}); }
   if(R.hasT&&e5) S.push({title:"Server errors through the day",cap:"5xx responses by hour",html:U.heat(R.h5,"count")});
   var cs=Object.keys(R.codes).sort(function(a,b){return R.codes[b]-R.codes[a];}).slice(0,10);
-  S.push({title:"Status codes",cap:"Meanings as defined in RFC 9110, and RFC 6585 for 429",html:U.table(["Code","Meaning","Requests","Share"],cs.map(function(k){return [k,HS[k]||"—",U.fmt(R.codes[k]),U.pct(R.codes[k],R.tot)+"%"];}),[2,3])});
+  S.push({title:"Status codes",cap:U.of("Meanings as defined in RFC 9110, and RFC 6585 for 429",10,Object.keys(R.codes).length),html:U.table(["Code","Meaning","Requests","Share"],cs.map(function(k){return [k,HS[k]||"—",U.fmt(R.codes[k]),U.pct(R.codes[k],R.tot)+"%"];}),[2,3])});
   var L=[]; L.push("API AND APP HEALTH — "+ctx.name.toUpperCase()); L.push(U.fmt(R.tot)+" requests   |   Prepared by Frutos"); L.push("");
   L.push("FINDING"); L.push("- Without server error: "+U.fmt(avail,2)+"% (target "+slo+"%)  |  burn "+U.fmt(burn,1)+"x the allowed error rate");
   if(burn>1) L.push("- At this pace a 30-day error budget lasts "+U.fmt(days,1)+" days");
@@ -296,6 +296,7 @@ var U={};
 U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
 U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
 U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.of=function(c,k,n){ return n>k ? c+" \u00b7 "+k+" of "+U.fmt(n)+" shown" : c; };
 U.MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 U.dd=function(t,noYear){ var d=new Date(t); return d.getDate()+" "+U.MON[d.getMonth()]+(noYear?"":" "+d.getFullYear()); };
 U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };

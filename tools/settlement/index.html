@@ -262,7 +262,7 @@ var TOOL={
     var r=[o.k,f(o.ua),f(o.ub),{t:U.fmt(g,2)+"%",cls:Math.abs(g)>R.tol?"flag":""},U.fmt(o.flag),o.both?o.lower+" of "+o.both:"—"]; if(hasV) r.push(U.rwf(o.va)); return r; }),hasV?[1,2,3,4,6]:[1,2,3,4])});
   var top=fl.slice().sort(function(a,b){ return Math.abs(b.val!==null?b.val:b.diff)-Math.abs(a.val!==null?a.val:a.diff); }).slice(0,12);
   if(top.length){ var h2=["Date","Route","Yours","Theirs","Gap"]; if(hasV) h2.push("Value");
-    S.push({title:"Route-days to dispute, largest first",cap:"Over your "+R.tol+"% threshold, or missing on one side",html:U.table(h2,top.map(function(p){ var r=[p.d,p.r,p.ua===null?"—":f(p.ua),p.ub===null?"—":f(p.ub),{t:p.miss?("missing on "+p.miss+" side"):U.fmt(p.pct,2)+"%",cls:"flag"}]; if(hasV) r.push(p.val===null?"—":U.rwf(p.val)); return r; }),hasV?[2,3,5]:[2,3])}); }
+    S.push({title:"Route-days to dispute, largest first",cap:U.of("Over your "+R.tol+"% threshold, or missing on one side",12,fl.length),html:U.table(h2,top.map(function(p){ var r=[p.d,p.r,p.ua===null?"—":f(p.ua),p.ub===null?"—":f(p.ub),{t:p.miss?("missing on "+p.miss+" side"):U.fmt(p.pct,2)+"%",cls:"flag"}]; if(hasV) r.push(p.val===null?"—":U.rwf(p.val)); return r; }),hasV?[2,3,5]:[2,3])}); }
   var L=[]; L.push("SETTLEMENT CHECK — "+ctx.name.toUpperCase()); L.push(nd+" days, "+rs.length+" routes   |   Prepared by Frutos"); L.push("");
   L.push("FINDING"); L.push("- Yours "+f(R.UA)+" vs theirs "+f(R.UB)+": "+(gap>=0?"yours":"theirs")+" higher by "+U.fmt(Math.abs(gp),2)+"%"+(hasV?" ("+U.rwf(Math.abs(net))+")":""));
   L.push("- Route-days over "+R.tol+"% or missing: "+U.fmt(fl.length)+" of "+U.fmt(P.length)+(hasV?"; in dispute "+U.rwf(gross):""));
@@ -286,6 +286,7 @@ var U={};
 U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
 U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
 U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.of=function(c,k,n){ return n>k ? c+" \u00b7 "+k+" of "+U.fmt(n)+" shown" : c; };
 U.MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 U.dd=function(t,noYear){ var d=new Date(t); return d.getDate()+" "+U.MON[d.getMonth()]+(noYear?"":" "+d.getFullYear()); };
 U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };
