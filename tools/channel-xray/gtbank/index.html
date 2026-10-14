@@ -11,7 +11,7 @@
 <meta property="og:description" content="See where customers fall out of your USSD or app journey. Prepared by Frutos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Expanded:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0E1512; --panel:#14201B; --panel2:#0B130F; --ink:#E8F0EA; --dim:#8BA596; --line:#27372F;
@@ -41,14 +41,14 @@ body{
   background-size:26px 26px;
 }
 .wrap{max-width:860px; margin:0 auto; padding-inline:16px; padding-block:22px 40px}
-.exp{font-family:"Archivo Expanded","Archivo",sans-serif}
+.exp{font-family:"Archivo",sans-serif; font-stretch:125%}
 .mono{font-family:var(--mono)}
 
 /* Header / title block */
 .head{border:1.5px solid var(--ink); background:var(--panel)}
 .head-top{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:14px 16px}
 .brandline{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 6px}
-.title{font-family:"Archivo Expanded","Archivo",sans-serif; font-weight:700; font-size:26px; line-height:1.05; margin:0; letter-spacing:-.01em}
+.title{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:26px; line-height:1.05; margin:0; letter-spacing:-.01em}
 .subtitle{margin:6px 0 0; font-size:14.5px; color:var(--dim); max-width:46ch}
 .theme{flex:none; border:1.5px solid var(--line); background:transparent; color:var(--dim); font:inherit; font-size:13px; padding:6px 10px; cursor:pointer; border-radius:8px}
 .head-grid{display:grid; grid-template-columns:1fr 1fr; border-top:1.5px solid var(--ink)}
@@ -64,7 +64,7 @@ body{
 .intake-in{padding:16px}
 .drop{border:1.6px dashed var(--line); background:var(--panel2); border-radius:12px; padding:20px 16px; text-align:center; transition:border-color .15s,background .15s}
 .drop.over{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,var(--panel2))}
-.drop h2{font-family:"Archivo Expanded","Archivo",sans-serif; font-size:17px; margin:0 0 4px}
+.drop h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; margin:0 0 4px}
 .drop p{margin:0 0 14px; font-size:14px; color:var(--dim)}
 .btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
 .btn{border:1.5px solid var(--ink); background:var(--ink); color:var(--bg); font:inherit; font-weight:700; font-size:15px; padding:11px 16px; border-radius:10px; cursor:pointer}
@@ -85,11 +85,11 @@ body{
 .tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
 .tile{border:1.5px solid var(--line); background:var(--panel); padding:12px}
 .tile .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
-.tile .v{font-family:"Archivo Expanded","Archivo",sans-serif; font-weight:700; font-size:25px; line-height:1.1; margin-top:5px; font-variant-numeric:tabular-nums}
+.tile .v{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:25px; line-height:1.1; margin-top:5px; font-variant-numeric:tabular-nums}
 .tile .s{font-size:12px; color:var(--dim); margin-top:2px}
 .tile .v.warn{color:var(--warn)} .tile .v.bad{color:var(--bad)} .tile .v.good{color:var(--good)}
 .card{border:1.5px solid var(--line); background:var(--panel); padding:14px 16px}
-.card h3{font-family:"Archivo Expanded","Archivo",sans-serif; font-size:15px; margin:0 0 2px}
+.card h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:15px; margin:0 0 2px}
 .card .cap{font-size:12.5px; color:var(--dim); margin:0 0 12px}
 .funnel{display:flex; flex-direction:column; gap:7px}
 .frow{display:grid; grid-template-columns:92px 1fr auto; align-items:center; gap:10px}
@@ -112,19 +112,19 @@ body{
 .lat{display:flex; gap:10px}
 .lat .lc{flex:1; border:1px solid var(--line); background:var(--panel2); padding:10px; text-align:center}
 .lat .lk{font-family:var(--mono); font-size:10.5px; color:var(--dim); text-transform:uppercase}
-.lat .lv{font-family:"Archivo Expanded","Archivo",sans-serif; font-weight:700; font-size:20px; margin-top:3px; font-variant-numeric:tabular-nums}
+.lat .lv{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:20px; margin-top:3px; font-variant-numeric:tabular-nums}
 .legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--dim)}
 .legend i{display:inline-block; width:11px; height:11px; margin-right:5px; vertical-align:-1px}
 .summary{border:1.5px solid var(--ink); background:var(--panel2)}
 .summary-h{display:flex; justify-content:space-between; align-items:center; padding:11px 16px; border-bottom:1.5px solid var(--line)}
-.summary-h h3{font-family:"Archivo Expanded","Archivo",sans-serif; font-size:14px; margin:0}
+.summary-h h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:14px; margin:0}
 .copy{border:1.5px solid var(--line); background:transparent; color:var(--ink); font:inherit; font-size:13px; font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer}
 .copy.done{border-color:var(--accent); color:var(--accent)}
 .summary pre{margin:0; padding:16px; font-family:var(--mono); font-size:12.5px; line-height:1.65; white-space:pre-wrap; color:var(--ink)}
 
 /* Gate */
 .gate{margin-top:16px; border:1.5px solid var(--accent); background:var(--panel); padding:20px 16px; text-align:center}
-.gate h2{font-family:"Archivo Expanded","Archivo",sans-serif; font-size:19px; margin:0 0 6px}
+.gate h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:19px; margin:0 0 6px}
 .gate p{margin:0 auto 14px; font-size:14.5px; color:var(--dim); max-width:48ch}
 .gate .btn{background:var(--accent); border-color:var(--accent); color:#06140D; text-decoration:none; display:inline-block}
 
