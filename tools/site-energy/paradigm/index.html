@@ -146,6 +146,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
 .assume{display:flex; flex-wrap:wrap; gap:12px; margin-top:12px}
 .assume label{font-family:var(--mono); font-size:11.5px; color:var(--dim); display:flex; flex-direction:column; gap:4px}
 .assume input{width:130px; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font:inherit; font-family:var(--mono); font-size:13px; padding:7px 8px; border-radius:8px}
+.tile .v .u{font-size:.56em; font-weight:600; font-stretch:100%; color:var(--dim); letter-spacing:0}
 .split{display:flex; height:22px; border:1px solid var(--line); overflow:hidden}
 .split span{display:block; height:100%}
 </style>
@@ -277,7 +278,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
   function fmt(n,d){ return Number(n).toLocaleString(undefined,{maximumFractionDigits:d||0, minimumFractionDigits:d||0}); }
   function rwf(n){ return n>=1e6?("RWF "+fmt(n/1e6,1)+"M"):("RWF "+fmt(n)); }
   function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
-  function tile(k,v,s,cls){ return '<div class="tile"><div class="k">'+esc(k)+'</div><div class="v '+(cls||'')+'">'+esc(v)+'</div><div class="s">'+esc(s)+'</div></div>'; }
+  function tile(k,v,s,cls){ var m=String(v).match(/^(.*?)\s(L|kWh|t)$/); var vv=m?esc(m[1])+'<small class="u">\u00a0'+m[2]+'</small>':esc(v); return '<div class="tile"><div class="k">'+esc(k)+'</div><div class="v '+(cls||'')+'">'+vv+'</div><div class="s">'+esc(s)+'</div></div>'; }
 
   function render(a){
     var name=inst.value.trim()||"your estate";
