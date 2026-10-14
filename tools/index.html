@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trial Tools · Frutos</title>
-<meta name="description" content="Seven self-serve trials for banks, fintechs, operators, utilities and contact centres. Each reads one export of your own data in your browser; nothing is uploaded. Prepared by Frutos.">
+<meta name="description" content="Thirteen self-serve trials for banks, fintechs, insurers, government, utilities, operators, contact centres and fleets. Each reads one export of your own data in your browser; nothing is uploaded. Prepared by Frutos.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Seven trials. One export each. · Frutos">
-<meta property="og:description" content="Self-serve checks for banks, fintechs, operators, utilities and contact centres, read in your browser.">
-<meta property="og:image" content="https://fkamanzi.github.io/telco-portfolio/tools/otp-lens/preview.png">
+<meta property="og:title" content="Thirteen trials. One export each. · Frutos">
+<meta property="og:description" content="Self-serve checks for banks, insurers, government, utilities, operators, contact centres and fleets, read in your browser.">
+<meta property="og:image" content="https://fkamanzi.github.io/telco-portfolio/tools/payment-decoder/preview.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -77,6 +77,11 @@ h1{font-stretch:125%; font-weight:700; font-size:clamp(28px,5.2vw,44px); line-he
 .chip{font-family:var(--mono); font-size:10.5px; letter-spacing:.03em; padding:2px 8px; border:1px solid var(--line); border-radius:999px; color:var(--dim); white-space:nowrap}
 .need{margin:0; font-size:13px; color:var(--dim)}
 .need span{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; margin-right:4px}
+.whyc{margin:0; font-size:13px; line-height:1.45; border-left:3px solid var(--c); padding:1px 0 1px 9px}
+.whyc span{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--c); margin-right:4px}
+.whyc a{color:var(--dim)}
+.fnote{margin:-4px 0 14px; font-family:var(--mono); font-size:11.5px; color:var(--dim)}
+.filters button .n{opacity:.7; margin-left:5px}
 .go{margin-top:auto; align-self:flex-start; display:inline-block; background:var(--c); color:var(--on); font-weight:700; font-size:15px; padding:10px 14px; border-radius:10px; text-decoration:none}
 .cta{margin-top:18px; border:1.5px solid var(--ink); background:var(--panel); padding:18px; display:flex; flex-wrap:wrap; gap:14px 24px; align-items:center; justify-content:space-between}
 .cta h2{margin:0; font-stretch:125%; font-weight:700; font-size:22px; line-height:1.15}
@@ -99,8 +104,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-of
     <div class="head-top">
       <div>
         <p class="brandline">Trial tools · 2026</p>
-        <h1>Seven trials. One export each.</h1>
-        <p class="sub">Self-serve checks for banks, fintechs, operators, utilities and contact centres. Drop in one CSV from your own systems and see, in seconds, where customers, money or uptime are slipping away.</p>
+        <h1>Thirteen trials. One export each.</h1>
+        <p class="sub">Self-serve checks for banks, insurers, government, utilities, operators, contact centres and fleets. Drop in one CSV from your own systems and see, in seconds, where customers, money or uptime are slipping away.</p>
       </div>
       <button class="theme" id="theme" type="button" aria-label="Switch light or dark">&#9680; Theme</button>
     </div>
@@ -115,20 +120,22 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-of
     <div class="step"><b>2 · Run</b><p>Try the illustrative sample, then your own CSV. Three runs per trial.</p></div>
     <div class="step"><b>3 · Share</b><p>Copy the ready-made summary for your team or your supplier.</p></div>
   </section>
-  <nav class="filters" aria-label="Filter by sector"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="fin" aria-pressed="false">Banks &amp; fintech</button><button type="button" data-f="ops" aria-pressed="false">Operators &amp; ISPs</button><button type="button" data-f="gov" aria-pressed="false">Government &amp; utilities</button><button type="button" data-f="cc" aria-pressed="false">Contact centres</button><button type="button" data-f="energy" aria-pressed="false">Towers &amp; energy</button></nav>
+  <nav class="filters" aria-label="Filter by sector"><button type="button" data-f="all" aria-pressed="true">All<span class="n">13</span></button><button type="button" data-f="fin" aria-pressed="false">Banks &amp; fintech<span class="n">9</span></button><button type="button" data-f="ins" aria-pressed="false">Insurers<span class="n">4</span></button><button type="button" data-f="gov" aria-pressed="false">Government<span class="n">7</span></button><button type="button" data-f="util" aria-pressed="false">Utilities<span class="n">6</span></button><button type="button" data-f="ops" aria-pressed="false">Operators &amp; ISPs<span class="n">6</span></button><button type="button" data-f="cc" aria-pressed="false">Contact centres<span class="n">2</span></button><button type="button" data-f="energy" aria-pressed="false">Towers &amp; energy<span class="n">2</span></button><button type="button" data-f="fleet" aria-pressed="false">Fleets<span class="n">1</span></button></nav>
+  <p class="fnote">Each card says why it matters now, with its source. Checked 14 Oct 2026.</p>
   <section class="grid">
-  <article class="tcard" data-tags="fin gov ops" style="--cd:#A78BFA;--cl:#6D4FD8">
-    <a class="thumb" href="otp-lens/index.html" tabindex="-1" aria-hidden="true"><img src="otp-lens/thumb.webp" alt="" width="720" height="450" loading="lazy" decoding="async"></a>
+  <article class="tcard" data-tags="fin" style="--cd:#34D399;--cl:#047857">
+    <a class="thumb" href="payment-decoder/index.html" tabindex="-1" aria-hidden="true"><img src="payment-decoder/thumb.webp" alt="" width="720" height="450" loading="lazy" decoding="async"></a>
     <div class="tbody">
-      <p class="tbrand">Customer messaging</p>
-      <h2><a href="otp-lens/index.html">OTP &amp; SMS Delivery Lens</a></h2>
-      <p class="what">How many one-time passwords and alerts reach the phone in time, network by network, and what the late ones cost.</p>
-      <p class="who"><span class="chip">Banks</span><span class="chip">Fintechs</span><span class="chip">E-government</span><span class="chip">Airlines</span></p>
-      <p class="need"><span>You need</span> One export of SMS delivery receipts</p>
-      <a class="go" href="otp-lens/index.html" aria-label="Open the OTP &amp; SMS Delivery Lens trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
+      <p class="tbrand">Payments</p>
+      <h2><a href="payment-decoder/index.html">Payment Failure Decoder</a></h2>
+      <p class="what">Why card, ATM and instant transfers fail, whose side each failure is on, and how much money customers tried to move and could not.</p>
+      <p class="who"><span class="chip">Banks</span><span class="chip">Mobile money</span><span class="chip">Fintechs</span><span class="chip">Microfinance</span></p>
+      <p class="need"><span>You need</span> One export of payment attempts with their response codes</p>
+      <p class="whyc"><span>Why now</span> Since 14 July 2026 eKash links every bank and e-money issuer, so a failed payment now crosses institutions. <a href="https://techafricanews.com/2026/07/13/rwanda-launches-full-interoperability-on-ekash-national-payment-system/" target="_blank" rel="noopener">TechAfrica News, 13 Jul 2026&nbsp;&#8599;</a></p>
+      <a class="go" href="payment-decoder/index.html" aria-label="Open the Payment Failure Decoder trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
     </div>
   </article>
-  <article class="tcard" data-tags="fin gov" style="--cd:#60A5FA;--cl:#1D4ED8">
+  <article class="tcard" data-tags="fin ins gov util" style="--cd:#60A5FA;--cl:#1D4ED8">
     <a class="thumb" href="reconciler/index.html" tabindex="-1" aria-hidden="true"><img src="reconciler/thumb.webp" alt="" width="720" height="450" loading="lazy" decoding="async"></a>
     <div class="tbody">
       <p class="tbrand">Collections</p>
@@ -136,10 +143,59 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-of
       <p class="what">Every payment received but not recorded, recorded but never received, or booked at the wrong amount, in seconds.</p>
       <p class="who"><span class="chip">Utilities</span><span class="chip">Schools</span><span class="chip">Insurers</span><span class="chip">SACCOs</span><span class="chip">Retail</span></p>
       <p class="need"><span>You need</span> Your mobile-money or bank statement and your ledger</p>
+      <p class="whyc"><span>Why now</span> Since 14 July 2026 customers can pay from any bank account or wallet through eKash: more channels to reconcile. <a href="https://techafricanews.com/2026/07/13/rwanda-launches-full-interoperability-on-ekash-national-payment-system/" target="_blank" rel="noopener">TechAfrica News, 13 Jul 2026&nbsp;&#8599;</a></p>
       <a class="go" href="reconciler/index.html" aria-label="Open the Collections Reconciler trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
     </div>
   </article>
-  <article class="tcard" data-tags="fin gov ops" style="--cd:#39D98A;--cl:#15935A">
+  <article class="tcard" data-tags="fin ops" style="--cd:#2DD4BF;--cl:#0F766E">
+    <a class="thumb" href="settlement/index.html" tabindex="-1" aria-hidden="true"><img src="settlement/thumb.webp" alt="" width="720" height="450" loading="lazy" decoding="async"></a>
+    <div class="tbody">
+      <p class="tbrand">Interconnect &amp; interoperability</p>
+      <h2><a href="settlement/index.html">Settlement Checker</a></h2>
+      <p class="what">Your records against your partner&rsquo;s or the switch&rsquo;s, day by day and route by route: exactly what is in dispute and what it is worth.</p>
+      <p class="who"><span class="chip">Banks</span><span class="chip">Mobile money</span><span class="chip">Operators</span><span class="chip">Aggregators</span></p>
+      <p class="need"><span>You need</span> Your daily totals and your partner&rsquo;s report</p>
+      <p class="whyc"><span>Why now</span> Since 14 July 2026 every bank and e-money issuer settles transfers with every other through eKash. <a href="https://techafricanews.com/2026/07/13/rwanda-launches-full-interoperability-on-ekash-national-payment-system/" target="_blank" rel="noopener">TechAfrica News, 13 Jul 2026&nbsp;&#8599;</a></p>
+      <a class="go" href="settlement/index.html" aria-label="Open the Settlement Checker trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </article>
+  <article class="tcard" data-tags="fin ins gov util" style="--cd:#FB923C;--cl:#C2410C">
+    <a class="thumb" href="turnaround/index.html" tabindex="-1" aria-hidden="true"><img src="turnaround/thumb.webp" alt="" width="720" height="450" loading="lazy" decoding="async"></a>
+    <div class="tbody">
+      <p class="tbrand">Service delivery</p>
+      <h2><a href="turnaround/index.html">Turnaround &amp; Backlog Lens</a></h2>
+      <p class="what">How long claims, applications, complaints or tickets take to close, how many break your target, and how old the open backlog is.</p>
+      <p class="who"><span class="chip">Banks</span><span class="chip">Insurers</span><span class="chip">Government</span><span class="chip">Utilities</span></p>
+      <p class="need"><span>You need</span> A case log with opened and closed dates</p>
+      <p class="whyc"><span>Why now</span> BNR allows 15 days to resolve a complaint and one working day to acknowledge it; the third-quarter report is due on 20 October 2026. <a href="https://bnr.rw/laws-and-regulations/regulatory-digest-market-consultation/regulatory-digest/financial-complaints-handling-regulation" target="_blank" rel="noopener">BNR, Regulation No. 56/2022&nbsp;&#8599;</a></p>
+      <a class="go" href="turnaround/index.html" aria-label="Open the Turnaround &amp; Backlog Lens trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </article>
+  <article class="tcard" data-tags="fin gov" style="--cd:#A78BFA;--cl:#6D4FD8">
+    <a class="thumb" href="otp-lens/index.html" tabindex="-1" aria-hidden="true"><img src="otp-lens/thumb.webp" alt="" width="720" height="450" loading="lazy" decoding="async"></a>
+    <div class="tbody">
+      <p class="tbrand">Customer messaging</p>
+      <h2><a href="otp-lens/index.html">OTP &amp; SMS Delivery Lens</a></h2>
+      <p class="what">How many one-time passwords and alerts reach the phone in time, network by network, and what the late ones cost.</p>
+      <p class="who"><span class="chip">Banks</span><span class="chip">Fintechs</span><span class="chip">E-government</span><span class="chip">Airlines</span></p>
+      <p class="need"><span>You need</span> One export of SMS delivery receipts</p>
+      <p class="whyc"><span>Why now</span> In April 2026 a national e-government portal reported login OTPs and SMS notifications failing to arrive. <a href="https://status.irembo.gov.rw/incidents/3q53t5dm19rd" target="_blank" rel="noopener">Portal status page, 11 Apr 2026&nbsp;&#8599;</a></p>
+      <a class="go" href="otp-lens/index.html" aria-label="Open the OTP &amp; SMS Delivery Lens trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </article>
+  <article class="tcard" data-tags="fin gov ops" style="--cd:#38BDF8;--cl:#0369A1">
+    <a class="thumb" href="api-health/index.html" tabindex="-1" aria-hidden="true"><img src="api-health/thumb.webp" alt="" width="720" height="450" loading="lazy" decoding="async"></a>
+    <div class="tbody">
+      <p class="tbrand">Digital channels</p>
+      <h2><a href="api-health/index.html">API &amp; App Health Lens</a></h2>
+      <p class="what">How often your app, website or API fails customers, which endpoints are slow, and how fast errors are eating your uptime target.</p>
+      <p class="who"><span class="chip">Banks</span><span class="chip">Fintechs</span><span class="chip">E-government</span><span class="chip">E-commerce</span></p>
+      <p class="need"><span>You need</span> A day or a week of API or web-server logs</p>
+      <p class="whyc"><span>Why now</span> From 2 to 8 July 2026 a national e-government portal reported unstable applications for every service that needs National ID data. <a href="https://status.irembo.gov.rw/incidents/8ys56kmllrjt" target="_blank" rel="noopener">Portal status page, Jul 2026&nbsp;&#8599;</a></p>
+      <a class="go" href="api-health/index.html" aria-label="Open the API &amp; App Health Lens trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </article>
+  <article class="tcard" data-tags="fin ins gov util" style="--cd:#39D98A;--cl:#15935A">
     <a class="thumb" href="channel-xray/index.html" tabindex="-1" aria-hidden="true"><img src="channel-xray/thumb.webp" alt="" width="720" height="450" loading="lazy" decoding="async"></a>
     <div class="tbody">
       <p class="tbrand">Channel assurance</p>
@@ -147,6 +203,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-of
       <p class="what">Exactly where customers fall out of your USSD or app journey, by step, network and hour, and what it is costing you.</p>
       <p class="who"><span class="chip">Banks</span><span class="chip">Mobile money</span><span class="chip">Utilities</span><span class="chip">Insurers</span></p>
       <p class="need"><span>You need</span> One day of USSD or app session records</p>
+      <p class="whyc"><span>Why now</span> Since RURA&rsquo;s January 2026 directive, every USSD short code must work the same way on all networks. <a href="https://www.ktpress.rw/2026/01/no-more-confusion-on-ussd-codes-rwanda-moves-to-end-telecom-barriers-for-essential-services/" target="_blank" rel="noopener">KT Press, Jan 2026&nbsp;&#8599;</a></p>
       <a class="go" href="channel-xray/index.html" aria-label="Open the Channel Journey X-ray trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
     </div>
   </article>
@@ -158,10 +215,11 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-of
       <p class="what">Which internet and WAN links broke their SLA, which provider is responsible, and the service you paid for and did not get.</p>
       <p class="who"><span class="chip">Banks</span><span class="chip">Government</span><span class="chip">Hospitals</span><span class="chip">Hotels</span><span class="chip">Retail chains</span></p>
       <p class="need"><span>You need</span> One month of link outages from monitoring or tickets</p>
+      <p class="whyc"><span>Why now</span> In April 2026 RURA ordered an internet provider to compensate customers for a week of disruption and pay daily penalties until compliant. <a href="https://www.ecofinagency.com/news-digital/2904-55122-rwanda-canalbox-restores-services-under-regulator-pressure-offers-compensation" target="_blank" rel="noopener">Ecofin, 29 Apr 2026&nbsp;&#8599;</a></p>
       <a class="go" href="link-sla/index.html" aria-label="Open the Link SLA Auditor trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
     </div>
   </article>
-  <article class="tcard" data-tags="cc fin ops gov" style="--cd:#E879F9;--cl:#A21CAF">
+  <article class="tcard" data-tags="cc fin ins ops util" style="--cd:#E879F9;--cl:#A21CAF">
     <a class="thumb" href="staffing-lens/index.html" tabindex="-1" aria-hidden="true"><img src="staffing-lens/thumb.webp" alt="" width="720" height="450" loading="lazy" decoding="async"></a>
     <div class="tbody">
       <p class="tbrand">Customer service</p>
@@ -169,6 +227,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-of
       <p class="what">How many agents you need each hour to answer on time, where your schedule leaves customers waiting, and where it pays for idle seats.</p>
       <p class="who"><span class="chip">Banks</span><span class="chip">Operators</span><span class="chip">Utilities</span><span class="chip">Insurers</span><span class="chip">Airlines</span></p>
       <p class="need"><span>You need</span> Calls per hour or half hour, with your schedule if you have it</p>
+      <p class="whyc"><span>Why now</span> 3G switches off on 30 June 2027, with pilot shutdowns in 2026: every customer who needs a new phone or SIM must be reached. <a href="https://www.ktpress.rw/2026/07/rwanda-to-phase-out-2g-and-3g-networks-by-2027/" target="_blank" rel="noopener">KT Press, 28 Jul 2026&nbsp;&#8599;</a></p>
       <a class="go" href="staffing-lens/index.html" aria-label="Open the Contact Centre Staffing Lens trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
     </div>
   </article>
@@ -180,7 +239,20 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-of
       <p class="what">A day of call and session failures ranked by cause, decoded to the standard, with the first place to look for each.</p>
       <p class="who"><span class="chip">Operators</span><span class="chip">ISPs</span><span class="chip">Voice carriers</span><span class="chip">Contact-centre platforms</span></p>
       <p class="need"><span>You need</span> Failure cause codes from your switch, core or logs</p>
+      <p class="whyc"><span>Why now</span> 3G switches off on 30 June 2027: voice moves to 4G and IMS, so call-failure causes need watching through the migration. <a href="https://minict.gov.rw/news-detail/rwanda-to-switch-off-3g-networks-on-30-june-2027" target="_blank" rel="noopener">MINICT announcement&nbsp;&#8599;</a></p>
       <a class="go" href="cause-decoder/index.html" aria-label="Open the Signalling Cause Decoder trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </article>
+  <article class="tcard" data-tags="util energy" style="--cd:#FACC15;--cl:#A16207">
+    <a class="thumb" href="power-reliability/index.html" tabindex="-1" aria-hidden="true"><img src="power-reliability/thumb.webp" alt="" width="720" height="450" loading="lazy" decoding="async"></a>
+    <div class="tbody">
+      <p class="tbrand">Power supply</p>
+      <h2><a href="power-reliability/index.html">Power Reliability Index</a></h2>
+      <p class="what">An outage log turned into the standard indices: how often supply fails, for how long, and which feeders or sites cause most of it.</p>
+      <p class="who"><span class="chip">Utilities</span><span class="chip">Mini-grids</span><span class="chip">Tower companies</span><span class="chip">Industrial parks</span></p>
+      <p class="need"><span>You need</span> One month of outage records</p>
+      <p class="whyc"><span>Why now</span> On 10 September 2026 senators raised frequent power interruptions reported by schools and health facilities. <a href="https://www.newtimes.co.rw/article/38862/news/energy/mps-demand-answers-from-reg-over-power-outages/amp" target="_blank" rel="noopener">The New Times, 10 Sep 2026&nbsp;&#8599;</a></p>
+      <a class="go" href="power-reliability/index.html" aria-label="Open the Power Reliability Index trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
     </div>
   </article>
   <article class="tcard" data-tags="energy ops" style="--cd:#F2A93B;--cl:#B86A0B">
@@ -191,7 +263,20 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-of
       <p class="what">One month of fuel and grid records turned into a measured baseline in litres, kWh and tonnes of CO₂, with fuel-loss sites flagged by name.</p>
       <p class="who"><span class="chip">Tower companies</span><span class="chip">Operators</span><span class="chip">Data centres</span><span class="chip">Branch networks</span></p>
       <p class="need"><span>You need</span> One month of site fuel and grid records</p>
+      <p class="whyc"><span>Why now</span> RURA&rsquo;s 6 June 2026 review capped diesel at RWF 2,927 a litre, 33% above the early-April cap. <a href="https://ynews.digital/top-stories/rwanda-fuel-prices-higher-than-kenya-2026/" target="_blank" rel="noopener">ynews.digital, 7 Jun 2026&nbsp;&#8599;</a></p>
       <a class="go" href="site-energy/index.html" aria-label="Open the Site Energy Baseline trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </article>
+  <article class="tcard" data-tags="fleet util gov" style="--cd:#F472B6;--cl:#BE185D">
+    <a class="thumb" href="fleet-fuel/index.html" tabindex="-1" aria-hidden="true"><img src="fleet-fuel/thumb.webp" alt="" width="720" height="450" loading="lazy" decoding="async"></a>
+    <div class="tbody">
+      <p class="tbrand">Fleet</p>
+      <h2><a href="fleet-fuel/index.html">Fleet Fuel Leak Finder</a></h2>
+      <p class="what">Which vehicles burn more fuel than their type explains, which fill-ups cannot be right, and what the excess costs at today&rsquo;s pump price.</p>
+      <p class="who"><span class="chip">Logistics</span><span class="chip">Bus operators</span><span class="chip">Utilities</span><span class="chip">Government fleets</span></p>
+      <p class="need"><span>You need</span> Fill-up records with odometer readings</p>
+      <p class="whyc"><span>Why now</span> RURA&rsquo;s 6 June 2026 review capped diesel at RWF 2,927 a litre, 33% above the early-April cap. <a href="https://ynews.digital/top-stories/rwanda-fuel-prices-higher-than-kenya-2026/" target="_blank" rel="noopener">ynews.digital, 7 Jun 2026&nbsp;&#8599;</a></p>
+      <a class="go" href="fleet-fuel/index.html" aria-label="Open the Fleet Fuel Leak Finder trial">Open the trial <span aria-hidden="true">&rarr;</span></a>
     </div>
   </article>
   </section>

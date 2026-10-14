@@ -1,0 +1,180 @@
+{
+ "checked": "2026-10-14",
+ "how": "Open each path, press #sample, read '.verdict p:last-child'; it must start with 'expect'. The trial gate (#gate) shows after the third run.",
+ "tools": [
+  {
+   "slug": "payment-decoder",
+   "name": "Payment Failure Decoder",
+   "paths": [
+    "payment-decoder/index.html"
+   ],
+   "expect": "Of 4,451 attempts, 91.6% went through",
+   "why": {
+    "text": "Since 14 July 2026, eKash links every bank and e-money issuer for transfers and merchant payments (BNR Directive No. 45/2026): a failed payment now crosses institutions, and you need to show whose side it failed on.",
+    "url": "https://techafricanews.com/2026/07/13/rwanda-launches-full-interoperability-on-ekash-national-payment-system/",
+    "source": "TechAfrica News, 13 Jul 2026"
+   }
+  },
+  {
+   "slug": "reconciler",
+   "name": "Collections Reconciler",
+   "paths": [
+    "reconciler/index.html"
+   ],
+   "expect": "Of RWF 58.1M received in 2,316 payments",
+   "why": {
+    "text": "Since 14 July 2026, eKash lets customers pay from any bank account or mobile wallet (BNR Directive No. 45/2026), so collections arrive through more channels to reconcile.",
+    "url": "https://techafricanews.com/2026/07/13/rwanda-launches-full-interoperability-on-ekash-national-payment-system/",
+    "source": "TechAfrica News, 13 Jul 2026"
+   }
+  },
+  {
+   "slug": "settlement",
+   "name": "Settlement Checker",
+   "paths": [
+    "settlement/index.html"
+   ],
+   "expect": "Across 30 days and 6 routes",
+   "why": {
+    "text": "Since 14 July 2026, every bank and e-money issuer settles transfers with every other through eKash (BNR Directive No. 45/2026): check your records against the switch's report every day.",
+    "url": "https://techafricanews.com/2026/07/13/rwanda-launches-full-interoperability-on-ekash-national-payment-system/",
+    "source": "TechAfrica News, 13 Jul 2026"
+   }
+  },
+  {
+   "slug": "turnaround",
+   "name": "Turnaround & Backlog Lens",
+   "paths": [
+    "turnaround/index.html"
+   ],
+   "expect": "Of the 1,356 cases that are closed or past due, 90.9%",
+   "why": {
+    "text": "BNR Regulation No. 56/2022 gives financial service providers 15 days to resolve a complaint and one working day to acknowledge it, with a report every quarter: the third-quarter report is due on 20 October 2026.",
+    "url": "https://bnr.rw/laws-and-regulations/regulatory-digest-market-consultation/regulatory-digest/financial-complaints-handling-regulation",
+    "source": "BNR, Regulation No. 56/2022"
+   }
+  },
+  {
+   "slug": "otp-lens",
+   "name": "OTP & SMS Delivery Lens",
+   "paths": [
+    "otp-lens/index.html"
+   ],
+   "expect": "Of 2,881 OTPs, 91.8% reached the phone",
+   "why": {
+    "text": "In April 2026 a national e-government portal reported login OTPs and SMS notifications failing to arrive.",
+    "url": "https://status.irembo.gov.rw/incidents/3q53t5dm19rd",
+    "source": "Portal status page, 11 Apr 2026"
+   }
+  },
+  {
+   "slug": "api-health",
+   "name": "API & App Health Lens",
+   "paths": [
+    "api-health/index.html"
+   ],
+   "expect": "Of 5,880 requests, 98.89% were served without a server error",
+   "why": {
+    "text": "From 2 to 8 July 2026, a national e-government portal reported unstable applications for every service that needs National ID data.",
+    "url": "https://status.irembo.gov.rw/incidents/8ys56kmllrjt",
+    "source": "Portal status page, Jul 2026"
+   }
+  },
+  {
+   "slug": "channel-xray",
+   "name": "Channel Journey X-ray",
+   "paths": [
+    "channel-xray/index.html",
+    "channel-xray/im-bank/index.html",
+    "channel-xray/gtbank/index.html",
+    "channel-xray/bpr/index.html",
+    "channel-xray/equity/index.html"
+   ],
+   "expect": "Of 1,935 sessions, 58% completed",
+   "why": {
+    "text": "Since RURA's directive of January 2026, every USSD short code must work the same way on all networks.",
+    "url": "https://www.ktpress.rw/2026/01/no-more-confusion-on-ussd-codes-rwanda-moves-to-end-telecom-barriers-for-essential-services/",
+    "source": "KT Press, Jan 2026"
+   }
+  },
+  {
+   "slug": "link-sla",
+   "name": "Link SLA Auditor",
+   "paths": [
+    "link-sla/index.html"
+   ],
+   "expect": "17 of 35 links with outages fell below",
+   "why": {
+    "text": "In April 2026 RURA ordered an internet provider to compensate customers for a week of disruption and to pay daily penalties until compliant.",
+    "url": "https://www.ecofinagency.com/news-digital/2904-55122-rwanda-canalbox-restores-services-under-regulator-pressure-offers-compensation",
+    "source": "Ecofin, 29 Apr 2026"
+   }
+  },
+  {
+   "slug": "staffing-lens",
+   "name": "Contact Centre Staffing Lens",
+   "paths": [
+    "staffing-lens/index.html"
+   ],
+   "expect": "To answer 80% of calls within 20 seconds you need between 8 and 38",
+   "why": {
+    "text": "Rwanda switches off 3G on 30 June 2027, with pilot shutdowns in 2026: operators must reach every customer who needs a new phone or SIM.",
+    "url": "https://www.ktpress.rw/2026/07/rwanda-to-phase-out-2g-and-3g-networks-by-2027/",
+    "source": "KT Press, 28 Jul 2026"
+   }
+  },
+  {
+   "slug": "cause-decoder",
+   "name": "Signalling Cause Decoder",
+   "paths": [
+    "cause-decoder/index.html"
+   ],
+   "expect": "Of 33,720 failed attempts",
+   "why": {
+    "text": "Rwanda switches off 3G on 30 June 2027, with pilot shutdowns in 2026: voice moves to 4G and IMS, so call-failure causes need watching through the migration.",
+    "url": "https://minict.gov.rw/news-detail/rwanda-to-switch-off-3g-networks-on-30-june-2027",
+    "source": "MINICT announcement"
+   }
+  },
+  {
+   "slug": "power-reliability",
+   "name": "Power Reliability Index",
+   "paths": [
+    "power-reliability/index.html"
+   ],
+   "expect": "In September 2026, the average customer lost power 3.00 times",
+   "why": {
+    "text": "On 10 September 2026 senators raised frequent power interruptions reported by schools and health facilities; REG is reinforcing the network with 290 new transformers.",
+    "url": "https://www.newtimes.co.rw/article/38862/news/energy/mps-demand-answers-from-reg-over-power-outages/amp",
+    "source": "The New Times, 10 Sep 2026"
+   }
+  },
+  {
+   "slug": "site-energy",
+   "name": "Site Energy Baseline",
+   "paths": [
+    "site-energy/index.html",
+    "site-energy/paradigm/index.html"
+   ],
+   "expect": "Across 44 sites the log shows 29,637 litres",
+   "why": {
+    "text": "RURA's pump-price review of 6 June 2026 capped diesel at RWF 2,927 a litre, 33% above the early-April cap of RWF 2,205: a measured baseline shows where the litres go.",
+    "url": "https://ynews.digital/top-stories/rwanda-fuel-prices-higher-than-kenya-2026/",
+    "source": "ynews.digital, 7 Jun 2026"
+   }
+  },
+  {
+   "slug": "fleet-fuel",
+   "name": "Fleet Fuel Leak Finder",
+   "paths": [
+    "fleet-fuel/index.html"
+   ],
+   "expect": "Across 36 vehicles and 1,092 fill-ups",
+   "why": {
+    "text": "RURA's pump-price review of 6 June 2026 capped diesel at RWF 2,927 a litre, 33% above the early-April cap of RWF 2,205. Enter today's price and every excess litre is valued at it.",
+    "url": "https://ynews.digital/top-stories/rwanda-fuel-prices-higher-than-kenya-2026/",
+    "source": "ynews.digital, 7 Jun 2026"
+   }
+  }
+ ]
+}

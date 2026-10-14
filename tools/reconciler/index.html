@@ -167,6 +167,9 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
 .tblwrap{overflow-x:auto}
 .tile .v .u{font-size:.56em; font-weight:600; font-stretch:100%; color:var(--dim); letter-spacing:0}
 .note-s{font-size:12px; color:var(--dim); margin:10px 0 0; line-height:1.5}
+.why{margin:10px 0 0; font-size:13px; line-height:1.5; max-width:62ch; border-left:3px solid var(--accent); padding:2px 0 2px 10px}
+.why-k{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-right:6px}
+.why a{color:var(--dim); white-space:nowrap}
 .chip{display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; padding:2px 7px; border:1px solid var(--line); border-radius:999px; color:var(--dim); white-space:nowrap}
 @media (max-width:560px){ .drops.two{grid-template-columns:1fr} .brow{grid-template-columns:minmax(60px,30%) 1fr auto} }
 </style>
@@ -179,6 +182,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
         <p class="brandline">Collections · Trial</p>
         <h1 class="title">Collections Reconciler</h1>
         <p class="subtitle">Match your mobile-money or bank statement against your ledger in seconds: every payment received but not recorded, recorded but never received, or booked at the wrong amount.</p>
+        <p class="why"><span class="why-k">Why now</span>Since 14 July 2026, eKash lets customers pay from any bank account or mobile wallet (BNR Directive No. 45/2026), so collections arrive through more channels to reconcile. <a href="https://techafricanews.com/2026/07/13/rwanda-launches-full-interoperability-on-ekash-national-payment-system/" target="_blank" rel="noopener">TechAfrica News, 13 Jul 2026 ↗</a></p>
       </div>
       <button class="theme" id="theme" type="button" aria-label="Switch light or dark">◐ Theme</button>
     </div>
@@ -280,6 +284,8 @@ var U={};
 U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
 U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
 U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+U.dd=function(t,noYear){ var d=new Date(t); return d.getDate()+" "+U.MON[d.getMonth()]+(noYear?"":" "+d.getFullYear()); };
 U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };
 U.pct=function(a,b){ return b? Math.round(a/b*1000)/10 : 0; };
 U.median=function(a){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; };
@@ -316,7 +322,7 @@ U.hour=function(v){ if(!v) return null; var m=String(v).match(/(?:^|[T\s,])(\d{1
   if(m[2]){ var pm=/p/i.test(m[2]); if(pm&&h<12) h+=12; if(!pm&&h===12) h=0; } return (h>=0&&h<24)?h:null; } return null; };
 U.hh=function(h){ if(h===null||h===undefined) return "—"; var ap=h<12?"am":"pm", r=h%12; if(r===0) r=12; return r+ap; };
 U.mask=function(v){ var d=String(v||"").replace(/\D/g,""); if(d.length<4) return "•••"; return "••• "+d.slice(-3); };
-U.tile=function(k,v,s,cls){ var m=String(v).match(/^(.*?)\s(L|kWh|t|h|s|min|agents|links)$/);
+U.tile=function(k,v,s,cls){ var m=String(v).match(/^(.*?)\s(L|kWh|t|h|s|ms|min|days|agents|links|vehicles|km|L\/100 km|\u00d7)$/);
   var vv=m?U.esc(m[1])+'<small class="u"> '+m[2]+'</small>':U.esc(v), m2=String(v).match(/^RWF\s(.+)$/);
   if(m2) vv='<small class="u">RWF </small>'+U.esc(m2[1]);
   return '<div class="tile"><div class="k">'+U.esc(k)+'</div><div class="v '+(cls||'')+'">'+vv+'</div><div class="s">'+U.esc(s||"")+'</div></div>'; };
