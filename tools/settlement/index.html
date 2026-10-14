@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settlement Checker</title>
+<meta name="description" content="A self-serve trial that reconciles your daily traffic or settlement totals with a partner's or a switch's report and values every difference over your threshold. Prepared by Frutos.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Settlement Checker · trial by Frutos">
+<meta property="og:description" content="A self-serve trial that reconciles your daily traffic or settlement totals with a partner's or a switch's report and values every difference over your threshold. Prepared by Frutos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1512; --panel:#14201B; --panel2:#0B130F; --ink:#E8F0EA; --dim:#8BA596; --line:#27372F;
+  --grid:rgba(45,212,191,.07); --accent:#2DD4BF; --accent2:#14B8A6; --warn:#F2B134; --bad:#FF6B5E; --good:#39D98A;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+    --grid:rgba(20,80,50,.06); --accent:#0F766E; --accent2:#115E59; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+  --grid:rgba(20,80,50,.06); --accent:#0F766E; --accent2:#115E59; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+.wrap{max-width:860px; margin:0 auto; padding-inline:16px; padding-block:22px 40px}
+.exp{font-family:"Archivo",sans-serif; font-stretch:125%}
+.mono{font-family:var(--mono)}
+
+/* Header / title block */
+.head{border:1.5px solid var(--ink); background:var(--panel)}
+.head-top{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:14px 16px}
+.brandline{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 6px}
+.title{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:26px; line-height:1.05; margin:0; letter-spacing:-.01em}
+.subtitle{margin:6px 0 0; font-size:14.5px; color:var(--dim); max-width:46ch}
+.theme{flex:none; border:1.5px solid var(--line); background:transparent; color:var(--dim); font:inherit; font-size:13px; padding:6px 10px; cursor:pointer; border-radius:8px}
+.head-grid{display:grid; grid-template-columns:1fr 1fr; border-top:1.5px solid var(--ink)}
+.head-grid>div{padding:9px 16px; min-width:0}
+.head-grid>div:first-child{border-right:1px solid var(--line)}
+.head-grid dt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim)}
+.head-grid dd{margin:3px 0 0; font-weight:600; font-size:14.5px}
+.inst-field{display:inline-block; min-width:12ch; border:0; border-bottom:1.5px dashed var(--line); background:transparent; color:var(--ink); font:inherit; font-weight:600; font-size:14.5px; padding:0 2px}
+.inst-field:focus{outline:0; border-bottom-color:var(--accent)}
+
+/* Intake */
+.intake{margin-top:16px; border:1.5px solid var(--line); background:var(--panel); border-radius:0}
+.intake-in{padding:16px}
+.drop{border:1.6px dashed var(--line); background:var(--panel2); border-radius:12px; padding:20px 16px; text-align:center; transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,var(--panel2))}
+.drop h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; margin:0 0 4px}
+.drop p{margin:0 0 14px; font-size:14px; color:var(--dim)}
+.btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+.btn{border:1.5px solid var(--ink); background:var(--ink); color:var(--bg); font:inherit; font-weight:700; font-size:15px; padding:11px 16px; border-radius:10px; cursor:pointer}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.hint{margin:12px 2px 0; font-family:var(--mono); font-size:11.5px; color:var(--dim); line-height:1.6}
+.runs{display:flex; align-items:center; gap:8px; margin-top:14px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+.pip{width:9px; height:9px; border-radius:50%; border:1.5px solid var(--line)}
+.pip.used{background:var(--accent); border-color:var(--accent)}
+
+/* Report */
+#report[hidden]{display:none}
+.report{margin-top:16px; display:flex; flex-direction:column; gap:14px}
+.verdict{border:1.5px solid var(--ink); background:var(--panel); padding:16px; border-left:5px solid var(--accent)}
+.verdict .vh{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin:0 0 6px}
+.verdict p{margin:0; font-size:16.5px; line-height:1.45}
+.verdict b{color:var(--accent)}
+.tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+.tile{border:1.5px solid var(--line); background:var(--panel); padding:12px}
+.tile .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+.tile .v{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:25px; line-height:1.1; margin-top:5px; font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px; color:var(--dim); margin-top:2px}
+.tile .v.warn{color:var(--warn)} .tile .v.bad{color:var(--bad)} .tile .v.good{color:var(--good)}
+.card{border:1.5px solid var(--line); background:var(--panel); padding:14px 16px}
+.card h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:15px; margin:0 0 2px}
+.card .cap{font-size:12.5px; color:var(--dim); margin:0 0 12px}
+.funnel{display:flex; flex-direction:column; gap:7px}
+.frow{display:grid; grid-template-columns:92px 1fr auto; align-items:center; gap:10px}
+.frow .fl{font-size:13px; color:var(--dim)}
+.fbar{height:26px; background:var(--panel2); border:1px solid var(--line); position:relative; overflow:hidden}
+.fbar>span{position:absolute; inset:0 auto 0 0; background:linear-gradient(90deg,var(--accent2),var(--accent)); opacity:.9}
+.frow .fv{font-family:var(--mono); font-size:12.5px; font-variant-numeric:tabular-nums; min-width:68px; text-align:right}
+.drop-tag{display:inline-block; font-family:var(--mono); font-size:10.5px; color:var(--bad); margin-left:6px}
+.net{display:flex; flex-direction:column; gap:9px}
+.nrow{display:grid; grid-template-columns:70px 1fr auto; align-items:center; gap:10px}
+.nrow .nl{font-size:13.5px; font-weight:600}
+.nbar{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.nbar>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.nbar>span.low{background:var(--bad)}
+.nrow .nv{font-family:var(--mono); font-size:12.5px; min-width:48px; text-align:right}
+.hours{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:4px}
+.hcell{aspect-ratio:1/2.2; border:1px solid var(--line); position:relative}
+.hlabels{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:5px; font-family:var(--mono); font-size:8.5px; color:var(--dim)}
+.hlabels span{text-align:center}
+.lat{display:flex; gap:10px}
+.lat .lc{flex:1; border:1px solid var(--line); background:var(--panel2); padding:10px; text-align:center}
+.lat .lk{font-family:var(--mono); font-size:10.5px; color:var(--dim); text-transform:uppercase}
+.lat .lv{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:20px; margin-top:3px; font-variant-numeric:tabular-nums}
+.legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--dim)}
+.legend i{display:inline-block; width:11px; height:11px; margin-right:5px; vertical-align:-1px}
+.summary{border:1.5px solid var(--ink); background:var(--panel2)}
+.summary-h{display:flex; justify-content:space-between; align-items:center; padding:11px 16px; border-bottom:1.5px solid var(--line)}
+.summary-h h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:14px; margin:0}
+.copy{border:1.5px solid var(--line); background:transparent; color:var(--ink); font:inherit; font-size:13px; font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer}
+.copy.done{border-color:var(--accent); color:var(--accent)}
+.summary pre{margin:0; padding:16px; font-family:var(--mono); font-size:12.5px; line-height:1.65; white-space:pre-wrap; color:var(--ink)}
+
+/* Gate */
+.gate{margin-top:16px; border:1.5px solid var(--accent); background:var(--panel); padding:20px 16px; text-align:center}
+.gate h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:19px; margin:0 0 6px}
+.gate p{margin:0 auto 14px; font-size:14.5px; color:var(--dim); max-width:48ch}
+.gate .btn{background:var(--accent); border-color:var(--accent); color:#06140D; text-decoration:none; display:inline-block}
+
+.foot{margin-top:20px; font-family:var(--mono); font-size:11px; color:var(--dim); line-height:1.7}
+.err{color:var(--bad); font-family:var(--mono); font-size:12.5px; margin-top:10px}
+@media (max-width:560px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .title{font-size:22px}
+  .frow{grid-template-columns:70px 1fr auto}
+  .lat{flex-wrap:wrap}
+}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+.drops{display:grid; grid-template-columns:1fr; gap:12px}
+.drops.two{grid-template-columns:1fr 1fr}
+.fname{margin:10px 0 0; font-family:var(--mono); font-size:12px; color:var(--accent); min-height:1.3em; overflow-wrap:anywhere}
+.runrow{display:flex; justify-content:center; gap:10px; margin-top:12px; flex-wrap:wrap}
+.assume{display:flex; flex-wrap:wrap; gap:12px; margin-top:14px}
+.assume label{font-family:var(--mono); font-size:11.5px; color:var(--dim); display:flex; flex-direction:column; gap:4px}
+.assume input{width:140px; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font:inherit; font-family:var(--mono); font-size:13px; padding:7px 8px; border-radius:8px}
+.bars{display:flex; flex-direction:column; gap:9px}
+.brow{display:grid; grid-template-columns:minmax(70px,24%) 1fr auto; align-items:center; gap:10px}
+.brow .bl{font-size:13px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.brow .bb{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.brow .bb>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.brow .bb>span.bad{background:var(--bad)}
+.brow .bb>span.warn{background:var(--warn)}
+.brow .bb>span.dim{background:var(--dim); opacity:.55}
+.brow .bv{font-family:var(--mono); font-size:12.5px; text-align:right; min-width:70px; font-variant-numeric:tabular-nums}
+.brow.pair .bb{height:9px}
+.brow.pair .bbs{display:flex; flex-direction:column; gap:3px}
+.stack{display:flex; height:24px; border:1px solid var(--line); overflow:hidden}
+.stack span{display:block; height:100%}
+.tbl{width:100%; border-collapse:collapse; font-size:13px}
+.tbl th{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); text-align:left; padding:6px 6px; border-bottom:1.5px solid var(--line)}
+.tbl td{padding:8px 6px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; vertical-align:top}
+.tbl td.num,.tbl th.num{text-align:right}
+.tbl td.flag{color:var(--bad); font-weight:700}
+.tbl td.ok{color:var(--good); font-weight:700}
+.tblwrap{overflow-x:auto}
+.tile .v .u{font-size:.56em; font-weight:600; font-stretch:100%; color:var(--dim); letter-spacing:0}
+.note-s{font-size:12px; color:var(--dim); margin:10px 0 0; line-height:1.5}
+.why{margin:10px 0 0; font-size:13px; line-height:1.5; max-width:62ch; border-left:3px solid var(--accent); padding:2px 0 2px 10px}
+.why-k{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-right:6px}
+.why a{color:var(--dim); white-space:nowrap}
+.chip{display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; padding:2px 7px; border:1px solid var(--line); border-radius:999px; color:var(--dim); white-space:nowrap}
+@media (max-width:560px){ .drops.two{grid-template-columns:1fr} .brow{grid-template-columns:minmax(60px,30%) 1fr auto} }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="head">
+    <div class="head-top">
+      <div>
+        <p class="brandline">Interconnect &amp; interoperability · Trial</p>
+        <h1 class="title">Settlement Checker</h1>
+        <p class="subtitle">Match your records against your partner's or the switch's, day by day and route by route, and see exactly what is in dispute and what it is worth.</p>
+        <p class="why"><span class="why-k">Why now</span>Since 14 July 2026, every bank and e-money issuer settles transfers with every other through eKash (BNR Directive No. 45/2026): check your records against the switch's report every day. <a href="https://techafricanews.com/2026/07/13/rwanda-launches-full-interoperability-on-ekash-national-payment-system/" target="_blank" rel="noopener">TechAfrica News, 13 Jul 2026 ↗</a></p>
+      </div>
+      <button class="theme" id="theme" type="button" aria-label="Switch light or dark">◐ Theme</button>
+    </div>
+    <dl class="head-grid">
+      <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your organisation" aria-label="Organisation name" spellcheck="false"></dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+    </dl>
+  </header>
+  <section class="intake">
+    <div class="intake-in">
+      <div class="drops two"><div class="drop" id="drop0"><h2>Your records</h2><p>Your daily totals per route, partner or counterparty, as CSV.</p><div class="btns"><button class="btn" id="pick0" type="button">Choose a CSV file</button></div><input id="file0" type="file" accept=".csv,text/csv" hidden><p class="fname" id="fn0"></p></div><div class="drop" id="drop1"><h2>Their records</h2><p>The partner's or the switch's report for the same days, as CSV.</p><div class="btns"><button class="btn" id="pick1" type="button">Choose a CSV file</button></div><input id="file1" type="file" accept=".csv,text/csv" hidden><p class="fname" id="fn1"></p></div></div><div class="runrow"><button class="btn" id="runbtn" type="button" disabled>Compare</button><button class="btn ghost" id="sample" type="button">Run an illustrative sample</button></div>
+      <p class="hint">Expected columns in both files, matched loosely: <b>date</b>, <b>route</b> (or partner, counterparty, participant), and <b>minutes</b>, <b>transactions</b> or another count, with an optional <b>amount</b>. Rows are summed per date and route, then matched; a difference counts when it is above your threshold or one side has no figure. Both files are read in your browser and never leave this page.</p>
+      <div class="assume"><label>Dispute threshold, %<input data-in="tol" type="number" step="any" value="1"></label><label>Value per unit, RWF, if no amount<input data-in="rate" type="number" step="any" value=""></label></div>
+      <div class="runs" id="runs" aria-live="polite"></div>
+      <p class="err" id="err" hidden></p>
+    </div>
+  </section>
+  <section id="report" class="report" hidden aria-live="polite"></section>
+  <section id="gate" class="gate" hidden>
+    <h2>That's your three trial runs</h2>
+    <p>The full version reconciles every partner and the switch each morning and prepares the dispute file, with every record behind each difference. Let's set it up for <b id="gate-inst">your organisation</b>.</p>
+    <a class="btn" id="gate-wa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a>
+    <p class="hint" style="margin-top:12px">Or call +250 731 000 163</p>
+  </section>
+  <p class="foot" id="foot"></p>
+</main>
+<script>
+var TOOL={
+ analyse:function(ps,inp,U){
+  function cols(P){ var H=P.header; return {d:U.pick(H,["date","day","traffic_date","settlement_date","value_date","period"]),
+    r:U.pick(H,["route","partner","counterparty","participant","trunk","destination","operator","carrier","institution"]),
+    u:U.pick(H,["minutes","transactions","calls","sms","messages","units","count","volume","quantity","events"]),
+    a:U.pick(H,["amount","value","charge","settlement_amount","total_amount"])}; }
+  var A=cols(ps[0]), B=cols(ps[1]);
+  if(!A.d) throw "Your records: I need a 'date' column."; if(!B.d) throw "Their records: I need a 'date' column.";
+  if(!A.u&&!A.a) throw "Your records: I need a count column (minutes, transactions) or an amount column.";
+  if(!B.u&&!B.a) throw "Their records: I need a count column (minutes, transactions) or an amount column.";
+  var useU=!!(A.u&&B.u), useA=!!(A.a&&B.a), tol=U.num(inp.tol); if(!(tol>=0)) tol=1; var rate=U.num(inp.rate);
+  function day(v){ var t=U.time(v); if(isNaN(t)) return null; var d=new Date(t); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function agg(P,c){ var m={}, bad=0; P.rows.forEach(function(r){ var d=day(r[c.d]); if(!d){ bad++; return; } var rt=c.r?String(r[c.r]||"?").trim():"All", k=d+"|"+rt;
+    var o=m[k]||(m[k]={d:d,r:rt,u:0,a:0}); var u=c.u?U.num(r[c.u]):NaN, a=c.a?U.num(r[c.a]):NaN; if(!isNaN(u)) o.u+=u; if(!isNaN(a)) o.a+=a; }); return {m:m,bad:bad}; }
+  var X=agg(ps[0],A), Y=agg(ps[1],B), keys={}; Object.keys(X.m).forEach(function(k){keys[k]=1;}); Object.keys(Y.m).forEach(function(k){keys[k]=1;});
+  var unitName=useU?(A.u.replace(/_/g," ")):"amount";
+  var R={pairs:[],routes:{},days:{},UA:0,UB:0,AA:0,AB:0,tol:tol,rate:rate,useU:useU,useA:useA,unit:unitName,bad:X.bad+Y.bad};
+  Object.keys(keys).sort().forEach(function(k){ var x=X.m[k], y=Y.m[k], d=(x||y).d, rt=(x||y).r;
+    var ua=x?(useU?x.u:x.a):null, ub=y?(useU?y.u:y.a):null, aa=x?x.a:0, ab=y?y.a:0;
+    var miss=!x?"ours":(!y?"theirs":""), diff=(ua||0)-(ub||0), base=Math.max(ua||0,ub||0), pct=base?diff/base*100:0;
+    var val=null; if(useA) val=aa-ab; else if(useU&&rate>0) val=diff*rate;
+    var flag=!!miss||Math.abs(pct)>tol;
+    var p={d:d,r:rt,ua:ua,ub:ub,diff:diff,pct:pct,val:val,miss:miss,flag:flag}; R.pairs.push(p); R.days[d]=1;
+    var o=R.routes[rt]||(R.routes[rt]={k:rt,ua:0,ub:0,va:0,flag:0,both:0,lower:0,miss:0}); o.ua+=ua||0; o.ub+=ub||0; if(val!==null) o.va+=val; if(flag) o.flag++; if(miss) o.miss++;
+    if(!miss){ o.both++; if((ub||0)<(ua||0)) o.lower++; }
+    R.UA+=ua||0; R.UB+=ub||0; R.AA+=aa; R.AB+=ab; });
+  if(!R.pairs.length) throw "No rows with readable dates.";
+  return R;
+ },
+ render:function(R,inp,U,ctx){
+  var P=R.pairs, fl=P.filter(function(p){return p.flag;}), nd=Object.keys(R.days).length, rs=Object.keys(R.routes).map(function(k){return R.routes[k];});
+  var gap=R.UA-R.UB, gp=Math.max(R.UA,R.UB)?gap/Math.max(R.UA,R.UB)*100:0, hasV=R.useA||(R.useU&&R.rate>0);
+  var net=0, gross=0; P.forEach(function(p){ if(p.val!==null){ net+=p.val; if(p.flag) gross+=Math.abs(p.val); } });
+  rs.sort(function(a,b){ return Math.abs(b.ua-b.ub)-Math.abs(a.ua-a.ub); });
+  var sys=rs.filter(function(o){return o.both>=5&&o.lower/o.both>=0.8&&o.ua>o.ub;})[0];
+  function f(n){ return R.useU?U.fmt(n):U.rwf(n); }
+  var v="Across <b>"+nd+" days</b> and <b>"+rs.length+(rs.length===1?" route":" routes")+"</b>, your records show <b>"+f(R.UA)+"</b> "+(R.useU?U.esc(R.unit):"")+" and theirs <b>"+f(R.UB)+"</b>: "+(gap>=0?"yours":"theirs")+" higher by <b>"+U.fmt(Math.abs(gp),2)+"%</b>";
+  if(hasV) v+=" (<b>"+U.rwf(Math.abs(net))+"</b>)";
+  v+=". <b>"+U.fmt(fl.length)+"</b> route-days differ by more than your <b>"+R.tol+"%</b> threshold or are missing on one side";
+  if(hasV&&fl.length) v+=" (<b>"+U.rwf(gross)+"</b> in dispute, counted both ways)";
+  v+=".";
+  if(sys) v+=" On <b>"+U.esc(sys.k)+"</b> their figure is lower on <b>"+sys.lower+" of "+sys.both+"</b> days: a systematic gap worth raising with the day-by-day evidence below.";
+  var miss=P.filter(function(p){return p.miss;}).length;
+  var tiles=[U.tile("Net gap",U.fmt(gp,2)+"%",(gap>=0?"yours higher by ":"theirs higher by ")+f(Math.abs(gap)),Math.abs(gp)>R.tol?"bad":"good"),
+    U.tile("Over threshold",U.fmt(fl.length),"of "+U.fmt(P.length)+" route-days",fl.length?"warn":"good"),
+    hasV?U.tile("In dispute",U.rwf(gross),"route-days over threshold",gross?"bad":""):U.tile("Difference",f(Math.abs(gap)),R.unit+", net",gap?"warn":""),
+    U.tile("Missing",U.fmt(miss),"route-days with one side blank",miss?"warn":"")];
+  var S=[], head=["Route","Yours","Theirs","Gap","Days over","Theirs lower"]; if(hasV) head.push("Value");
+  S.push({title:"Routes, largest gap first",cap:"Totals per route over the whole period",html:U.table(head,rs.map(function(o){ var g=Math.max(o.ua,o.ub)?(o.ua-o.ub)/Math.max(o.ua,o.ub)*100:0;
+    var r=[o.k,f(o.ua),f(o.ub),{t:U.fmt(g,2)+"%",cls:Math.abs(g)>R.tol?"flag":""},U.fmt(o.flag),o.both?o.lower+" of "+o.both:"—"]; if(hasV) r.push(U.rwf(o.va)); return r; }),hasV?[1,2,3,4,6]:[1,2,3,4])});
+  var top=fl.slice().sort(function(a,b){ return Math.abs(b.val!==null?b.val:b.diff)-Math.abs(a.val!==null?a.val:a.diff); }).slice(0,12);
+  if(top.length){ var h2=["Date","Route","Yours","Theirs","Gap"]; if(hasV) h2.push("Value");
+    S.push({title:"Route-days to dispute, largest first",cap:"Over your "+R.tol+"% threshold, or missing on one side",html:U.table(h2,top.map(function(p){ var r=[p.d,p.r,p.ua===null?"—":f(p.ua),p.ub===null?"—":f(p.ub),{t:p.miss?("missing on "+p.miss+" side"):U.fmt(p.pct,2)+"%",cls:"flag"}]; if(hasV) r.push(p.val===null?"—":U.rwf(p.val)); return r; }),hasV?[2,3,5]:[2,3])}); }
+  var L=[]; L.push("SETTLEMENT CHECK — "+ctx.name.toUpperCase()); L.push(nd+" days, "+rs.length+" routes   |   Prepared by Frutos"); L.push("");
+  L.push("FINDING"); L.push("- Yours "+f(R.UA)+" vs theirs "+f(R.UB)+": "+(gap>=0?"yours":"theirs")+" higher by "+U.fmt(Math.abs(gp),2)+"%"+(hasV?" ("+U.rwf(Math.abs(net))+")":""));
+  L.push("- Route-days over "+R.tol+"% or missing: "+U.fmt(fl.length)+" of "+U.fmt(P.length)+(hasV?"; in dispute "+U.rwf(gross):""));
+  rs.slice(0,5).forEach(function(o){ var g=Math.max(o.ua,o.ub)?(o.ua-o.ub)/Math.max(o.ua,o.ub)*100:0; L.push("  "+o.k+": gap "+U.fmt(g,2)+"%, "+o.flag+(o.flag===1?" day":" days")+" over threshold, theirs lower on "+o.lower+" of "+o.both+" days"); });
+  if(sys) L.push("- Systematic: "+sys.k+" (theirs lower on "+sys.lower+" of "+sys.both+" days)");
+  L.push(""); L.push("NEXT STEP");
+  L.push("- Share the record-level files for the disputed days; I match them call by call or transaction by transaction");
+  L.push("  and prepare the dispute file, within 5 working days, at a fixed price.");
+  L.push(""); L.push("Note: a trial read. Figures are indicative until run on your full records.");
+  return {verdict:v,tiles:tiles,sections:S,summary:L.join("\n")};
+ }
+};
+</script>
+<script>
+(function(){
+"use strict";
+var CFG={"slug": "settlement", "maxRuns": 3, "wa": "250788312423", "defaultFor": "your organisation", "files": 2, "fileLabels": ["Your records", "Their records"], "summaryTitle": "Dispute-ready summary", "waMsg": "Muraho Frutos. I tried the Settlement Checker for {name} and I'd like the full version.", "foot": "Read entirely in your browser \u00b7 nothing is uploaded \u00b7 personal numbers are masked on sight. A trial limited to {n} runs. \u00a9 2026 Frutos."}, SAMPLES=["date,route,minutes,amount\n2026-09-01,Route A,51734,517340\n2026-09-01,Route B,39354,393540\n2026-09-01,Route C,22224,222240\n2026-09-01,Route D,9334,93340\n2026-09-01,Route E,6410,64100\n2026-09-01,Route F,3124,31240\n2026-09-02,Route A,52896,528960\n2026-09-02,Route B,40059,400590\n2026-09-02,Route C,20944,209440\n2026-09-02,Route D,9951,99510\n2026-09-02,Route E,6560,65600\n2026-09-02,Route F,3290,32900\n2026-09-03,Route A,50684,506840\n2026-09-03,Route B,37776,377760\n2026-09-03,Route C,21585,215850\n2026-09-03,Route D,8948,89480\n2026-09-03,Route E,6559,65590\n2026-09-03,Route F,3248,32480\n2026-09-04,Route A,49389,493890\n2026-09-04,Route B,37210,372100\n2026-09-04,Route C,21076,210760\n2026-09-04,Route D,9916,99160\n2026-09-04,Route E,6703,67030\n2026-09-04,Route F,3076,30760\n2026-09-05,Route A,43527,435270\n2026-09-05,Route B,32171,321710\n2026-09-05,Route C,17662,176620\n2026-09-05,Route D,8131,81310\n2026-09-05,Route E,5566,55660\n2026-09-05,Route F,2679,26790\n2026-09-06,Route A,42740,427400\n2026-09-06,Route B,31522,315220\n2026-09-06,Route C,17796,177960\n2026-09-06,Route D,8109,81090\n2026-09-06,Route E,6071,60710\n2026-09-06,Route F,2707,27070\n2026-09-07,Route A,50923,509230\n2026-09-07,Route B,39052,390520\n2026-09-07,Route C,22015,220150\n2026-09-07,Route D,9097,90970\n2026-09-07,Route E,6683,66830\n2026-09-07,Route F,3241,32410\n2026-09-08,Route A,50396,503960\n2026-09-08,Route B,38271,382710\n2026-09-08,Route C,20759,207590\n2026-09-08,Route D,9427,94270\n2026-09-08,Route E,6968,69680\n2026-09-08,Route F,3322,33220\n2026-09-09,Route A,51718,517180\n2026-09-09,Route B,38683,386830\n2026-09-09,Route C,21816,218160\n2026-09-09,Route D,9646,96460\n2026-09-09,Route E,6629,66290\n2026-09-09,Route F,3286,32860\n2026-09-10,Route A,51474,514740\n2026-09-10,Route B,37169,371690\n2026-09-10,Route C,21154,211540\n2026-09-10,Route D,9256,92560\n2026-09-10,Route E,6678,66780\n2026-09-10,Route F,3103,31030\n2026-09-11,Route A,49670,496700\n2026-09-11,Route B,37503,375030\n2026-09-11,Route C,20150,201500\n2026-09-11,Route D,9486,94860\n2026-09-11,Route E,6932,69320\n2026-09-11,Route F,3067,30670\n2026-09-12,Route A,41712,417120\n2026-09-12,Route B,33403,334030\n2026-09-12,Route C,17664,176640\n2026-09-12,Route D,7878,78780\n2026-09-12,Route E,5623,56230\n2026-09-12,Route F,2857,28570\n2026-09-13,Route A,43718,437180\n2026-09-13,Route B,33100,331000\n2026-09-13,Route C,18195,181950\n2026-09-13,Route D,7794,77940\n2026-09-13,Route E,5679,56790\n2026-09-13,Route F,2645,26450\n2026-09-14,Route A,53259,532590\n2026-09-14,Route B,35830,358300\n2026-09-14,Route C,20771,207710\n2026-09-14,Route D,9821,98210\n2026-09-14,Route E,6544,65440\n2026-09-14,Route F,3377,33770\n2026-09-15,Route A,51495,514950\n2026-09-15,Route B,36788,367880\n2026-09-15,Route C,21289,212890\n2026-09-15,Route D,9918,99180\n2026-09-15,Route E,6446,64460\n2026-09-15,Route F,3289,32890\n2026-09-16,Route A,54614,546140\n2026-09-16,Route B,39672,396720\n2026-09-16,Route C,20305,203050\n2026-09-16,Route D,9136,91360\n2026-09-16,Route E,7150,71500\n2026-09-16,Route F,3375,33750\n2026-09-17,Route A,50716,507160\n2026-09-17,Route B,36916,369160\n2026-09-17,Route C,20016,200160\n2026-09-17,Route D,9651,96510\n2026-09-17,Route E,6756,67560\n2026-09-17,Route F,3028,30280\n2026-09-18,Route A,50659,506590\n2026-09-18,Route B,35767,357670\n2026-09-18,Route C,20478,204780\n2026-09-18,Route D,9878,98780\n2026-09-18,Route E,6820,68200\n2026-09-18,Route F,3165,31650\n2026-09-19,Route A,44382,443820\n2026-09-19,Route B,33608,336080\n2026-09-19,Route C,18344,183440\n2026-09-19,Route D,7735,77350\n2026-09-19,Route E,5654,56540\n2026-09-19,Route F,2793,27930\n2026-09-20,Route A,44359,443590\n2026-09-20,Route B,30864,308640\n2026-09-20,Route C,18041,180410\n2026-09-20,Route D,8101,81010\n2026-09-20,Route E,5518,55180\n2026-09-20,Route F,2841,28410\n2026-09-21,Route A,54154,541540\n2026-09-21,Route B,39855,398550\n2026-09-21,Route C,19784,197840\n2026-09-21,Route D,9426,94260\n2026-09-21,Route E,7195,71950\n2026-09-21,Route F,3167,31670\n2026-09-22,Route A,53649,536490\n2026-09-22,Route B,37644,376440\n2026-09-22,Route C,21771,217710\n2026-09-22,Route D,9985,99850\n2026-09-22,Route E,6783,67830\n2026-09-22,Route F,3070,30700\n2026-09-23,Route A,51041,510410\n2026-09-23,Route B,39218,392180\n2026-09-23,Route C,21302,213020\n2026-09-23,Route D,9092,90920\n2026-09-23,Route E,7135,71350\n2026-09-23,Route F,3246,32460\n2026-09-24,Route A,54537,545370\n2026-09-24,Route B,38571,385710\n2026-09-24,Route C,21029,210290\n2026-09-24,Route D,9866,98660\n2026-09-24,Route E,6729,67290\n2026-09-24,Route F,3325,33250\n2026-09-25,Route A,55077,550770\n2026-09-25,Route B,38596,385960\n2026-09-25,Route C,20230,202300\n2026-09-25,Route D,9366,93660\n2026-09-25,Route E,6979,69790\n2026-09-25,Route F,3283,32830\n2026-09-26,Route A,43221,432210\n2026-09-26,Route B,31557,315570\n2026-09-26,Route C,17243,172430\n2026-09-26,Route D,7688,76880\n2026-09-26,Route E,5436,54360\n2026-09-26,Route F,2704,27040\n2026-09-27,Route A,42626,426260\n2026-09-27,Route B,31418,314180\n2026-09-27,Route C,17730,177300\n2026-09-27,Route D,8162,81620\n2026-09-27,Route E,5909,59090\n2026-09-27,Route F,2701,27010\n2026-09-28,Route B,38556,385560\n2026-09-28,Route C,21911,219110\n2026-09-28,Route D,10035,100350\n2026-09-28,Route E,6934,69340\n2026-09-28,Route F,3085,30850\n2026-09-29,Route A,53331,533310\n2026-09-29,Route B,40244,402440\n2026-09-29,Route C,19857,198570\n2026-09-29,Route D,9065,90650\n2026-09-29,Route E,7100,71000\n2026-09-29,Route F,3344,33440\n2026-09-30,Route A,50510,505100\n2026-09-30,Route B,37702,377020\n2026-09-30,Route C,21039,210390\n2026-09-30,Route D,9532,95320\n2026-09-30,Route E,6920,69200\n2026-09-30,Route F,3195,31950\n", "traffic_date,partner,minutes,amount\n01/09/2026,Route A,51703,517030\n01/09/2026,Route B,39291,392910\n01/09/2026,Route C,21292,212920\n01/09/2026,Route D,9302,93020\n01/09/2026,Route E,6420,64200\n01/09/2026,Route F,3127,31270\n02/09/2026,Route A,52827,528270\n02/09/2026,Route B,40022,400220\n02/09/2026,Route C,20159,201590\n02/09/2026,Route D,9942,99420\n02/09/2026,Route E,6551,65510\n02/09/2026,Route F,3288,32880\n03/09/2026,Route A,50582,505820\n03/09/2026,Route B,37898,378980\n03/09/2026,Route C,20957,209570\n03/09/2026,Route D,8944,89440\n03/09/2026,Route E,6564,65640\n03/09/2026,Route F,3236,32360\n04/09/2026,Route A,49401,494010\n04/09/2026,Route B,37256,372560\n04/09/2026,Route C,20415,204150\n04/09/2026,Route D,9920,99200\n04/09/2026,Route E,6701,67010\n04/09/2026,Route F,3075,30750\n05/09/2026,Route A,43740,437400\n05/09/2026,Route B,32161,321610\n05/09/2026,Route C,17162,171620\n05/09/2026,Route D,8124,81240\n05/09/2026,Route E,5545,55450\n05/09/2026,Route F,2681,26810\n06/09/2026,Route A,42786,427860\n06/09/2026,Route B,31514,315140\n06/09/2026,Route C,17158,171580\n06/09/2026,Route D,8081,80810\n06/09/2026,Route E,6086,60860\n06/09/2026,Route F,2706,27060\n07/09/2026,Route A,50997,509970\n07/09/2026,Route B,38966,389660\n07/09/2026,Route C,21229,212290\n07/09/2026,Route D,9070,90700\n07/09/2026,Route E,6675,66750\n07/09/2026,Route F,3231,32310\n08/09/2026,Route A,50380,503800\n08/09/2026,Route B,38244,382440\n08/09/2026,Route C,20091,200910\n08/09/2026,Route D,9447,94470\n08/09/2026,Route E,6977,69770\n08/09/2026,Route F,3323,33230\n09/09/2026,Route A,51726,517260\n09/09/2026,Route B,38682,386820\n09/09/2026,Route C,21253,212530\n09/09/2026,Route D,9632,96320\n09/09/2026,Route F,3294,32940\n10/09/2026,Route A,51582,515820\n10/09/2026,Route B,37262,372620\n10/09/2026,Route C,20403,204030\n10/09/2026,Route D,9237,92370\n10/09/2026,Route E,6690,66900\n10/09/2026,Route F,3108,31080\n11/09/2026,Route A,49604,496040\n11/09/2026,Route B,37452,374520\n11/09/2026,Route C,19524,195240\n11/09/2026,Route D,9488,94880\n11/09/2026,Route E,6924,69240\n11/09/2026,Route F,3067,30670\n12/09/2026,Route A,41818,418180\n12/09/2026,Route B,33483,334830\n12/09/2026,Route C,17072,170720\n12/09/2026,Route D,7889,78890\n12/09/2026,Route E,5610,56100\n12/09/2026,Route F,2859,28590\n13/09/2026,Route A,43810,438100\n13/09/2026,Route B,33185,331850\n13/09/2026,Route C,17530,175300\n13/09/2026,Route D,7778,77780\n13/09/2026,Route E,5688,56880\n13/09/2026,Route F,2647,26470\n14/09/2026,Route A,53213,532130\n14/09/2026,Route B,35826,358260\n14/09/2026,Route C,20011,200110\n14/09/2026,Route D,9820,98200\n14/09/2026,Route E,6541,65410\n14/09/2026,Route F,3380,33800\n15/09/2026,Route A,51659,516590\n15/09/2026,Route B,36762,367620\n15/09/2026,Route C,20517,205170\n15/09/2026,Route D,9946,99460\n15/09/2026,Route E,6450,64500\n15/09/2026,Route F,3289,32890\n16/09/2026,Route A,54763,547630\n16/09/2026,Route B,39836,398360\n16/09/2026,Route C,19687,196870\n16/09/2026,Route D,9139,91390\n16/09/2026,Route E,7147,71470\n16/09/2026,Route F,3372,33720\n17/09/2026,Route A,50463,504630\n17/09/2026,Route B,38393,383930\n17/09/2026,Route C,19341,193410\n17/09/2026,Route D,9658,96580\n17/09/2026,Route E,6747,67470\n17/09/2026,Route F,3028,30280\n18/09/2026,Route A,50736,507360\n18/09/2026,Route B,35982,359820\n18/09/2026,Route C,19499,194990\n18/09/2026,Route D,9878,98780\n18/09/2026,Route E,6826,68260\n18/09/2026,Route F,3167,31670\n19/09/2026,Route A,44467,444670\n19/09/2026,Route B,33637,336370\n19/09/2026,Route C,17758,177580\n19/09/2026,Route D,7740,77400\n19/09/2026,Route E,5660,56600\n19/09/2026,Route F,2801,28010\n20/09/2026,Route A,44362,443620\n20/09/2026,Route B,30870,308700\n20/09/2026,Route C,17301,173010\n20/09/2026,Route D,8100,81000\n20/09/2026,Route E,5503,55030\n20/09/2026,Route F,2832,28320\n21/09/2026,Route A,54077,540770\n21/09/2026,Route B,39976,399760\n21/09/2026,Route C,19049,190490\n21/09/2026,Route D,9420,94200\n21/09/2026,Route E,7210,72100\n21/09/2026,Route F,3178,31780\n22/09/2026,Route A,53756,537560\n22/09/2026,Route B,37534,375340\n22/09/2026,Route C,21067,210670\n22/09/2026,Route D,9997,99970\n22/09/2026,Route F,3064,30640\n23/09/2026,Route A,51013,510130\n23/09/2026,Route B,39284,392840\n23/09/2026,Route C,20767,207670\n23/09/2026,Route D,9120,91200\n23/09/2026,Route E,7136,71360\n23/09/2026,Route F,3250,32500\n24/09/2026,Route A,54595,545950\n24/09/2026,Route B,38509,385090\n24/09/2026,Route C,20236,202360\n24/09/2026,Route D,9856,98560\n24/09/2026,Route E,6728,67280\n24/09/2026,Route F,3323,33230\n25/09/2026,Route A,55238,552380\n25/09/2026,Route B,38384,383840\n25/09/2026,Route C,19504,195040\n25/09/2026,Route D,9340,93400\n25/09/2026,Route E,6963,69630\n25/09/2026,Route F,3287,32870\n26/09/2026,Route A,43058,430580\n26/09/2026,Route B,31550,315500\n26/09/2026,Route C,16626,166260\n26/09/2026,Route D,7680,76800\n26/09/2026,Route E,5434,54340\n26/09/2026,Route F,2708,27080\n27/09/2026,Route A,42760,427600\n27/09/2026,Route B,31353,313530\n27/09/2026,Route C,16959,169590\n27/09/2026,Route D,8158,81580\n27/09/2026,Route E,5887,58870\n27/09/2026,Route F,2694,26940\n28/09/2026,Route A,49799,497990\n28/09/2026,Route B,38470,384700\n28/09/2026,Route C,21240,212400\n28/09/2026,Route D,10058,100580\n28/09/2026,Route E,6915,69150\n28/09/2026,Route F,3086,30860\n29/09/2026,Route A,53340,533400\n29/09/2026,Route B,40288,402880\n29/09/2026,Route C,19274,192740\n29/09/2026,Route D,9058,90580\n29/09/2026,Route E,7107,71070\n29/09/2026,Route F,3341,33410\n30/09/2026,Route A,50430,504300\n30/09/2026,Route B,37821,378210\n30/09/2026,Route C,20376,203760\n30/09/2026,Route D,9524,95240\n30/09/2026,Route E,6917,69170\n30/09/2026,Route F,3199,31990\n"];
+var $=function(id){return document.getElementById(id);};
+var inst=$("inst"), errEl=$("err"), isSample=false, lastParsed=null, texts=[null,null];
+var U={};
+U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
+U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
+U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+U.dd=function(t,noYear){ var d=new Date(t); return d.getDate()+" "+U.MON[d.getMonth()]+(noYear?"":" "+d.getFullYear()); };
+U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };
+U.pct=function(a,b){ return b? Math.round(a/b*1000)/10 : 0; };
+U.median=function(a){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; };
+U.pctl=function(a,p){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}); var i=Math.max(0,Math.ceil(p/100*s.length)-1); return s[i]; };
+U.parseCSV=function(text){
+  text=String(text).replace(/^﻿/,"");
+  var lines=text.replace(/\r\n?/g,"\n").split("\n").filter(function(l){ return l.trim().length; });
+  if(!lines.length) return null;
+  var h0=lines[0], cnt={",":0,";":0,"\t":0,"|":0}, qq=false, D=",";
+  for(var z=0;z<h0.length;z++){ var cz=h0[z]; if(cz==='"') qq=!qq; else if(!qq&&cnt.hasOwnProperty(cz)) cnt[cz]++; }
+  Object.keys(cnt).forEach(function(k){ if(cnt[k]>cnt[D]) D=k; });
+  function cells(line){ var o=[],c="",q=false; for(var i=0;i<line.length;i++){ var ch=line[i];
+    if(q){ if(ch==='"'){ if(line[i+1]==='"'){c+='"';i++;} else q=false; } else c+=ch; }
+    else { if(ch==='"') q=true; else if(ch===D){ o.push(c); c=""; } else c+=ch; } } o.push(c); return o; }
+  var H=cells(h0).map(function(h){ return h.trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,""); }), R=[];
+  for(var i=1;i<lines.length;i++){ var c=cells(lines[i]), o={}; for(var j=0;j<H.length;j++) o[H[j]]=(c[j]===undefined?"":String(c[j]).trim()); R.push(o); }
+  return {header:H, rows:R};
+};
+U.pick=function(H,al){ var a,h; for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h]===al[a]) return H[h];
+  for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h].indexOf(al[a])>=0) return H[h]; return null; };
+U.time=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim(); if(!s) return NaN;
+  if(/^\d{13}$/.test(s)) return parseInt(s,10); if(/^\d{10}$/.test(s)) return parseInt(s,10)*1000;
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?)?\s*(Z|[+-]\d{2}:?\d{2})?$/);
+  if(m){ var ms=m[7]?Math.round(parseFloat("0."+m[7])*1000):0;
+    var y=+m[1], mo=+m[2]-1, d=+m[3], hh=+(m[4]||0), mi=+(m[5]||0), se=+(m[6]||0);
+    if(m[8]){ var t=Date.UTC(y,mo,d,hh,mi,se,ms); if(m[8]!=="Z"){ var z=m[8].replace(":",""), sg=z[0]==="-"?-1:1; t-=sg*(parseInt(z.slice(1,3),10)*60+parseInt(z.slice(3,5),10))*60000; } return t; }
+    return new Date(y,mo,d,hh,mi,se,ms).getTime(); }
+  var d2=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:[T ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?)?$/);
+  if(d2){ var A1=+d2[1], A2=+d2[2], dd=A1, mm=A2; if(A2>12&&A1<=12){ dd=A2; mm=A1; } var H2=+(d2[4]||0);
+    if(d2[7]){ var pm=/p/i.test(d2[7]); if(pm&&H2<12) H2+=12; if(!pm&&H2===12) H2=0; }
+    return new Date(+d2[3],mm-1,dd,H2,+(d2[5]||0),+(d2[6]||0)).getTime(); }
+  return Date.parse(s); };
+U.hour=function(v){ if(!v) return null; var m=String(v).match(/(?:^|[T\s,])(\d{1,2}):\d{2}(?::\d{2})?(?:\.\d+)?\s*([AaPp][Mm])?/); if(m){ var h=parseInt(m[1],10);
+  if(m[2]){ var pm=/p/i.test(m[2]); if(pm&&h<12) h+=12; if(!pm&&h===12) h=0; } return (h>=0&&h<24)?h:null; } return null; };
+U.hh=function(h){ if(h===null||h===undefined) return "—"; var ap=h<12?"am":"pm", r=h%12; if(r===0) r=12; return r+ap; };
+U.mask=function(v){ var d=String(v||"").replace(/\D/g,""); if(d.length<4) return "•••"; return "••• "+d.slice(-3); };
+U.tile=function(k,v,s,cls){ var m=String(v).match(/^(.*?)\s(L|kWh|t|h|s|ms|min|days|agents|links|vehicles|km|L\/100 km|\u00d7)$/);
+  var vv=m?U.esc(m[1])+'<small class="u"> '+m[2]+'</small>':U.esc(v), m2=String(v).match(/^RWF\s(.+)$/);
+  if(m2) vv='<small class="u">RWF </small>'+U.esc(m2[1]);
+  return '<div class="tile"><div class="k">'+U.esc(k)+'</div><div class="v '+(cls||'')+'">'+vv+'</div><div class="s">'+U.esc(s||"")+'</div></div>'; };
+U.bars=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){ var w=Math.max(0,Math.min(100,r.w));
+  h+='<div class="brow"><div class="bl" title="'+U.esc(r.label)+'">'+U.esc(r.label)+'</div><div class="bb"><span class="'+(r.cls||'')+'" style="width:'+w+'%"></span></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.pairs=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){
+  h+='<div class="brow pair"><div class="bl">'+U.esc(r.label)+'</div><div class="bbs"><div class="bb"><span class="'+(r.cls1||'')+'" style="width:'+Math.min(100,r.w1)+'%"></span></div><div class="bb"><span class="'+(r.cls2||'dim')+'" style="width:'+Math.min(100,r.w2)+'%"></span></div></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.stack=function(parts){ var tot=0; parts.forEach(function(p){ tot+=p.v; }); var h='<div class="stack">';
+  parts.forEach(function(p){ if(p.v>0) h+='<span title="'+U.esc(p.label)+'" style="width:'+(tot?p.v/tot*100:0)+'%;background:'+p.color+'"></span>'; });
+  h+='</div><div class="legend">'; parts.forEach(function(p){ h+='<span><i style="background:'+p.color+'"></i>'+U.esc(p.label)+' '+U.esc(p.text)+'</span>'; }); return h+'</div>'; };
+U.heat=function(vals, mode, ref, labs){ // mode "count": raw counts, darker red = more; mode "level": ratios against a reference
+  var mx=0, i; if(mode==="count") vals.forEach(function(v){ if(v>mx) mx=v; });
+  var h='<div class="hours">';
+  for(i=0;i<24;i++){ var v=vals[i], col="var(--panel2)";
+    if(v!==null&&v!==undefined&&!isNaN(v)){
+      if(mode==="count"){ if(v>0&&mx>0) col="color-mix(in srgb, var(--bad) "+Math.round(22+78*v/mx)+"%, var(--panel2))"; }
+      else col = v>=ref-1e-9 ? "var(--accent)" : (v>=ref-0.10 ? "var(--warn)" : "var(--bad)"); }
+    h+='<div class="hcell" style="background:'+col+'"></div>'; }
+  h+='</div><div class="hlabels">'; ["12a","","","3","","","6","","","9","","","12p","","","3","","","6","","","9","",""].forEach(function(l){ h+='<span>'+l+'</span>'; });
+  h+='</div><div class="legend">';
+  if(mode==="count") h+='<span><i style="background:color-mix(in srgb, var(--bad) 22%, var(--panel2))"></i>Fewer</span><span><i style="background:var(--bad)"></i>Most</span><span><i style="background:var(--panel2)"></i>None</span>';
+  else { labs=labs||["At or above target","Up to 10 points below","More than 10 points below"];
+    h+='<span><i style="background:var(--accent)"></i>'+U.esc(labs[0])+'</span><span><i style="background:var(--warn)"></i>'+U.esc(labs[1])+'</span><span><i style="background:var(--bad)"></i>'+U.esc(labs[2])+'</span><span><i style="background:var(--panel2)"></i>No data</span>'; }
+  return h+'</div>'; };
+U.table=function(head, rows, numCols){ numCols=numCols||[]; var h='<div class="tblwrap"><table class="tbl"><thead><tr>';
+  head.forEach(function(c,i){ h+='<th class="'+(numCols.indexOf(i)>=0?'num':'')+'">'+U.esc(c)+'</th>'; }); h+='</tr></thead><tbody>';
+  rows.forEach(function(r){ h+='<tr>'; r.forEach(function(c,i){ var cls=(numCols.indexOf(i)>=0?'num':''), txt=c;
+    if(c&&typeof c==="object"){ cls+=' '+(c.cls||''); txt=c.t; } h+='<td class="'+cls+'">'+U.esc(txt)+'</td>'; }); h+='</tr>'; });
+  return h+'</tbody></table></div>'; };
+
+try{ var sv=localStorage.getItem(CFG.slug+"_theme"); if(sv) document.documentElement.setAttribute("data-theme",sv); }catch(e){}
+$("theme").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dk=window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var nx=cur?(cur==="dark"?"light":"dark"):(dk?"light":"dark");
+  document.documentElement.setAttribute("data-theme",nx);
+  try{ localStorage.setItem(CFG.slug+"_theme",nx); }catch(e){}
+});
+var mem=null, KEY=CFG.slug+"_runs_v1";
+function getRuns(){ try{ var v=parseInt(localStorage.getItem(KEY)||"0",10); return isNaN(v)?0:v; }catch(e){ return mem===null?0:mem; } }
+function setRuns(v){ mem=v; try{ localStorage.setItem(KEY,String(v)); }catch(e){} }
+function paintRuns(){ var u=getRuns(), h="Trial runs used&nbsp;&nbsp;";
+  for(var i=0;i<CFG.maxRuns;i++) h+='<span class="pip'+(i<u?' used':'')+'"></span>';
+  $("runs").innerHTML=h+'&nbsp;&nbsp;'+Math.max(0,CFG.maxRuns-u)+' of '+CFG.maxRuns+' left'; }
+paintRuns();
+function name(){ return inst.value.trim()||CFG.defaultFor; }
+try{ var qf=new URLSearchParams(location.search).get("for"); if(qf){ inst.value=qf.slice(0,60); } }catch(e){}
+$("gate-inst").textContent=name();
+inst.addEventListener("input",function(){ $("gate-inst").textContent=name(); });
+function inputs(){ var o={}; document.querySelectorAll("[data-in]").forEach(function(el){ o[el.getAttribute("data-in")]=el.value; }); return o; }
+function showErr(m){ errEl.textContent=m; errEl.hidden=false; }
+
+function readInto(i,f){ var r=new FileReader();
+  r.onload=function(){ texts[i]=String(r.result); var fn=$("fn"+i); if(fn) fn.textContent=f.name;
+    if(CFG.files===1){ isSample=false; go([texts[0]]); } else { $("runbtn").disabled=!(texts[0]&&texts[1]); } };
+  r.onerror=function(){ showErr("Could not read that file."); }; r.readAsText(f); }
+for(var i=0;i<CFG.files;i++)(function(i){
+  var d=$("drop"+i), p=$("pick"+i), fi=$("file"+i);
+  p.addEventListener("click",function(){ fi.click(); });
+  fi.addEventListener("change",function(e){ var f=e.target.files&&e.target.files[0]; if(f) readInto(i,f); });
+  ["dragenter","dragover"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.add("over"); }); });
+  ["dragleave","drop"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.remove("over"); }); });
+  d.addEventListener("drop",function(e){ var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) readInto(i,f); });
+})(i);
+if(CFG.files===2){ $("runbtn").addEventListener("click",function(){ isSample=false; go([texts[0],texts[1]]); }); }
+$("sample").addEventListener("click",function(){ isSample=true; go(SAMPLES); });
+
+function go(arr){
+  errEl.hidden=true;
+  var u=getRuns(); if(u>=CFG.maxRuns){ gate(); return; }
+  var ps=[], R;
+  try{ arr.forEach(function(t,ix){ var p=U.parseCSV(t); if(!p||!p.rows.length) throw (CFG.files===2?(CFG.fileLabels[ix]+": "):"")+"I couldn't find any rows in that file."; ps.push(p); });
+       R=TOOL.analyse(ps, inputs(), U); }
+  catch(e){ showErr(typeof e==="string"?e:"That file couldn't be read."); return; }
+  setRuns(u+1); paintRuns(); lastParsed=ps; draw(R);
+  if(getRuns()>=CFG.maxRuns) setTimeout(gate,400);
+}
+document.querySelectorAll("[data-in]").forEach(function(el){ el.addEventListener("change",function(){
+  if(!lastParsed) return; try{ draw(TOOL.analyse(lastParsed, inputs(), U)); }catch(e){} }); });
+
+function draw(R){
+  var out=TOOL.render(R, inputs(), U, {name:name(), sample:isSample});
+  var H='<div class="verdict"><p class="vh">What the data shows'+(isSample?' · illustrative sample, not your data':'')+'</p><p>'+out.verdict+'</p></div>';
+  if(out.tiles&&out.tiles.length) H+='<div class="tiles">'+out.tiles.join("")+'</div>';
+  (out.sections||[]).forEach(function(s){ H+='<div class="card"><h3>'+U.esc(s.title)+'</h3>'+(s.cap?'<p class="cap">'+U.esc(s.cap)+'</p>':'')+s.html+'</div>'; });
+  H+='<div class="summary"><div class="summary-h"><h3>'+U.esc(CFG.summaryTitle)+'</h3><button class="copy" id="copy" type="button">Copy</button></div><pre id="smtext">'+U.esc(out.summary)+'</pre></div>';
+  var rep=$("report"); rep.innerHTML=H; rep.hidden=false;
+  var cp=$("copy"); cp.addEventListener("click",function(){ var t=$("smtext").textContent;
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ cp.textContent="Copied"; cp.classList.add("done"); }); } });
+  rep.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function gate(){
+  var v=name();
+  $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+  $("gate-inst").textContent=v; $("gate").hidden=false;
+  $("gate").scrollIntoView({behavior:"smooth",block:"center"});
+}
+$("foot").textContent=CFG.foot.replace("{n}",CFG.maxRuns);
+})();
+</script>
+</body>
+</html>
