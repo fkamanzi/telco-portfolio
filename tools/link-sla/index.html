@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Link SLA Auditor</title>
+<meta name="description" content="A self-serve trial that turns an outage log into availability per link, SLA breaches per provider and the value of service not delivered. Prepared by Frutos.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Link SLA Auditor · trial by Frutos">
+<meta property="og:description" content="A self-serve trial that turns an outage log into availability per link, SLA breaches per provider and the value of service not delivered. Prepared by Frutos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1512; --panel:#14201B; --panel2:#0B130F; --ink:#E8F0EA; --dim:#8BA596; --line:#27372F;
+  --grid:rgba(34,211,238,.07); --accent:#22D3EE; --accent2:#0EA5C6; --warn:#F2B134; --bad:#FF6B5E; --good:#39D98A;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+    --grid:rgba(20,80,50,.06); --accent:#0E7490; --accent2:#0B5F75; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+  --grid:rgba(20,80,50,.06); --accent:#0E7490; --accent2:#0B5F75; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+.wrap{max-width:860px; margin:0 auto; padding-inline:16px; padding-block:22px 40px}
+.exp{font-family:"Archivo",sans-serif; font-stretch:125%}
+.mono{font-family:var(--mono)}
+
+/* Header / title block */
+.head{border:1.5px solid var(--ink); background:var(--panel)}
+.head-top{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:14px 16px}
+.brandline{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 6px}
+.title{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:26px; line-height:1.05; margin:0; letter-spacing:-.01em}
+.subtitle{margin:6px 0 0; font-size:14.5px; color:var(--dim); max-width:46ch}
+.theme{flex:none; border:1.5px solid var(--line); background:transparent; color:var(--dim); font:inherit; font-size:13px; padding:6px 10px; cursor:pointer; border-radius:8px}
+.head-grid{display:grid; grid-template-columns:1fr 1fr; border-top:1.5px solid var(--ink)}
+.head-grid>div{padding:9px 16px; min-width:0}
+.head-grid>div:first-child{border-right:1px solid var(--line)}
+.head-grid dt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim)}
+.head-grid dd{margin:3px 0 0; font-weight:600; font-size:14.5px}
+.inst-field{display:inline-block; min-width:12ch; border:0; border-bottom:1.5px dashed var(--line); background:transparent; color:var(--ink); font:inherit; font-weight:600; font-size:14.5px; padding:0 2px}
+.inst-field:focus{outline:0; border-bottom-color:var(--accent)}
+
+/* Intake */
+.intake{margin-top:16px; border:1.5px solid var(--line); background:var(--panel); border-radius:0}
+.intake-in{padding:16px}
+.drop{border:1.6px dashed var(--line); background:var(--panel2); border-radius:12px; padding:20px 16px; text-align:center; transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,var(--panel2))}
+.drop h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; margin:0 0 4px}
+.drop p{margin:0 0 14px; font-size:14px; color:var(--dim)}
+.btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+.btn{border:1.5px solid var(--ink); background:var(--ink); color:var(--bg); font:inherit; font-weight:700; font-size:15px; padding:11px 16px; border-radius:10px; cursor:pointer}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.hint{margin:12px 2px 0; font-family:var(--mono); font-size:11.5px; color:var(--dim); line-height:1.6}
+.runs{display:flex; align-items:center; gap:8px; margin-top:14px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+.pip{width:9px; height:9px; border-radius:50%; border:1.5px solid var(--line)}
+.pip.used{background:var(--accent); border-color:var(--accent)}
+
+/* Report */
+#report[hidden]{display:none}
+.report{margin-top:16px; display:flex; flex-direction:column; gap:14px}
+.verdict{border:1.5px solid var(--ink); background:var(--panel); padding:16px; border-left:5px solid var(--accent)}
+.verdict .vh{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin:0 0 6px}
+.verdict p{margin:0; font-size:16.5px; line-height:1.45}
+.verdict b{color:var(--accent)}
+.tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+.tile{border:1.5px solid var(--line); background:var(--panel); padding:12px}
+.tile .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+.tile .v{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:25px; line-height:1.1; margin-top:5px; font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px; color:var(--dim); margin-top:2px}
+.tile .v.warn{color:var(--warn)} .tile .v.bad{color:var(--bad)} .tile .v.good{color:var(--good)}
+.card{border:1.5px solid var(--line); background:var(--panel); padding:14px 16px}
+.card h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:15px; margin:0 0 2px}
+.card .cap{font-size:12.5px; color:var(--dim); margin:0 0 12px}
+.funnel{display:flex; flex-direction:column; gap:7px}
+.frow{display:grid; grid-template-columns:92px 1fr auto; align-items:center; gap:10px}
+.frow .fl{font-size:13px; color:var(--dim)}
+.fbar{height:26px; background:var(--panel2); border:1px solid var(--line); position:relative; overflow:hidden}
+.fbar>span{position:absolute; inset:0 auto 0 0; background:linear-gradient(90deg,var(--accent2),var(--accent)); opacity:.9}
+.frow .fv{font-family:var(--mono); font-size:12.5px; font-variant-numeric:tabular-nums; min-width:68px; text-align:right}
+.drop-tag{display:inline-block; font-family:var(--mono); font-size:10.5px; color:var(--bad); margin-left:6px}
+.net{display:flex; flex-direction:column; gap:9px}
+.nrow{display:grid; grid-template-columns:70px 1fr auto; align-items:center; gap:10px}
+.nrow .nl{font-size:13.5px; font-weight:600}
+.nbar{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.nbar>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.nbar>span.low{background:var(--bad)}
+.nrow .nv{font-family:var(--mono); font-size:12.5px; min-width:48px; text-align:right}
+.hours{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:4px}
+.hcell{aspect-ratio:1/2.2; border:1px solid var(--line); position:relative}
+.hlabels{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:5px; font-family:var(--mono); font-size:8.5px; color:var(--dim)}
+.hlabels span{text-align:center}
+.lat{display:flex; gap:10px}
+.lat .lc{flex:1; border:1px solid var(--line); background:var(--panel2); padding:10px; text-align:center}
+.lat .lk{font-family:var(--mono); font-size:10.5px; color:var(--dim); text-transform:uppercase}
+.lat .lv{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:20px; margin-top:3px; font-variant-numeric:tabular-nums}
+.legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--dim)}
+.legend i{display:inline-block; width:11px; height:11px; margin-right:5px; vertical-align:-1px}
+.summary{border:1.5px solid var(--ink); background:var(--panel2)}
+.summary-h{display:flex; justify-content:space-between; align-items:center; padding:11px 16px; border-bottom:1.5px solid var(--line)}
+.summary-h h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:14px; margin:0}
+.copy{border:1.5px solid var(--line); background:transparent; color:var(--ink); font:inherit; font-size:13px; font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer}
+.copy.done{border-color:var(--accent); color:var(--accent)}
+.summary pre{margin:0; padding:16px; font-family:var(--mono); font-size:12.5px; line-height:1.65; white-space:pre-wrap; color:var(--ink)}
+
+/* Gate */
+.gate{margin-top:16px; border:1.5px solid var(--accent); background:var(--panel); padding:20px 16px; text-align:center}
+.gate h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:19px; margin:0 0 6px}
+.gate p{margin:0 auto 14px; font-size:14.5px; color:var(--dim); max-width:48ch}
+.gate .btn{background:var(--accent); border-color:var(--accent); color:#06140D; text-decoration:none; display:inline-block}
+
+.foot{margin-top:20px; font-family:var(--mono); font-size:11px; color:var(--dim); line-height:1.7}
+.err{color:var(--bad); font-family:var(--mono); font-size:12.5px; margin-top:10px}
+@media (max-width:560px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .title{font-size:22px}
+  .frow{grid-template-columns:70px 1fr auto}
+  .lat{flex-wrap:wrap}
+}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+.drops{display:grid; grid-template-columns:1fr; gap:12px}
+.drops.two{grid-template-columns:1fr 1fr}
+.fname{margin:10px 0 0; font-family:var(--mono); font-size:12px; color:var(--accent); min-height:1.3em; overflow-wrap:anywhere}
+.runrow{display:flex; justify-content:center; gap:10px; margin-top:12px; flex-wrap:wrap}
+.assume{display:flex; flex-wrap:wrap; gap:12px; margin-top:14px}
+.assume label{font-family:var(--mono); font-size:11.5px; color:var(--dim); display:flex; flex-direction:column; gap:4px}
+.assume input{width:140px; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font:inherit; font-family:var(--mono); font-size:13px; padding:7px 8px; border-radius:8px}
+.bars{display:flex; flex-direction:column; gap:9px}
+.brow{display:grid; grid-template-columns:minmax(70px,24%) 1fr auto; align-items:center; gap:10px}
+.brow .bl{font-size:13px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.brow .bb{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.brow .bb>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.brow .bb>span.bad{background:var(--bad)}
+.brow .bb>span.warn{background:var(--warn)}
+.brow .bb>span.dim{background:var(--dim); opacity:.55}
+.brow .bv{font-family:var(--mono); font-size:12.5px; text-align:right; min-width:70px; font-variant-numeric:tabular-nums}
+.brow.pair .bb{height:9px}
+.brow.pair .bbs{display:flex; flex-direction:column; gap:3px}
+.stack{display:flex; height:24px; border:1px solid var(--line); overflow:hidden}
+.stack span{display:block; height:100%}
+.tbl{width:100%; border-collapse:collapse; font-size:13px}
+.tbl th{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); text-align:left; padding:6px 6px; border-bottom:1.5px solid var(--line)}
+.tbl td{padding:8px 6px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; vertical-align:top}
+.tbl td.num,.tbl th.num{text-align:right}
+.tbl td.flag{color:var(--bad); font-weight:700}
+.tbl td.ok{color:var(--good); font-weight:700}
+.tblwrap{overflow-x:auto}
+.tile .v .u{font-size:.56em; font-weight:600; font-stretch:100%; color:var(--dim); letter-spacing:0}
+.note-s{font-size:12px; color:var(--dim); margin:10px 0 0; line-height:1.5}
+.chip{display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; padding:2px 7px; border:1px solid var(--line); border-radius:999px; color:var(--dim); white-space:nowrap}
+@media (max-width:560px){ .drops.two{grid-template-columns:1fr} .brow{grid-template-columns:minmax(60px,30%) 1fr auto} }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="head">
+    <div class="head-top">
+      <div>
+        <p class="brandline">Connectivity · Trial</p>
+        <h1 class="title">Link SLA Auditor</h1>
+        <p class="subtitle">Find out which internet and WAN links broke their SLA last month, which provider is responsible, and how much service you paid for and did not get.</p>
+      </div>
+      <button class="theme" id="theme" type="button" aria-label="Switch light or dark">◐ Theme</button>
+    </div>
+    <dl class="head-grid">
+      <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your organisation" aria-label="Organisation name" spellcheck="false"></dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+    </dl>
+  </header>
+  <section class="intake">
+    <div class="intake-in">
+      <div class="drop" id="drop0"><h2>Drop in an outage log</h2><p>A CSV of link outages from your monitoring system or provider tickets. It is read in your browser and never leaves this page.</p><div class="btns"><button class="btn" id="pick0" type="button">Choose a CSV file</button><button class="btn ghost" id="sample" type="button">Run an illustrative sample</button></div><input id="file0" type="file" accept=".csv,text/csv" hidden></div>
+      <p class="hint">Expected columns (any order, matched loosely): <b>link_id</b>, <b>provider</b>, <b>outage_start</b>, <b>outage_end</b> (YYYY-MM-DD HH:MM). Overlapping outages on the same link are merged; availability is measured over the whole calendar months the outages fall in.</p>
+      <div class="assume"><label>Contracted availability, %<input data-in="sla" type="number" step="any" value="99.5"></label><label>Monthly fee per link, RWF<input data-in="fee" type="number" step="any" value=""></label></div>
+      <div class="runs" id="runs" aria-live="polite"></div>
+      <p class="err" id="err" hidden></p>
+    </div>
+  </section>
+  <section id="report" class="report" hidden aria-live="polite"></section>
+  <section id="gate" class="gate" hidden>
+    <h2>That's your three trial runs</h2>
+    <p>The full version runs every month on your monitoring export, matches each outage to the contract clause, and drafts the claim for each provider. Let's set it up for <b id="gate-inst">your organisation</b>.</p>
+    <a class="btn" id="gate-wa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a>
+    <p class="hint" style="margin-top:12px">Or call +250 731 000 163</p>
+  </section>
+  <p class="foot" id="foot"></p>
+</main>
+<script>
+var TOOL={
+ analyse:function(ps,inp,U){
+  var P=ps[0],H=P.header;
+  var cL=U.pick(H,["link_id","link","circuit","site","branch","location","service_id","id"]);
+  var cP=U.pick(H,["provider","isp","carrier","vendor","supplier","operator"]);
+  var cS=U.pick(H,["outage_start","start","down_at","down","from","begin"]);
+  var cE=U.pick(H,["outage_end","end","up_at","restored","recovered","to","up"]);
+  if(!cL||!cS||!cE) throw "I need a link column and outage start and end columns ('link_id', 'outage_start', 'outage_end').";
+  var sla=U.num(inp.sla); if(!(sla>0&&sla<100)) sla=99.5;
+  var links={}, minT=Infinity, maxT=-Infinity, bad=0, hours=[]; for(var h=0;h<24;h++) hours.push(0);
+  P.rows.forEach(function(r){ var s=U.time(r[cS]), e=U.time(r[cE]); if(isNaN(s)||isNaN(e)||e<=s){ bad++; return; }
+    var id=r[cL]||"?"; if(!links[id]) links[id]={id:id,prov:cP?(r[cP]||"?"):"—",iv:[]};
+    links[id].iv.push([s,e]); if(s<minT) minT=s; if(e>maxT) maxT=e; var hr=U.hour(r[cS]); if(hr!==null) hours[hr]++; });
+  var ids=Object.keys(links); if(!ids.length) throw "No valid outages found (each needs a start before its end).";
+  var a=new Date(minT), b=new Date(maxT);
+  var p0=new Date(a.getFullYear(),a.getMonth(),1).getTime(), p1=new Date(b.getFullYear(),b.getMonth()+1,1).getTime();
+  if(maxT===new Date(b.getFullYear(),b.getMonth(),1).getTime()) p1=maxT;
+  var periodH=(p1-p0)/3.6e6, buckets=[0,0,0,0];
+  ids.forEach(function(id){ var L=links[id]; L.iv.sort(function(x,y){return x[0]-y[0];});
+    var m=[]; L.iv.forEach(function(x){ if(m.length&&x[0]<=m[m.length-1][1]) m[m.length-1][1]=Math.max(m[m.length-1][1],x[1]); else m.push([x[0],x[1]]); });
+    L.count=m.length; L.downMs=0; L.longest=0;
+    m.forEach(function(x){ var ms=Math.min(x[1],p1)-Math.max(x[0],p0); if(ms>0){ L.downMs+=ms; var d=ms/3.6e6; L.longest=Math.max(L.longest,d); var mins=ms/60000; buckets[mins<15?0:(mins<60?1:(mins<240?2:3))]++; } });
+    L.down=L.downMs/3.6e6; L.avail=1-L.down/periodH; L.allow=(1-sla/100)*periodH; L.excess=Math.max(0,L.down-L.allow); L.breach=L.avail<sla/100; });
+  return {links:ids.map(function(i){return links[i];}),periodH:periodH,p0:p0,sla:sla,bad:bad,hours:hours,buckets:buckets,hasProv:!!cP};
+ },
+ render:function(R,inp,U,ctx){
+  function av(x){ return U.fmt(Math.floor(x*10000+1e-7)/100,2)+"%"; } function ex(x){ return (x>0&&x<0.05)?"<0.1":U.fmt(x,1); }
+  var fee=U.num(inp.fee), L=R.links.slice().sort(function(a,b){return a.avail-b.avail;});
+  var br=L.filter(function(x){return x.breach;}), dms=0; L.forEach(function(x){dms+=x.downMs;}); var down=dms/3.6e6;
+  var pv={}; L.forEach(function(x){ if(!pv[x.prov]) pv[x.prov]={k:x.prov,n:0,ms:0,br:0}; var p=pv[x.prov]; p.n++; p.ms+=x.downMs; if(x.breach) p.br++; });
+  var PV=Object.keys(pv).map(function(k){ pv[k].down=pv[k].ms/3.6e6; return pv[k];}).sort(function(a,b){return b.down-a.down;});
+  var w=L[0], top=PV[0], share=down?Math.round(top.down/down*100):0;
+  var per=R.periodH>800?"the period":new Date(R.p0).toLocaleString("en-GB",{month:"long",year:"numeric"});
+  var v="<b>"+br.length+"</b> of <b>"+L.length+"</b> links with outages fell below your <b>"+R.sla+"%</b> availability in "+per+". The worst, <b>"+U.esc(w.id)+"</b>"+(R.hasProv?" ("+U.esc(w.prov)+")":"")+", was down <b>"+U.fmt(w.down,1)+" hours</b> ("+av(w.avail)+" available).";
+  if(R.hasProv&&PV.length>1) v+=" <b>"+U.esc(top.k)+"</b> accounts for <b>"+share+"%</b> of all downtime.";
+  var val=0; if(fee>0){ val=fee*down/R.periodH; v+=" At your fee of "+U.rwf(fee)+" a link per month, that is <b>"+U.rwf(val)+"</b> of service paid for and not delivered."; }
+  var longest=Math.max.apply(null,L.map(function(x){return x.longest;}));
+  var tiles=[U.tile("Below SLA",br.length+" links","of "+L.length+" with outages",br.length?"bad":"good"),U.tile("Downtime",U.fmt(down,1)+" h","all links, "+per),
+    U.tile("Worst availability",av(w.avail),w.id,w.breach?"bad":""),U.tile("Longest outage",U.fmt(longest,1)+" h","single event")];
+  var S=[], head=["Link"]; if(R.hasProv) head.push("Provider"); head=head.concat(["Available","Down h","Over allowance h"]); if(fee>0) head.push("Value lost");
+  var rows=br.map(function(x){ var r=[x.id]; if(R.hasProv) r.push(x.prov); r.push({t:av(x.avail),cls:"flag"}); r.push(U.fmt(x.down,1)); r.push(ex(x.excess)); if(fee>0) r.push(U.rwf(fee*x.down/R.periodH)); return r; });
+  var skip=R.bad?'<p class="note-s">'+R.bad+(R.bad===1?" row was":" rows were")+" skipped: the end was before the start, or a time could not be read.</p>":"";
+  S.push({title:"Links below your SLA",cap:"Allowance at "+R.sla+"% is "+U.fmt((1-R.sla/100)*R.periodH,1)+" hours of downtime per link in "+per,html:(br.length?U.table(head,rows,R.hasProv?[2,3,4,5]:[1,2,3,4]):'<p class="cap">Every link met the SLA in this file.</p>')+skip});
+  if(R.hasProv&&PV.length>1){ var mx=Math.max.apply(null,PV.map(function(p){return p.down;}));
+    S.push({title:"By provider",cap:"Hours of downtime, and links below SLA out of links with outages",html:U.bars(PV.map(function(p){ return {label:p.k,w:mx?p.down/mx*100:0,text:U.fmt(p.down,1)+" h · "+p.br+"/"+p.n+" below",cls:p.br?"bad":""}; }))}); }
+  S.push({title:"When outages start",cap:"Outages starting in each hour of the day",html:U.heat(R.hours,"count")});
+  var bl=["Under 15 min","15 to 60 min","1 to 4 hours","Over 4 hours"], bm=Math.max.apply(null,R.buckets);
+  S.push({title:"How long outages last",cap:"Outages by length, after merging overlaps",html:U.bars(R.buckets.map(function(n,i){return {label:bl[i],w:bm?n/bm*100:0,text:U.fmt(n),cls:i===3&&n?"bad":""};}))});
+  var T=[]; T.push("LINK SLA AUDIT — "+ctx.name.toUpperCase()); T.push(L.length+" links with outages, "+per+"   |   Prepared by Frutos"); T.push("");
+  T.push("FINDING"); T.push("- "+br.length+" links below "+R.sla+"% availability; total downtime "+U.fmt(down,1)+" h");
+  if(R.hasProv) PV.forEach(function(p){ T.push("- "+p.k+": "+U.fmt(p.down,1)+" h down, "+p.br+" of "+p.n+" links below SLA"); });
+  br.slice(0,5).forEach(function(x){ T.push("  "+x.id+(R.hasProv?" ("+x.prov+")":"")+": "+av(x.avail)+", "+ex(x.excess)+" h over allowance"); });
+  if(fee>0) T.push("- Service paid for and not delivered: "+U.rwf(val)+" (pro rata at "+U.rwf(fee)+" per link per month)");
+  T.push(""); T.push("NEXT STEP");
+  T.push("- I check these figures against each contract's SLA clause and prepare the claim pack per provider,");
+  T.push("  with every outage listed, within 5 working days, at a fixed price.");
+  if(R.bad) T.push("- "+R.bad+(R.bad===1?" row":" rows")+" skipped (end before start, or unreadable time)");
+  T.push(""); T.push("Note: a trial read. Availability is measured over whole calendar months; links with no outage");
+  T.push("in the file are not counted. Figures are indicative until run on your full records.");
+  return {verdict:v,tiles:tiles,sections:S,summary:T.join("\n")};
+ }
+};
+</script>
+<script>
+(function(){
+"use strict";
+var CFG={"slug": "link-sla", "maxRuns": 3, "wa": "250788312423", "defaultFor": "your organisation", "files": 1, "fileLabels": [], "summaryTitle": "Claim-ready summary", "waMsg": "Muraho Frutos. I tried the Link SLA Auditor for {name} and I'd like the full version.", "foot": "Read entirely in your browser \u00b7 nothing is uploaded \u00b7 personal numbers are masked on sight. A trial limited to {n} runs. \u00a9 2026 Frutos."}, SAMPLES=["link_id,provider,outage_start,outage_end,cause\nBR-02,ISP A,2026-09-24 18:36,2026-09-24 19:57,power\nBR-04,ISP A,2026-09-08 09:39,2026-09-08 11:40,power\nBR-04,ISP A,2026-09-28 08:11,2026-09-28 09:17,equipment\nBR-04,ISP A,2026-09-17 00:05,2026-09-17 00:28,equipment\nBR-04,ISP A,2026-09-04 05:51,2026-09-04 06:00,equipment\nBR-05,ISP A,2026-09-28 10:39,2026-09-28 11:58,fibre\nBR-05,ISP A,2026-09-28 14:36,2026-09-28 14:39,fibre\nBR-05,ISP A,2026-09-20 05:53,2026-09-20 06:44,power\nBR-05,ISP A,2026-09-30 23:03,2026-09-30 23:15,power\nBR-05,ISP A,2026-09-02 13:20,2026-09-02 14:41,equipment\nBR-05,ISP A,2026-09-10 16:12,2026-09-10 16:34,fibre\nBR-06,ISP A,2026-09-17 16:25,2026-09-17 16:35,fibre\nBR-06,ISP A,2026-09-28 05:53,2026-09-28 06:01,fibre\nBR-07,ISP A,2026-09-10 15:51,2026-09-10 22:16,equipment\nBR-07,ISP A,2026-09-13 16:08,2026-09-13 16:24,equipment\nBR-07,ISP A,2026-09-21 16:52,2026-09-21 17:03,power\nBR-07,ISP A,2026-09-08 13:06,2026-09-08 17:34,power\nBR-08,ISP A,2026-09-21 02:52,2026-09-21 03:11,unknown\nBR-08,ISP A,2026-09-07 01:04,2026-09-07 01:12,fibre\nBR-08,ISP A,2026-09-27 20:38,2026-09-27 21:05,equipment\nBR-10,ISP A,2026-09-30 19:27,2026-09-30 21:18,unknown\nBR-10,ISP A,2026-09-27 21:59,2026-09-27 22:21,equipment\nBR-10,ISP A,2026-09-26 20:55,2026-09-26 21:54,equipment\nBR-10,ISP A,2026-09-21 14:39,2026-09-21 14:54,fibre\nBR-10,ISP A,2026-09-23 04:08,2026-09-23 05:12,unknown\nBR-11,ISP A,2026-09-20 23:20,2026-09-21 00:06,equipment\nBR-12,ISP A,2026-09-20 14:51,2026-09-20 14:56,fibre\nBR-13,ISP A,2026-09-25 04:44,2026-09-25 04:59,equipment\nBR-14,ISP A,2026-09-24 20:03,2026-09-24 20:15,power\nBR-14,ISP A,2026-09-19 17:55,2026-09-19 18:03,fibre\nBR-15,ISP B,2026-09-04 21:45,2026-09-04 23:36,unknown\nBR-15,ISP B,2026-09-08 20:39,2026-09-08 22:11,power\nBR-15,ISP B,2026-09-01 12:47,2026-09-01 12:56,equipment\nBR-15,ISP B,2026-09-01 01:21,2026-09-01 03:04,fibre\nBR-16,ISP B,2026-09-10 17:08,2026-09-10 20:35,unknown\nBR-16,ISP B,2026-09-02 19:25,2026-09-02 20:48,power\nBR-17,ISP B,2026-09-25 04:17,2026-09-25 04:46,power\nBR-17,ISP B,2026-09-15 05:32,2026-09-15 06:57,equipment\nBR-17,ISP B,2026-09-06 00:17,2026-09-06 03:43,power\nBR-17,ISP B,2026-09-10 17:21,2026-09-10 17:29,power\nBR-18,ISP B,2026-09-11 05:53,2026-09-11 08:06,power\nBR-18,ISP B,2026-09-11 00:41,2026-09-11 04:21,power\nBR-19,ISP B,2026-09-14 18:53,2026-09-14 19:32,fibre\nBR-19,ISP B,2026-09-21 15:54,2026-09-21 16:56,unknown\nBR-19,ISP B,2026-09-17 07:13,2026-09-17 07:31,equipment\nBR-19,ISP B,2026-09-06 00:22,2026-09-06 01:14,fibre\nBR-19,ISP B,2026-09-16 05:30,2026-09-16 05:57,power\nBR-19,ISP B,2026-09-05 20:39,2026-09-05 21:21,equipment\nBR-19,ISP B,2026-09-20 22:36,2026-09-21 01:45,fibre\nBR-20,ISP B,2026-09-20 04:11,2026-09-20 04:19,unknown\nBR-20,ISP B,2026-09-06 11:41,2026-09-06 12:11,power\nBR-20,ISP B,2026-09-22 09:31,2026-09-22 10:52,equipment\nBR-20,ISP B,2026-09-22 14:08,2026-09-23 02:07,fibre\nBR-20,ISP B,2026-09-19 06:32,2026-09-19 09:09,unknown\nBR-21,ISP B,2026-09-18 10:15,2026-09-18 18:13,power\nBR-21,ISP B,2026-09-06 23:53,2026-09-07 00:46,power\nBR-21,ISP B,2026-09-23 06:39,2026-09-23 07:20,power\nBR-21,ISP B,2026-09-15 18:21,2026-09-15 20:47,unknown\nBR-21,ISP B,2026-09-22 18:28,2026-09-22 21:03,fibre\nBR-21,ISP B,2026-09-09 18:21,2026-09-09 19:32,unknown\nBR-22,ISP B,2026-09-08 18:18,2026-09-08 19:48,fibre\nBR-22,ISP B,2026-09-17 18:41,2026-09-17 18:55,fibre\nBR-22,ISP B,2026-09-28 10:57,2026-09-28 11:11,unknown\nBR-22,ISP B,2026-09-06 18:38,2026-09-06 20:17,unknown\nBR-23,ISP B,2026-09-06 16:20,2026-09-06 16:43,power\nBR-23,ISP B,2026-09-15 07:30,2026-09-15 08:31,power\nBR-23,ISP B,2026-09-10 01:01,2026-09-10 02:17,unknown\nBR-23,ISP B,2026-09-15 21:47,2026-09-15 22:40,fibre\nBR-24,ISP B,2026-09-03 17:30,2026-09-03 19:44,equipment\nBR-24,ISP B,2026-09-03 15:09,2026-09-03 20:18,power\nBR-24,ISP B,2026-09-28 10:04,2026-09-28 10:52,equipment\nBR-24,ISP B,2026-09-20 20:28,2026-09-20 20:51,equipment\nBR-25,ISP B,2026-09-04 11:35,2026-09-04 11:47,unknown\nBR-25,ISP B,2026-09-20 10:28,2026-09-20 12:23,unknown\nBR-25,ISP B,2026-09-02 13:08,2026-09-02 13:45,fibre\nBR-25,ISP B,2026-09-15 11:36,2026-09-15 15:41,unknown\nBR-26,ISP B,2026-09-12 11:50,2026-09-12 12:10,fibre\nBR-26,ISP B,2026-09-03 02:51,2026-09-03 03:59,power\nBR-26,ISP B,2026-09-17 13:26,2026-09-17 14:53,equipment\nBR-27,ISP C,2026-09-14 19:15,2026-09-14 22:04,fibre\nBR-27,ISP C,2026-09-03 12:54,2026-09-03 14:31,power\nBR-28,ISP C,2026-09-27 22:11,2026-09-27 22:20,unknown\nATM-02,ISP A,2026-09-10 11:54,2026-09-10 12:27,unknown\nATM-03,ISP A,2026-09-22 12:41,2026-09-22 12:46,fibre\nATM-03,ISP A,2026-09-10 20:13,2026-09-10 21:06,unknown\nATM-04,ISP A,2026-09-07 08:50,2026-09-07 10:13,power\nATM-04,ISP A,2026-09-13 22:20,2026-09-13 22:29,power\nATM-05,ISP A,2026-09-08 18:45,2026-09-08 19:14,equipment\nATM-07,ISP B,2026-09-13 09:28,2026-09-13 10:21,equipment\nATM-08,ISP B,2026-09-30 19:53,2026-09-30 20:26,fibre\nATM-08,ISP B,2026-09-08 14:45,2026-09-08 19:05,unknown\nATM-08,ISP B,2026-09-15 11:31,2026-09-15 12:39,equipment\nATM-08,ISP B,2026-09-08 17:06,2026-09-08 19:39,equipment\nATM-08,ISP B,2026-09-19 18:02,2026-09-19 22:07,equipment\nATM-08,ISP B,2026-09-09 22:00,2026-09-09 23:33,fibre\nATM-08,ISP B,2026-09-02 18:54,2026-09-02 19:13,equipment\nATM-08,ISP B,2026-09-11 11:43,2026-09-11 12:54,unknown\nATM-09,ISP B,2026-09-18 06:00,2026-09-18 06:52,equipment\nATM-09,ISP B,2026-09-22 04:51,2026-09-22 12:28,unknown\nATM-09,ISP B,2026-09-09 19:49,2026-09-10 00:49,fibre\nATM-09,ISP B,2026-09-10 15:05,2026-09-10 18:58,fibre\nATM-09,ISP B,2026-09-30 07:54,2026-09-30 08:15,power\nATM-09,ISP B,2026-09-24 02:29,2026-09-24 03:51,power\nATM-10,ISP B,2026-09-26 20:46,2026-09-26 21:19,power\nATM-10,ISP B,2026-09-07 09:56,2026-09-07 11:21,unknown\nATM-10,ISP B,2026-09-22 23:05,2026-09-23 00:06,power\nATM-11,ISP C,2026-09-13 00:45,2026-09-13 01:06,fibre\nATM-11,ISP C,2026-09-23 07:31,2026-09-23 07:49,equipment\nATM-11,ISP C,2026-09-21 03:54,2026-09-21 04:11,equipment\nATM-11,ISP C,2026-09-08 15:37,2026-09-08 17:07,power\nATM-12,ISP C,2026-09-23 20:22,2026-09-23 21:31,fibre\nATM-12,ISP C,2026-09-15 19:22,2026-09-15 19:36,fibre\nBR-17,ISP B,2026-09-09 14:10,2026-09-10 01:40,fibre\nBR-21,ISP B,2026-09-17 14:10,2026-09-17 21:25,fibre\nATM-08,ISP B,2026-09-23 14:10,2026-09-24 09:10,fibre\nBR-05,ISP A,2026-09-12 09:00,2026-09-12 12:00,power\nBR-05,ISP A,2026-09-12 11:00,2026-09-12 13:30,power\n"];
+var $=function(id){return document.getElementById(id);};
+var inst=$("inst"), errEl=$("err"), isSample=false, lastParsed=null, texts=[null,null];
+var U={};
+U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
+U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
+U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };
+U.pct=function(a,b){ return b? Math.round(a/b*1000)/10 : 0; };
+U.median=function(a){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; };
+U.pctl=function(a,p){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}); var i=Math.max(0,Math.ceil(p/100*s.length)-1); return s[i]; };
+U.parseCSV=function(text){
+  text=String(text).replace(/^﻿/,"");
+  var lines=text.replace(/\r\n?/g,"\n").split("\n").filter(function(l){ return l.trim().length; });
+  if(!lines.length) return null;
+  var h0=lines[0], cnt={",":0,";":0,"\t":0,"|":0}, qq=false, D=",";
+  for(var z=0;z<h0.length;z++){ var cz=h0[z]; if(cz==='"') qq=!qq; else if(!qq&&cnt.hasOwnProperty(cz)) cnt[cz]++; }
+  Object.keys(cnt).forEach(function(k){ if(cnt[k]>cnt[D]) D=k; });
+  function cells(line){ var o=[],c="",q=false; for(var i=0;i<line.length;i++){ var ch=line[i];
+    if(q){ if(ch==='"'){ if(line[i+1]==='"'){c+='"';i++;} else q=false; } else c+=ch; }
+    else { if(ch==='"') q=true; else if(ch===D){ o.push(c); c=""; } else c+=ch; } } o.push(c); return o; }
+  var H=cells(h0).map(function(h){ return h.trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,""); }), R=[];
+  for(var i=1;i<lines.length;i++){ var c=cells(lines[i]), o={}; for(var j=0;j<H.length;j++) o[H[j]]=(c[j]===undefined?"":String(c[j]).trim()); R.push(o); }
+  return {header:H, rows:R};
+};
+U.pick=function(H,al){ var a,h; for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h]===al[a]) return H[h];
+  for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h].indexOf(al[a])>=0) return H[h]; return null; };
+U.time=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim(); if(!s) return NaN;
+  if(/^\d{13}$/.test(s)) return parseInt(s,10); if(/^\d{10}$/.test(s)) return parseInt(s,10)*1000;
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?)?\s*(Z|[+-]\d{2}:?\d{2})?$/);
+  if(m){ var ms=m[7]?Math.round(parseFloat("0."+m[7])*1000):0;
+    var y=+m[1], mo=+m[2]-1, d=+m[3], hh=+(m[4]||0), mi=+(m[5]||0), se=+(m[6]||0);
+    if(m[8]){ var t=Date.UTC(y,mo,d,hh,mi,se,ms); if(m[8]!=="Z"){ var z=m[8].replace(":",""), sg=z[0]==="-"?-1:1; t-=sg*(parseInt(z.slice(1,3),10)*60+parseInt(z.slice(3,5),10))*60000; } return t; }
+    return new Date(y,mo,d,hh,mi,se,ms).getTime(); }
+  var d2=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:[T ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?)?$/);
+  if(d2){ var A1=+d2[1], A2=+d2[2], dd=A1, mm=A2; if(A2>12&&A1<=12){ dd=A2; mm=A1; } var H2=+(d2[4]||0);
+    if(d2[7]){ var pm=/p/i.test(d2[7]); if(pm&&H2<12) H2+=12; if(!pm&&H2===12) H2=0; }
+    return new Date(+d2[3],mm-1,dd,H2,+(d2[5]||0),+(d2[6]||0)).getTime(); }
+  return Date.parse(s); };
+U.hour=function(v){ if(!v) return null; var m=String(v).match(/(?:^|[T\s,])(\d{1,2}):\d{2}(?::\d{2})?(?:\.\d+)?\s*([AaPp][Mm])?/); if(m){ var h=parseInt(m[1],10);
+  if(m[2]){ var pm=/p/i.test(m[2]); if(pm&&h<12) h+=12; if(!pm&&h===12) h=0; } return (h>=0&&h<24)?h:null; } return null; };
+U.hh=function(h){ if(h===null||h===undefined) return "—"; var ap=h<12?"am":"pm", r=h%12; if(r===0) r=12; return r+ap; };
+U.mask=function(v){ var d=String(v||"").replace(/\D/g,""); if(d.length<4) return "•••"; return "••• "+d.slice(-3); };
+U.tile=function(k,v,s,cls){ var m=String(v).match(/^(.*?)\s(L|kWh|t|h|s|min|agents|links)$/);
+  var vv=m?U.esc(m[1])+'<small class="u"> '+m[2]+'</small>':U.esc(v), m2=String(v).match(/^RWF\s(.+)$/);
+  if(m2) vv='<small class="u">RWF </small>'+U.esc(m2[1]);
+  return '<div class="tile"><div class="k">'+U.esc(k)+'</div><div class="v '+(cls||'')+'">'+vv+'</div><div class="s">'+U.esc(s||"")+'</div></div>'; };
+U.bars=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){ var w=Math.max(0,Math.min(100,r.w));
+  h+='<div class="brow"><div class="bl" title="'+U.esc(r.label)+'">'+U.esc(r.label)+'</div><div class="bb"><span class="'+(r.cls||'')+'" style="width:'+w+'%"></span></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.pairs=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){
+  h+='<div class="brow pair"><div class="bl">'+U.esc(r.label)+'</div><div class="bbs"><div class="bb"><span class="'+(r.cls1||'')+'" style="width:'+Math.min(100,r.w1)+'%"></span></div><div class="bb"><span class="'+(r.cls2||'dim')+'" style="width:'+Math.min(100,r.w2)+'%"></span></div></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.stack=function(parts){ var tot=0; parts.forEach(function(p){ tot+=p.v; }); var h='<div class="stack">';
+  parts.forEach(function(p){ if(p.v>0) h+='<span title="'+U.esc(p.label)+'" style="width:'+(tot?p.v/tot*100:0)+'%;background:'+p.color+'"></span>'; });
+  h+='</div><div class="legend">'; parts.forEach(function(p){ h+='<span><i style="background:'+p.color+'"></i>'+U.esc(p.label)+' '+U.esc(p.text)+'</span>'; }); return h+'</div>'; };
+U.heat=function(vals, mode, ref, labs){ // mode "count": raw counts, darker red = more; mode "level": ratios against a reference
+  var mx=0, i; if(mode==="count") vals.forEach(function(v){ if(v>mx) mx=v; });
+  var h='<div class="hours">';
+  for(i=0;i<24;i++){ var v=vals[i], col="var(--panel2)";
+    if(v!==null&&v!==undefined&&!isNaN(v)){
+      if(mode==="count"){ if(v>0&&mx>0) col="color-mix(in srgb, var(--bad) "+Math.round(22+78*v/mx)+"%, var(--panel2))"; }
+      else col = v>=ref-1e-9 ? "var(--accent)" : (v>=ref-0.10 ? "var(--warn)" : "var(--bad)"); }
+    h+='<div class="hcell" style="background:'+col+'"></div>'; }
+  h+='</div><div class="hlabels">'; ["12a","","","3","","","6","","","9","","","12p","","","3","","","6","","","9","",""].forEach(function(l){ h+='<span>'+l+'</span>'; });
+  h+='</div><div class="legend">';
+  if(mode==="count") h+='<span><i style="background:color-mix(in srgb, var(--bad) 22%, var(--panel2))"></i>Fewer</span><span><i style="background:var(--bad)"></i>Most</span><span><i style="background:var(--panel2)"></i>None</span>';
+  else { labs=labs||["At or above target","Up to 10 points below","More than 10 points below"];
+    h+='<span><i style="background:var(--accent)"></i>'+U.esc(labs[0])+'</span><span><i style="background:var(--warn)"></i>'+U.esc(labs[1])+'</span><span><i style="background:var(--bad)"></i>'+U.esc(labs[2])+'</span><span><i style="background:var(--panel2)"></i>No data</span>'; }
+  return h+'</div>'; };
+U.table=function(head, rows, numCols){ numCols=numCols||[]; var h='<div class="tblwrap"><table class="tbl"><thead><tr>';
+  head.forEach(function(c,i){ h+='<th class="'+(numCols.indexOf(i)>=0?'num':'')+'">'+U.esc(c)+'</th>'; }); h+='</tr></thead><tbody>';
+  rows.forEach(function(r){ h+='<tr>'; r.forEach(function(c,i){ var cls=(numCols.indexOf(i)>=0?'num':''), txt=c;
+    if(c&&typeof c==="object"){ cls+=' '+(c.cls||''); txt=c.t; } h+='<td class="'+cls+'">'+U.esc(txt)+'</td>'; }); h+='</tr>'; });
+  return h+'</tbody></table></div>'; };
+
+try{ var sv=localStorage.getItem(CFG.slug+"_theme"); if(sv) document.documentElement.setAttribute("data-theme",sv); }catch(e){}
+$("theme").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dk=window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var nx=cur?(cur==="dark"?"light":"dark"):(dk?"light":"dark");
+  document.documentElement.setAttribute("data-theme",nx);
+  try{ localStorage.setItem(CFG.slug+"_theme",nx); }catch(e){}
+});
+var mem=null, KEY=CFG.slug+"_runs_v1";
+function getRuns(){ try{ var v=parseInt(localStorage.getItem(KEY)||"0",10); return isNaN(v)?0:v; }catch(e){ return mem===null?0:mem; } }
+function setRuns(v){ mem=v; try{ localStorage.setItem(KEY,String(v)); }catch(e){} }
+function paintRuns(){ var u=getRuns(), h="Trial runs used&nbsp;&nbsp;";
+  for(var i=0;i<CFG.maxRuns;i++) h+='<span class="pip'+(i<u?' used':'')+'"></span>';
+  $("runs").innerHTML=h+'&nbsp;&nbsp;'+Math.max(0,CFG.maxRuns-u)+' of '+CFG.maxRuns+' left'; }
+paintRuns();
+function name(){ return inst.value.trim()||CFG.defaultFor; }
+try{ var qf=new URLSearchParams(location.search).get("for"); if(qf){ inst.value=qf.slice(0,60); } }catch(e){}
+$("gate-inst").textContent=name();
+inst.addEventListener("input",function(){ $("gate-inst").textContent=name(); });
+function inputs(){ var o={}; document.querySelectorAll("[data-in]").forEach(function(el){ o[el.getAttribute("data-in")]=el.value; }); return o; }
+function showErr(m){ errEl.textContent=m; errEl.hidden=false; }
+
+function readInto(i,f){ var r=new FileReader();
+  r.onload=function(){ texts[i]=String(r.result); var fn=$("fn"+i); if(fn) fn.textContent=f.name;
+    if(CFG.files===1){ isSample=false; go([texts[0]]); } else { $("runbtn").disabled=!(texts[0]&&texts[1]); } };
+  r.onerror=function(){ showErr("Could not read that file."); }; r.readAsText(f); }
+for(var i=0;i<CFG.files;i++)(function(i){
+  var d=$("drop"+i), p=$("pick"+i), fi=$("file"+i);
+  p.addEventListener("click",function(){ fi.click(); });
+  fi.addEventListener("change",function(e){ var f=e.target.files&&e.target.files[0]; if(f) readInto(i,f); });
+  ["dragenter","dragover"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.add("over"); }); });
+  ["dragleave","drop"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.remove("over"); }); });
+  d.addEventListener("drop",function(e){ var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) readInto(i,f); });
+})(i);
+if(CFG.files===2){ $("runbtn").addEventListener("click",function(){ isSample=false; go([texts[0],texts[1]]); }); }
+$("sample").addEventListener("click",function(){ isSample=true; go(SAMPLES); });
+
+function go(arr){
+  errEl.hidden=true;
+  var u=getRuns(); if(u>=CFG.maxRuns){ gate(); return; }
+  var ps=[], R;
+  try{ arr.forEach(function(t,ix){ var p=U.parseCSV(t); if(!p||!p.rows.length) throw (CFG.files===2?(CFG.fileLabels[ix]+": "):"")+"I couldn't find any rows in that file."; ps.push(p); });
+       R=TOOL.analyse(ps, inputs(), U); }
+  catch(e){ showErr(typeof e==="string"?e:"That file couldn't be read."); return; }
+  setRuns(u+1); paintRuns(); lastParsed=ps; draw(R);
+  if(getRuns()>=CFG.maxRuns) setTimeout(gate,400);
+}
+document.querySelectorAll("[data-in]").forEach(function(el){ el.addEventListener("change",function(){
+  if(!lastParsed) return; try{ draw(TOOL.analyse(lastParsed, inputs(), U)); }catch(e){} }); });
+
+function draw(R){
+  var out=TOOL.render(R, inputs(), U, {name:name(), sample:isSample});
+  var H='<div class="verdict"><p class="vh">What the data shows'+(isSample?' · illustrative sample, not your data':'')+'</p><p>'+out.verdict+'</p></div>';
+  if(out.tiles&&out.tiles.length) H+='<div class="tiles">'+out.tiles.join("")+'</div>';
+  (out.sections||[]).forEach(function(s){ H+='<div class="card"><h3>'+U.esc(s.title)+'</h3>'+(s.cap?'<p class="cap">'+U.esc(s.cap)+'</p>':'')+s.html+'</div>'; });
+  H+='<div class="summary"><div class="summary-h"><h3>'+U.esc(CFG.summaryTitle)+'</h3><button class="copy" id="copy" type="button">Copy</button></div><pre id="smtext">'+U.esc(out.summary)+'</pre></div>';
+  var rep=$("report"); rep.innerHTML=H; rep.hidden=false;
+  var cp=$("copy"); cp.addEventListener("click",function(){ var t=$("smtext").textContent;
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ cp.textContent="Copied"; cp.classList.add("done"); }); } });
+  rep.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function gate(){
+  var v=name();
+  $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+  $("gate-inst").textContent=v; $("gate").hidden=false;
+  $("gate").scrollIntoView({behavior:"smooth",block:"center"});
+}
+$("foot").textContent=CFG.foot.replace("{n}",CFG.maxRuns);
+})();
+</script>
+</body>
+</html>

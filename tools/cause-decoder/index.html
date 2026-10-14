@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signalling Cause Decoder</title>
+<meta name="description" content="A self-serve trial that decodes and ranks SIP, Q.850, Diameter, GTPv2 and 5GMM failure causes, with the first place to look. Prepared by Frutos.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Signalling Cause Decoder · trial by Frutos">
+<meta property="og:description" content="A self-serve trial that decodes and ranks SIP, Q.850, Diameter, GTPv2 and 5GMM failure causes, with the first place to look. Prepared by Frutos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1512; --panel:#14201B; --panel2:#0B130F; --ink:#E8F0EA; --dim:#8BA596; --line:#27372F;
+  --grid:rgba(163,230,53,.07); --accent:#A3E635; --accent2:#84CC16; --warn:#F2B134; --bad:#FF6B5E; --good:#39D98A;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+    --grid:rgba(20,80,50,.06); --accent:#4D7C0F; --accent2:#3F6212; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+  --grid:rgba(20,80,50,.06); --accent:#4D7C0F; --accent2:#3F6212; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+.wrap{max-width:860px; margin:0 auto; padding-inline:16px; padding-block:22px 40px}
+.exp{font-family:"Archivo",sans-serif; font-stretch:125%}
+.mono{font-family:var(--mono)}
+
+/* Header / title block */
+.head{border:1.5px solid var(--ink); background:var(--panel)}
+.head-top{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:14px 16px}
+.brandline{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 6px}
+.title{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:26px; line-height:1.05; margin:0; letter-spacing:-.01em}
+.subtitle{margin:6px 0 0; font-size:14.5px; color:var(--dim); max-width:46ch}
+.theme{flex:none; border:1.5px solid var(--line); background:transparent; color:var(--dim); font:inherit; font-size:13px; padding:6px 10px; cursor:pointer; border-radius:8px}
+.head-grid{display:grid; grid-template-columns:1fr 1fr; border-top:1.5px solid var(--ink)}
+.head-grid>div{padding:9px 16px; min-width:0}
+.head-grid>div:first-child{border-right:1px solid var(--line)}
+.head-grid dt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim)}
+.head-grid dd{margin:3px 0 0; font-weight:600; font-size:14.5px}
+.inst-field{display:inline-block; min-width:12ch; border:0; border-bottom:1.5px dashed var(--line); background:transparent; color:var(--ink); font:inherit; font-weight:600; font-size:14.5px; padding:0 2px}
+.inst-field:focus{outline:0; border-bottom-color:var(--accent)}
+
+/* Intake */
+.intake{margin-top:16px; border:1.5px solid var(--line); background:var(--panel); border-radius:0}
+.intake-in{padding:16px}
+.drop{border:1.6px dashed var(--line); background:var(--panel2); border-radius:12px; padding:20px 16px; text-align:center; transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,var(--panel2))}
+.drop h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; margin:0 0 4px}
+.drop p{margin:0 0 14px; font-size:14px; color:var(--dim)}
+.btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+.btn{border:1.5px solid var(--ink); background:var(--ink); color:var(--bg); font:inherit; font-weight:700; font-size:15px; padding:11px 16px; border-radius:10px; cursor:pointer}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.hint{margin:12px 2px 0; font-family:var(--mono); font-size:11.5px; color:var(--dim); line-height:1.6}
+.runs{display:flex; align-items:center; gap:8px; margin-top:14px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+.pip{width:9px; height:9px; border-radius:50%; border:1.5px solid var(--line)}
+.pip.used{background:var(--accent); border-color:var(--accent)}
+
+/* Report */
+#report[hidden]{display:none}
+.report{margin-top:16px; display:flex; flex-direction:column; gap:14px}
+.verdict{border:1.5px solid var(--ink); background:var(--panel); padding:16px; border-left:5px solid var(--accent)}
+.verdict .vh{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin:0 0 6px}
+.verdict p{margin:0; font-size:16.5px; line-height:1.45}
+.verdict b{color:var(--accent)}
+.tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+.tile{border:1.5px solid var(--line); background:var(--panel); padding:12px}
+.tile .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+.tile .v{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:25px; line-height:1.1; margin-top:5px; font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px; color:var(--dim); margin-top:2px}
+.tile .v.warn{color:var(--warn)} .tile .v.bad{color:var(--bad)} .tile .v.good{color:var(--good)}
+.card{border:1.5px solid var(--line); background:var(--panel); padding:14px 16px}
+.card h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:15px; margin:0 0 2px}
+.card .cap{font-size:12.5px; color:var(--dim); margin:0 0 12px}
+.funnel{display:flex; flex-direction:column; gap:7px}
+.frow{display:grid; grid-template-columns:92px 1fr auto; align-items:center; gap:10px}
+.frow .fl{font-size:13px; color:var(--dim)}
+.fbar{height:26px; background:var(--panel2); border:1px solid var(--line); position:relative; overflow:hidden}
+.fbar>span{position:absolute; inset:0 auto 0 0; background:linear-gradient(90deg,var(--accent2),var(--accent)); opacity:.9}
+.frow .fv{font-family:var(--mono); font-size:12.5px; font-variant-numeric:tabular-nums; min-width:68px; text-align:right}
+.drop-tag{display:inline-block; font-family:var(--mono); font-size:10.5px; color:var(--bad); margin-left:6px}
+.net{display:flex; flex-direction:column; gap:9px}
+.nrow{display:grid; grid-template-columns:70px 1fr auto; align-items:center; gap:10px}
+.nrow .nl{font-size:13.5px; font-weight:600}
+.nbar{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.nbar>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.nbar>span.low{background:var(--bad)}
+.nrow .nv{font-family:var(--mono); font-size:12.5px; min-width:48px; text-align:right}
+.hours{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:4px}
+.hcell{aspect-ratio:1/2.2; border:1px solid var(--line); position:relative}
+.hlabels{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:5px; font-family:var(--mono); font-size:8.5px; color:var(--dim)}
+.hlabels span{text-align:center}
+.lat{display:flex; gap:10px}
+.lat .lc{flex:1; border:1px solid var(--line); background:var(--panel2); padding:10px; text-align:center}
+.lat .lk{font-family:var(--mono); font-size:10.5px; color:var(--dim); text-transform:uppercase}
+.lat .lv{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:20px; margin-top:3px; font-variant-numeric:tabular-nums}
+.legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--dim)}
+.legend i{display:inline-block; width:11px; height:11px; margin-right:5px; vertical-align:-1px}
+.summary{border:1.5px solid var(--ink); background:var(--panel2)}
+.summary-h{display:flex; justify-content:space-between; align-items:center; padding:11px 16px; border-bottom:1.5px solid var(--line)}
+.summary-h h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:14px; margin:0}
+.copy{border:1.5px solid var(--line); background:transparent; color:var(--ink); font:inherit; font-size:13px; font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer}
+.copy.done{border-color:var(--accent); color:var(--accent)}
+.summary pre{margin:0; padding:16px; font-family:var(--mono); font-size:12.5px; line-height:1.65; white-space:pre-wrap; color:var(--ink)}
+
+/* Gate */
+.gate{margin-top:16px; border:1.5px solid var(--accent); background:var(--panel); padding:20px 16px; text-align:center}
+.gate h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:19px; margin:0 0 6px}
+.gate p{margin:0 auto 14px; font-size:14.5px; color:var(--dim); max-width:48ch}
+.gate .btn{background:var(--accent); border-color:var(--accent); color:#06140D; text-decoration:none; display:inline-block}
+
+.foot{margin-top:20px; font-family:var(--mono); font-size:11px; color:var(--dim); line-height:1.7}
+.err{color:var(--bad); font-family:var(--mono); font-size:12.5px; margin-top:10px}
+@media (max-width:560px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .title{font-size:22px}
+  .frow{grid-template-columns:70px 1fr auto}
+  .lat{flex-wrap:wrap}
+}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+.drops{display:grid; grid-template-columns:1fr; gap:12px}
+.drops.two{grid-template-columns:1fr 1fr}
+.fname{margin:10px 0 0; font-family:var(--mono); font-size:12px; color:var(--accent); min-height:1.3em; overflow-wrap:anywhere}
+.runrow{display:flex; justify-content:center; gap:10px; margin-top:12px; flex-wrap:wrap}
+.assume{display:flex; flex-wrap:wrap; gap:12px; margin-top:14px}
+.assume label{font-family:var(--mono); font-size:11.5px; color:var(--dim); display:flex; flex-direction:column; gap:4px}
+.assume input{width:140px; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font:inherit; font-family:var(--mono); font-size:13px; padding:7px 8px; border-radius:8px}
+.bars{display:flex; flex-direction:column; gap:9px}
+.brow{display:grid; grid-template-columns:minmax(70px,24%) 1fr auto; align-items:center; gap:10px}
+.brow .bl{font-size:13px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.brow .bb{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.brow .bb>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.brow .bb>span.bad{background:var(--bad)}
+.brow .bb>span.warn{background:var(--warn)}
+.brow .bb>span.dim{background:var(--dim); opacity:.55}
+.brow .bv{font-family:var(--mono); font-size:12.5px; text-align:right; min-width:70px; font-variant-numeric:tabular-nums}
+.brow.pair .bb{height:9px}
+.brow.pair .bbs{display:flex; flex-direction:column; gap:3px}
+.stack{display:flex; height:24px; border:1px solid var(--line); overflow:hidden}
+.stack span{display:block; height:100%}
+.tbl{width:100%; border-collapse:collapse; font-size:13px}
+.tbl th{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); text-align:left; padding:6px 6px; border-bottom:1.5px solid var(--line)}
+.tbl td{padding:8px 6px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; vertical-align:top}
+.tbl td.num,.tbl th.num{text-align:right}
+.tbl td.flag{color:var(--bad); font-weight:700}
+.tbl td.ok{color:var(--good); font-weight:700}
+.tblwrap{overflow-x:auto}
+.tile .v .u{font-size:.56em; font-weight:600; font-stretch:100%; color:var(--dim); letter-spacing:0}
+.note-s{font-size:12px; color:var(--dim); margin:10px 0 0; line-height:1.5}
+.chip{display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; padding:2px 7px; border:1px solid var(--line); border-radius:999px; color:var(--dim); white-space:nowrap}
+@media (max-width:560px){ .drops.two{grid-template-columns:1fr} .brow{grid-template-columns:minmax(60px,30%) 1fr auto} }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="head">
+    <div class="head-top">
+      <div>
+        <p class="brandline">Network assurance · Trial</p>
+        <h1 class="title">Signalling Cause Decoder</h1>
+        <p class="subtitle">Turn a day of call and session failures into a ranked list of causes, decoded to the standard, with the first place to look for each.</p>
+      </div>
+      <button class="theme" id="theme" type="button" aria-label="Switch light or dark">◐ Theme</button>
+    </div>
+    <dl class="head-grid">
+      <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your network" aria-label="Organisation name" spellcheck="false"></dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+    </dl>
+  </header>
+  <section class="intake">
+    <div class="intake-in">
+      <div class="drop" id="drop0"><h2>Drop in a failure-cause export</h2><p>A CSV of cause codes from your switch, core or session logs, with counts if you have them. It is read in your browser and never leaves this page.</p><div class="btns"><button class="btn" id="pick0" type="button">Choose a CSV file</button><button class="btn ghost" id="sample" type="button">Run an illustrative sample</button></div><input id="file0" type="file" accept=".csv,text/csv" hidden></div>
+      <p class="hint">Expected columns (any order, matched loosely): <b>cause</b>, optional <b>protocol</b> (SIP, Q.850, Diameter, GTPv2, 5GMM), <b>count</b>, <b>node</b>, <b>hour</b>. Decodes SIP responses (RFC 3261 and extensions), ITU-T Q.850 causes, Diameter base Result-Code (RFC 6733), GTPv2 causes (3GPP TS 29.274) and 5GMM causes (3GPP TS 24.501). Diameter codes carried in Experimental-Result are not decoded.</p>
+      
+      <div class="runs" id="runs" aria-live="polite"></div>
+      <p class="err" id="err" hidden></p>
+    </div>
+  </section>
+  <section id="report" class="report" hidden aria-live="polite"></section>
+  <section id="gate" class="gate" hidden>
+    <h2>That's your three trial runs</h2>
+    <p>The full version reads your raw traces, follows each top cause across the nodes it touches, and returns the root cause with the fix and the check that proves it. Let's set it up for <b id="gate-inst">your network</b>.</p>
+    <a class="btn" id="gate-wa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a>
+    <p class="hint" style="margin-top:12px">Or call +250 731 000 163</p>
+  </section>
+  <p class="foot" id="foot"></p>
+</main>
+<script>
+var DT={
+ sip:{400:["Bad Request","proto"],401:["Unauthorized","auth"],402:["Payment Required","auth"],403:["Forbidden","auth"],404:["Not Found","routing"],405:["Method Not Allowed","proto"],
+  406:["Not Acceptable","proto"],407:["Proxy Authentication Required","auth"],408:["Request Timeout","fault"],410:["Gone","routing"],413:["Request Entity Too Large","proto"],
+  414:["Request-URI Too Long","proto"],415:["Unsupported Media Type","proto"],416:["Unsupported URI Scheme","proto"],420:["Bad Extension","proto"],421:["Extension Required","proto"],
+  422:["Session Interval Too Small","proto"],423:["Interval Too Brief","proto"],480:["Temporarily Unavailable","reach"],481:["Call/Transaction Does Not Exist","proto"],
+  482:["Loop Detected","routing"],483:["Too Many Hops","routing"],484:["Address Incomplete","routing"],485:["Ambiguous","routing"],486:["Busy Here","user"],
+  487:["Request Terminated","user"],488:["Not Acceptable Here","proto"],489:["Bad Event","proto"],491:["Request Pending","proto"],493:["Undecipherable","proto"],
+  494:["Security Agreement Required","proto"],500:["Server Internal Error","fault"],501:["Not Implemented","proto"],502:["Bad Gateway","fault"],503:["Service Unavailable","capacity"],
+  504:["Server Time-out","fault"],505:["Version Not Supported","proto"],513:["Message Too Large","proto"],580:["Precondition Failure","proto"],600:["Busy Everywhere","user"],
+  603:["Decline","user"],604:["Does Not Exist Anywhere","routing"],606:["Not Acceptable","proto"]},
+ q850:{1:["Unallocated (unassigned) number","routing"],2:["No route to specified transit network","routing"],3:["No route to destination","routing"],6:["Channel unacceptable","proto"],
+  16:["Normal call clearing","normal"],17:["User busy","user"],18:["No user responding","reach"],19:["No answer from user (user alerted)","user"],20:["Subscriber absent","reach"],
+  21:["Call rejected","user"],22:["Number changed","routing"],27:["Destination out of order","fault"],28:["Invalid number format (address incomplete)","routing"],29:["Facility rejected","proto"],
+  31:["Normal, unspecified","normal"],34:["No circuit/channel available","capacity"],38:["Network out of order","fault"],41:["Temporary failure","fault"],42:["Switching equipment congestion","capacity"],
+  44:["Requested circuit/channel not available","capacity"],47:["Resource unavailable, unspecified","capacity"],50:["Requested facility not subscribed","auth"],57:["Bearer capability not authorized","auth"],
+  58:["Bearer capability not presently available","capacity"],63:["Service or option not available, unspecified","proto"],65:["Bearer capability not implemented","proto"],
+  69:["Requested facility not implemented","proto"],79:["Service or option not implemented, unspecified","proto"],88:["Incompatible destination","proto"],102:["Recovery on timer expiry","fault"],
+  111:["Protocol error, unspecified","proto"],127:["Interworking, unspecified","proto"]},
+ dia:{2001:["DIAMETER_SUCCESS","normal"],2002:["DIAMETER_LIMITED_SUCCESS","normal"],3001:["DIAMETER_COMMAND_UNSUPPORTED","proto"],3002:["DIAMETER_UNABLE_TO_DELIVER","routing"],
+  3003:["DIAMETER_REALM_NOT_SERVED","routing"],3004:["DIAMETER_TOO_BUSY","capacity"],3005:["DIAMETER_LOOP_DETECTED","routing"],3006:["DIAMETER_REDIRECT_INDICATION","routing"],
+  3007:["DIAMETER_APPLICATION_UNSUPPORTED","proto"],3008:["DIAMETER_INVALID_HDR_BITS","proto"],3009:["DIAMETER_INVALID_AVP_BITS","proto"],3010:["DIAMETER_UNKNOWN_PEER","routing"],
+  4001:["DIAMETER_AUTHENTICATION_REJECTED","auth"],4002:["DIAMETER_OUT_OF_SPACE","capacity"],4003:["ELECTION_LOST","proto"],5001:["DIAMETER_AVP_UNSUPPORTED","proto"],
+  5002:["DIAMETER_UNKNOWN_SESSION_ID","proto"],5003:["DIAMETER_AUTHORIZATION_REJECTED","auth"],5004:["DIAMETER_INVALID_AVP_VALUE","proto"],5005:["DIAMETER_MISSING_AVP","proto"],
+  5006:["DIAMETER_RESOURCES_EXCEEDED","capacity"],5007:["DIAMETER_CONTRADICTING_AVPS","proto"],5008:["DIAMETER_AVP_NOT_ALLOWED","proto"],5009:["DIAMETER_AVP_OCCURS_TOO_MANY_TIMES","proto"],
+  5010:["DIAMETER_NO_COMMON_APPLICATION","proto"],5011:["DIAMETER_UNSUPPORTED_VERSION","proto"],5012:["DIAMETER_UNABLE_TO_COMPLY","fault"],5013:["DIAMETER_INVALID_BIT_IN_HEADER","proto"],
+  5014:["DIAMETER_INVALID_AVP_LENGTH","proto"],5015:["DIAMETER_INVALID_MESSAGE_LENGTH","proto"],5016:["DIAMETER_INVALID_AVP_BIT_COMBO","proto"],5017:["DIAMETER_NO_COMMON_SECURITY","proto"]},
+ gtp:{16:["Request accepted","normal"],17:["Request accepted partially","normal"],18:["New PDN type due to network preference","normal"],19:["New PDN type due to single address bearer only","normal"],
+  64:["Context Not Found","proto"],65:["Invalid Message Format","proto"],66:["Version not supported by next peer","proto"],67:["Invalid length","proto"],68:["Service not supported","proto"],
+  69:["Mandatory IE incorrect","proto"],70:["Mandatory IE missing","proto"],72:["System failure","fault"],73:["No resources available","capacity"],74:["Semantic error in the TFT operation","proto"],
+  75:["Syntactic error in the TFT operation","proto"],76:["Semantic errors in packet filter(s)","proto"],77:["Syntactic errors in packet filter(s)","proto"],78:["Missing or unknown APN","auth"],
+  80:["GRE key not found","proto"],81:["Relocation failure","fault"],82:["Denied in RAT","auth"],83:["Preferred PDN type not supported","proto"],84:["All dynamic addresses are occupied","capacity"],
+  85:["UE context without TFT already activated","proto"],86:["Protocol type not supported","proto"],87:["UE not responding","reach"],88:["UE refuses","user"],89:["Service denied","auth"],
+  90:["Unable to page UE","reach"],91:["No memory available","capacity"],92:["User authentication failed","auth"],93:["APN access denied – no subscription","auth"],
+  94:["Request rejected (reason not specified)","fault"],100:["Remote peer not responding","fault"],110:["Temporarily rejected due to handover/TAU/RAU procedure in progress","fault"],113:["APN Congestion","capacity"]},
+ nas5g:{3:["Illegal UE","auth"],5:["PEI not accepted","auth"],6:["Illegal ME","auth"],7:["5GS services not allowed","auth"],9:["UE identity cannot be derived by the network","auth"],
+  10:["Implicitly de-registered","reach"],11:["PLMN not allowed","auth"],12:["Tracking area not allowed","auth"],13:["Roaming not allowed in this tracking area","auth"],
+  15:["No suitable cells in tracking area","auth"],20:["MAC failure","auth"],21:["Synch failure","auth"],22:["Congestion","capacity"],23:["UE security capabilities mismatch","proto"],
+  24:["Security mode rejected, unspecified","proto"],26:["Non-5G authentication unacceptable","auth"],27:["N1 mode not allowed","auth"],28:["Restricted service area","auth"],
+  31:["Redirection to EPC required","routing"],43:["LADN not available","auth"],62:["No network slices available","auth"],65:["Maximum number of PDU sessions reached","capacity"],
+  67:["Insufficient resources for specific slice and DNN","capacity"],69:["Insufficient resources for specific slice","capacity"],71:["ngKSI already in use","proto"],
+  72:["Non-3GPP access to 5GCN not allowed","auth"],73:["Serving network not authorized","auth"],90:["Payload was not forwarded","fault"],91:["DNN not supported or not subscribed in the slice","auth"],
+  92:["Insufficient user-plane resources for the PDU session","capacity"],95:["Semantically incorrect message","proto"],96:["Invalid mandatory information","proto"],
+  97:["Message type non-existent or not implemented","proto"],98:["Message type not compatible with the protocol state","proto"],99:["Information element non-existent or not implemented","proto"],
+  100:["Conditional IE error","proto"],101:["Message not compatible with the protocol state","proto"],111:["Protocol error, unspecified","proto"]}
+};
+var CAT={normal:["Normal completion","Not a failure"],user:["Customer behaviour","Busy, declined or hung up: not a network fault"],
+ reach:["Subscriber unreachable","Phone off, out of coverage or not registered: check coverage, paging and registration"],
+ routing:["Number or routing","Check number analysis, routing tables, the portability database and interconnect routes"],
+ capacity:["Capacity or congestion","Check trunk and node load in the busy hour, licences and overload controls"],
+ fault:["Network fault or timeout","Check node alarms, link status and the timers between peers"],
+ auth:["Subscription or authorisation","Check subscriber data, APN or DNN and slice provisioning, and roaming agreements"],
+ proto:["Protocol or interoperability","Check message traces between the two peers and their feature and codec negotiation"],
+ unknown:["Not in the table","Look the code up in the specification named"]};
+var SPEC={sip:"RFC 3261 §21 and extensions",q850:"ITU-T Q.850",dia:"RFC 6733 §7.1",gtp:"3GPP TS 29.274 Table 8.4-1",nas5g:"3GPP TS 24.501 §9.11.3.2",x:"protocol not given"};
+var PN={sip:"SIP",q850:"Q.850",dia:"Diameter",gtp:"GTPv2",nas5g:"5GMM",x:"?"};
+var TOOL={
+ analyse:function(ps,inp,U){
+  var P=ps[0],H=P.header;
+  var cP=U.pick(H,["protocol","proto","family","interface"]), cC=U.pick(H,["cause","cause_code","result_code","code","response","reason_code","status"]);
+  var cN=U.pick(H,["count","occurrences","attempts","total","n"]), cNode=U.pick(H,["node","element","ne","host","peer","trunk","network"]), cT=U.pick(H,["hour","time","timestamp","datetime","date"]);
+  if(!cC) throw "I need a 'cause' column with the code.";
+  var agg={}, cat={}, nodes={}, hours=[], fail=0, normal=0, dec=0; for(var h=0;h<24;h++) hours.push(0);
+  P.rows.forEach(function(r){
+    var raw=String(r[cC]||""), pr=protoOf(cP?r[cP]:"", raw); var code=parseInt((raw.replace(/sip\s*\/\s*2\.0/i,"SIP").replace(/^\s*(sip|q\.?\s?850|isup|bicc|diameter|dia|gtpv?2?|gtp|5gmm|nas)\s*[:#\-]?\s*/i,"").match(/\d+/)||[""])[0],10);
+    if(isNaN(code)) return; if(pr==="x") pr=code>=100&&code<700?"sip":(code>=1000&&code<6000?"dia":"x");
+    var n=cN?U.num(r[cN]):1; if(!(n>0)) n=1;
+    var info=(DT[pr]&&DT[pr][code])||null, c=info?info[1]:"unknown";
+    if(c==="normal"){ normal+=n; return; }
+    fail+=n; if(info) dec+=n; var k=pr+"|"+code;
+    if(!agg[k]) agg[k]={p:pr,code:code,name:info?info[0]:"Not in the table",cat:c,n:0}; agg[k].n+=n; cat[c]=(cat[c]||0)+n;
+    if(cNode){ var nd=r[cNode]||"?"; if(!nodes[nd]) nodes[nd]={n:0,net:0,top:{}}; nodes[nd].n+=n; if(c!=="user"&&c!=="reach"){ nodes[nd].net+=n; nodes[nd].top[k]=(nodes[nd].top[k]||0)+n; } }
+    if(cT&&c!=="user"&&c!=="reach"){ var hr=U.hour(r[cT]); if(hr!==null) hours[hr]+=n; }
+  });
+  if(!fail) throw "No failure causes found in this file (only normal completions or unreadable codes).";
+  return {agg:agg,cat:cat,nodes:nodes,hours:hours,fail:fail,normal:normal,dec:dec,hasNode:!!cNode,hasT:!!cT};
+  function protoOf(col,raw){ var s=(String(col||"")+" "+raw).toLowerCase();
+    if(/\bsip\b/.test(s)) return "sip"; if(/q\.?\s?850|isup|bicc/.test(s)) return "q850"; if(/diameter|\bdia\b/.test(s)) return "dia";
+    if(/gtp/.test(s)) return "gtp"; if(/5gmm|\bnas\b|\b5g\b/.test(s)) return "nas5g"; return "x"; }
+ },
+ render:function(R,inp,U,ctx){
+  var list=Object.keys(R.agg).map(function(k){return R.agg[k];}).sort(function(a,b){return b.n-a.n;});
+  var net=list.filter(function(x){return x.cat!=="user"&&x.cat!=="reach";}), netN=0; net.forEach(function(x){netN+=x.n;});
+  var userN=R.cat.user||0, reachN=R.cat.reach||0, top3=net.slice(0,3), t3=0; top3.forEach(function(x){t3+=x.n;});
+  function lab(x){ return PN[x.p]+" "+x.code+" "+x.name; }
+  var cats=Object.keys(R.cat).filter(function(c){return c!=="user"&&c!=="reach";}).sort(function(a,b){return R.cat[b]-R.cat[a];});
+  var parts=[]; if(userN) parts.push("<b>"+U.pct(userN,R.fail)+"%</b> are customer behaviour (busy, declined, hung up)"); if(reachN) parts.push("<b>"+U.pct(reachN,R.fail)+"%</b> are subscribers out of reach");
+  var v="Of <b>"+U.fmt(R.fail)+"</b> failed attempts, "+(parts.length?parts.join(" and ")+(parts.length===2?", so neither is a network fault. ":", which is not a network fault. "):"all are network-side. ");
+  if(netN){ v+="Of the <b>"+U.fmt(netN)+"</b> network-side failures, <b>"+U.pct(t3,netN)+"%</b> come from "+(top3.length===3?"three causes":"these causes")+": "+top3.map(function(x){return "<b>"+U.esc(lab(x))+"</b> ("+U.fmt(x.n)+")";}).join(", ")+". ";
+    v+="Most point to <b>"+CAT[cats[0]][0].toLowerCase()+"</b>: "+CAT[cats[0]][1].charAt(0).toLowerCase()+CAT[cats[0]][1].slice(1)+"."; }
+  var tiles=[U.tile("Failed attempts",U.fmt(R.fail),"normal completions excluded"),U.tile("Network-side",U.pct(netN,R.fail)+"%",U.fmt(netN)+" attempts",netN?"warn":"good"),
+    U.tile("Top 3 share",U.pct(t3,netN)+"%","of network-side"),U.tile("Decoded",U.pct(R.dec,R.fail)+"%","of failures, to the standard")];
+  var S=[], cum=0;
+  S.push({title:"Network-side causes, ranked",cap:"Customer behaviour and unreachable subscribers are excluded here",html:U.table(["#","Code","Meaning","Area","Count","Share","Cumulative"],net.slice(0,12).map(function(x,i){ cum+=x.n;
+    return [String(i+1),PN[x.p]+" "+x.code,x.name,CAT[x.cat][0],U.fmt(x.n),U.pct(x.n,netN)+"%",U.pct(cum,netN)+"%"]; }),[0,4,5,6])});
+  var cm=Math.max.apply(null,cats.map(function(c){return R.cat[c];}));
+  S.push({title:"By area, with the first place to look",cap:"Network-side failures grouped by what they point to",html:U.bars(cats.map(function(c){return {label:CAT[c][0],w:cm?R.cat[c]/cm*100:0,text:U.fmt(R.cat[c])+" · "+U.pct(R.cat[c],netN)+"%",cls:c==="capacity"||c==="fault"?"bad":""};}))+
+    '<p class="note-s">'+cats.slice(0,3).map(function(c){return "<b>"+U.esc(CAT[c][0])+":</b> "+U.esc(CAT[c][1]);}).join("<br>")+'</p>'});
+  if(R.hasNode){ var nd=Object.keys(R.nodes).map(function(k){var o=R.nodes[k], tk=Object.keys(o.top).sort(function(a,b){return o.top[b]-o.top[a];})[0]; return {k:k,net:o.net,top:tk?R.agg[tk]:null,topn:tk?o.top[tk]:0};}).sort(function(a,b){return b.net-a.net;});
+    S.push({title:"Where it happens",cap:"Network-side failures by node, with each node's top cause",html:U.table(["Node","Network-side","Top cause","Count"],nd.slice(0,10).map(function(o){return [o.k,U.fmt(o.net),o.top?(PN[o.top.p]+" "+o.top.code+" "+o.top.name):"—",U.fmt(o.topn)];}),[1,3])}); }
+  if(R.hasT) S.push({title:"Through the day",cap:"Network-side failures by hour",html:U.heat(R.hours,"count")});
+  var L=[]; L.push("SIGNALLING CAUSES — "+ctx.name.toUpperCase()); L.push(U.fmt(R.fail)+" failed attempts   |   Prepared by Frutos"); L.push("");
+  L.push("FINDING"); L.push("- Customer behaviour "+U.pct(userN,R.fail)+"%, unreachable "+U.pct(reachN,R.fail)+"%, network-side "+U.pct(netN,R.fail)+"%");
+  net.slice(0,8).forEach(function(x,i){ L.push("  "+(i+1)+". "+PN[x.p]+" "+x.code+" "+x.name+" — "+U.fmt(x.n)+" ("+U.pct(x.n,netN)+"%) — "+CAT[x.cat][0]+" — "+SPEC[x.p]); });
+  if(cats.length) L.push("- First place to look: "+CAT[cats[0]][1]);
+  L.push(""); L.push("NEXT STEP");
+  L.push("- Share the raw traces for the top cause; I return the root cause, the fix and the check that proves it");
+  L.push("  within 3 working days, at a fixed price.");
+  L.push(""); L.push("Decoding: "+["sip","q850","dia","gtp","nas5g"].map(function(p){return PN[p]+" per "+SPEC[p];}).join("; ")+".");
+  L.push("Note: a cause shows where a failure was declared, not always where it began. Figures are indicative until run on your full records.");
+  return {verdict:v,tiles:tiles,sections:S,summary:L.join("\n")};
+ }
+};
+</script>
+<script>
+(function(){
+"use strict";
+var CFG={"slug": "cause-decoder", "maxRuns": 3, "wa": "250788312423", "defaultFor": "your network", "files": 1, "fileLabels": [], "summaryTitle": "Engineer-ready summary", "waMsg": "Muraho Frutos. I tried the Signalling Cause Decoder for {name} and I'd like the full version.", "foot": "Read entirely in your browser \u00b7 nothing is uploaded \u00b7 personal numbers are masked on sight. A trial limited to {n} runs. \u00a9 2026 Frutos."}, SAMPLES=["hour,protocol,cause,node,count\n2026-10-12 00:00,SIP,486,IMS-1,52\n2026-10-12 00:00,SIP,486,IMS-2,34\n2026-10-12 01:00,SIP,486,IMS-1,26\n2026-10-12 01:00,SIP,486,IMS-2,17\n2026-10-12 02:00,SIP,486,IMS-1,26\n2026-10-12 02:00,SIP,486,IMS-2,17\n2026-10-12 03:00,SIP,486,IMS-1,26\n2026-10-12 03:00,SIP,486,IMS-2,17\n2026-10-12 04:00,SIP,486,IMS-1,26\n2026-10-12 04:00,SIP,486,IMS-2,17\n2026-10-12 05:00,SIP,486,IMS-1,52\n2026-10-12 05:00,SIP,486,IMS-2,34\n2026-10-12 06:00,SIP,486,IMS-1,104\n2026-10-12 06:00,SIP,486,IMS-2,69\n2026-10-12 07:00,SIP,486,IMS-1,156\n2026-10-12 07:00,SIP,486,IMS-2,104\n2026-10-12 08:00,SIP,486,IMS-1,208\n2026-10-12 08:00,SIP,486,IMS-2,138\n2026-10-12 09:00,SIP,486,IMS-1,208\n2026-10-12 09:00,SIP,486,IMS-2,138\n2026-10-12 10:00,SIP,486,IMS-1,182\n2026-10-12 10:00,SIP,486,IMS-2,121\n2026-10-12 11:00,SIP,486,IMS-1,156\n2026-10-12 11:00,SIP,486,IMS-2,104\n2026-10-12 12:00,SIP,486,IMS-1,182\n2026-10-12 12:00,SIP,486,IMS-2,121\n2026-10-12 13:00,SIP,486,IMS-1,182\n2026-10-12 13:00,SIP,486,IMS-2,121\n2026-10-12 14:00,SIP,486,IMS-1,156\n2026-10-12 14:00,SIP,486,IMS-2,104\n2026-10-12 15:00,SIP,486,IMS-1,156\n2026-10-12 15:00,SIP,486,IMS-2,104\n2026-10-12 16:00,SIP,486,IMS-1,182\n2026-10-12 16:00,SIP,486,IMS-2,121\n2026-10-12 17:00,SIP,486,IMS-1,208\n2026-10-12 17:00,SIP,486,IMS-2,138\n2026-10-12 18:00,SIP,486,IMS-1,234\n2026-10-12 18:00,SIP,486,IMS-2,156\n2026-10-12 19:00,SIP,486,IMS-1,212\n2026-10-12 19:00,SIP,486,IMS-2,142\n2026-10-12 20:00,SIP,486,IMS-1,156\n2026-10-12 20:00,SIP,486,IMS-2,104\n2026-10-12 21:00,SIP,486,IMS-1,104\n2026-10-12 21:00,SIP,486,IMS-2,69\n2026-10-12 22:00,SIP,486,IMS-1,78\n2026-10-12 22:00,SIP,486,IMS-2,52\n2026-10-12 23:00,SIP,486,IMS-1,52\n2026-10-12 23:00,SIP,486,IMS-2,34\n2026-10-12 00:00,SIP,487,IMS-1,41\n2026-10-12 00:00,SIP,487,IMS-2,27\n2026-10-12 01:00,SIP,487,IMS-1,20\n2026-10-12 01:00,SIP,487,IMS-2,14\n2026-10-12 02:00,SIP,487,IMS-1,20\n2026-10-12 02:00,SIP,487,IMS-2,14\n2026-10-12 03:00,SIP,487,IMS-1,20\n2026-10-12 03:00,SIP,487,IMS-2,14\n2026-10-12 04:00,SIP,487,IMS-1,20\n2026-10-12 04:00,SIP,487,IMS-2,14\n2026-10-12 05:00,SIP,487,IMS-1,41\n2026-10-12 05:00,SIP,487,IMS-2,27\n2026-10-12 06:00,SIP,487,IMS-1,82\n2026-10-12 06:00,SIP,487,IMS-2,54\n2026-10-12 07:00,SIP,487,IMS-1,123\n2026-10-12 07:00,SIP,487,IMS-2,82\n2026-10-12 08:00,SIP,487,IMS-1,164\n2026-10-12 08:00,SIP,487,IMS-2,109\n2026-10-12 09:00,SIP,487,IMS-1,164\n2026-10-12 09:00,SIP,487,IMS-2,109\n2026-10-12 10:00,SIP,487,IMS-1,143\n2026-10-12 10:00,SIP,487,IMS-2,96\n2026-10-12 11:00,SIP,487,IMS-1,123\n2026-10-12 11:00,SIP,487,IMS-2,82\n2026-10-12 12:00,SIP,487,IMS-1,143\n2026-10-12 12:00,SIP,487,IMS-2,96\n2026-10-12 13:00,SIP,487,IMS-1,143\n2026-10-12 13:00,SIP,487,IMS-2,96\n2026-10-12 14:00,SIP,487,IMS-1,123\n2026-10-12 14:00,SIP,487,IMS-2,82\n2026-10-12 15:00,SIP,487,IMS-1,123\n2026-10-12 15:00,SIP,487,IMS-2,82\n2026-10-12 16:00,SIP,487,IMS-1,143\n2026-10-12 16:00,SIP,487,IMS-2,96\n2026-10-12 17:00,SIP,487,IMS-1,164\n2026-10-12 17:00,SIP,487,IMS-2,109\n2026-10-12 18:00,SIP,487,IMS-1,184\n2026-10-12 18:00,SIP,487,IMS-2,123\n2026-10-12 19:00,SIP,487,IMS-1,167\n2026-10-12 19:00,SIP,487,IMS-2,112\n2026-10-12 20:00,SIP,487,IMS-1,123\n2026-10-12 20:00,SIP,487,IMS-2,82\n2026-10-12 21:00,SIP,487,IMS-1,82\n2026-10-12 21:00,SIP,487,IMS-2,54\n2026-10-12 22:00,SIP,487,IMS-1,61\n2026-10-12 22:00,SIP,487,IMS-2,41\n2026-10-12 23:00,SIP,487,IMS-1,41\n2026-10-12 23:00,SIP,487,IMS-2,27\n2026-10-12 00:00,SIP,480,IMS-1,33\n2026-10-12 00:00,SIP,480,IMS-2,22\n2026-10-12 01:00,SIP,480,IMS-1,16\n2026-10-12 01:00,SIP,480,IMS-2,11\n2026-10-12 02:00,SIP,480,IMS-1,16\n2026-10-12 02:00,SIP,480,IMS-2,11\n2026-10-12 03:00,SIP,480,IMS-1,16\n2026-10-12 03:00,SIP,480,IMS-2,11\n2026-10-12 04:00,SIP,480,IMS-1,16\n2026-10-12 04:00,SIP,480,IMS-2,11\n2026-10-12 05:00,SIP,480,IMS-1,33\n2026-10-12 05:00,SIP,480,IMS-2,22\n2026-10-12 06:00,SIP,480,IMS-1,66\n2026-10-12 06:00,SIP,480,IMS-2,44\n2026-10-12 07:00,SIP,480,IMS-1,99\n2026-10-12 07:00,SIP,480,IMS-2,66\n2026-10-12 08:00,SIP,480,IMS-1,132\n2026-10-12 08:00,SIP,480,IMS-2,88\n2026-10-12 09:00,SIP,480,IMS-1,132\n2026-10-12 09:00,SIP,480,IMS-2,88\n2026-10-12 10:00,SIP,480,IMS-1,115\n2026-10-12 10:00,SIP,480,IMS-2,77\n2026-10-12 11:00,SIP,480,IMS-1,99\n2026-10-12 11:00,SIP,480,IMS-2,66\n2026-10-12 12:00,SIP,480,IMS-1,115\n2026-10-12 12:00,SIP,480,IMS-2,77\n2026-10-12 13:00,SIP,480,IMS-1,115\n2026-10-12 13:00,SIP,480,IMS-2,77\n2026-10-12 14:00,SIP,480,IMS-1,99\n2026-10-12 14:00,SIP,480,IMS-2,66\n2026-10-12 15:00,SIP,480,IMS-1,99\n2026-10-12 15:00,SIP,480,IMS-2,66\n2026-10-12 16:00,SIP,480,IMS-1,115\n2026-10-12 16:00,SIP,480,IMS-2,77\n2026-10-12 17:00,SIP,480,IMS-1,132\n2026-10-12 17:00,SIP,480,IMS-2,88\n2026-10-12 18:00,SIP,480,IMS-1,148\n2026-10-12 18:00,SIP,480,IMS-2,99\n2026-10-12 19:00,SIP,480,IMS-1,135\n2026-10-12 19:00,SIP,480,IMS-2,90\n2026-10-12 20:00,SIP,480,IMS-1,99\n2026-10-12 20:00,SIP,480,IMS-2,66\n2026-10-12 21:00,SIP,480,IMS-1,66\n2026-10-12 21:00,SIP,480,IMS-2,44\n2026-10-12 22:00,SIP,480,IMS-1,49\n2026-10-12 22:00,SIP,480,IMS-2,33\n2026-10-12 23:00,SIP,480,IMS-1,33\n2026-10-12 23:00,SIP,480,IMS-2,22\n2026-10-12 00:00,SIP,408,IMS-1,19\n2026-10-12 00:00,SIP,408,IMS-2,12\n2026-10-12 01:00,SIP,408,IMS-1,9\n2026-10-12 01:00,SIP,408,IMS-2,6\n2026-10-12 02:00,SIP,408,IMS-1,9\n2026-10-12 02:00,SIP,408,IMS-2,6\n2026-10-12 03:00,SIP,408,IMS-1,9\n2026-10-12 03:00,SIP,408,IMS-2,6\n2026-10-12 04:00,SIP,408,IMS-1,9\n2026-10-12 04:00,SIP,408,IMS-2,6\n2026-10-12 05:00,SIP,408,IMS-1,19\n2026-10-12 05:00,SIP,408,IMS-2,12\n2026-10-12 06:00,SIP,408,IMS-1,38\n2026-10-12 06:00,SIP,408,IMS-2,25\n2026-10-12 07:00,SIP,408,IMS-1,57\n2026-10-12 07:00,SIP,408,IMS-2,38\n2026-10-12 08:00,SIP,408,IMS-1,76\n2026-10-12 08:00,SIP,408,IMS-2,50\n2026-10-12 09:00,SIP,408,IMS-1,76\n2026-10-12 09:00,SIP,408,IMS-2,50\n2026-10-12 10:00,SIP,408,IMS-1,66\n2026-10-12 10:00,SIP,408,IMS-2,44\n2026-10-12 11:00,SIP,408,IMS-1,57\n2026-10-12 11:00,SIP,408,IMS-2,38\n2026-10-12 12:00,SIP,408,IMS-1,66\n2026-10-12 12:00,SIP,408,IMS-2,44\n2026-10-12 13:00,SIP,408,IMS-1,66\n2026-10-12 13:00,SIP,408,IMS-2,44\n2026-10-12 14:00,SIP,408,IMS-1,57\n2026-10-12 14:00,SIP,408,IMS-2,38\n2026-10-12 15:00,SIP,408,IMS-1,57\n2026-10-12 15:00,SIP,408,IMS-2,38\n2026-10-12 16:00,SIP,408,IMS-1,66\n2026-10-12 16:00,SIP,408,IMS-2,44\n2026-10-12 17:00,SIP,408,IMS-1,76\n2026-10-12 17:00,SIP,408,IMS-2,50\n2026-10-12 18:00,SIP,408,IMS-1,85\n2026-10-12 18:00,SIP,408,IMS-2,57\n2026-10-12 19:00,SIP,408,IMS-1,83\n2026-10-12 19:00,SIP,408,IMS-2,56\n2026-10-12 20:00,SIP,408,IMS-1,57\n2026-10-12 20:00,SIP,408,IMS-2,38\n2026-10-12 21:00,SIP,408,IMS-1,38\n2026-10-12 21:00,SIP,408,IMS-2,25\n2026-10-12 22:00,SIP,408,IMS-1,28\n2026-10-12 22:00,SIP,408,IMS-2,19\n2026-10-12 23:00,SIP,408,IMS-1,19\n2026-10-12 23:00,SIP,408,IMS-2,12\n2026-10-12 00:00,SIP,503,IMS-2,30\n2026-10-12 01:00,SIP,503,IMS-2,15\n2026-10-12 02:00,SIP,503,IMS-2,15\n2026-10-12 03:00,SIP,503,IMS-2,15\n2026-10-12 04:00,SIP,503,IMS-2,15\n2026-10-12 05:00,SIP,503,IMS-2,30\n2026-10-12 06:00,SIP,503,IMS-2,60\n2026-10-12 07:00,SIP,503,IMS-2,91\n2026-10-12 08:00,SIP,503,IMS-2,121\n2026-10-12 09:00,SIP,503,IMS-2,121\n2026-10-12 10:00,SIP,503,IMS-2,106\n2026-10-12 11:00,SIP,503,IMS-2,91\n2026-10-12 12:00,SIP,503,IMS-2,106\n2026-10-12 13:00,SIP,503,IMS-2,106\n2026-10-12 14:00,SIP,503,IMS-2,91\n2026-10-12 15:00,SIP,503,IMS-2,91\n2026-10-12 16:00,SIP,503,IMS-2,106\n2026-10-12 17:00,SIP,503,IMS-2,121\n2026-10-12 18:00,SIP,503,IMS-2,438\n2026-10-12 19:00,SIP,503,IMS-2,404\n2026-10-12 20:00,SIP,503,IMS-2,292\n2026-10-12 21:00,SIP,503,IMS-2,60\n2026-10-12 22:00,SIP,503,IMS-2,45\n2026-10-12 23:00,SIP,503,IMS-2,30\n2026-10-12 00:00,SIP,500,IMS-1,7\n2026-10-12 00:00,SIP,500,IMS-2,4\n2026-10-12 01:00,SIP,500,IMS-1,3\n2026-10-12 01:00,SIP,500,IMS-2,2\n2026-10-12 02:00,SIP,500,IMS-1,3\n2026-10-12 02:00,SIP,500,IMS-2,2\n2026-10-12 03:00,SIP,500,IMS-1,3\n2026-10-12 03:00,SIP,500,IMS-2,2\n2026-10-12 04:00,SIP,500,IMS-1,3\n2026-10-12 04:00,SIP,500,IMS-2,2\n2026-10-12 05:00,SIP,500,IMS-1,7\n2026-10-12 05:00,SIP,500,IMS-2,4\n2026-10-12 06:00,SIP,500,IMS-1,14\n2026-10-12 06:00,SIP,500,IMS-2,9\n2026-10-12 07:00,SIP,500,IMS-1,21\n2026-10-12 07:00,SIP,500,IMS-2,14\n2026-10-12 08:00,SIP,500,IMS-1,28\n2026-10-12 08:00,SIP,500,IMS-2,18\n2026-10-12 09:00,SIP,500,IMS-1,28\n2026-10-12 09:00,SIP,500,IMS-2,18\n2026-10-12 10:00,SIP,500,IMS-1,24\n2026-10-12 10:00,SIP,500,IMS-2,16\n2026-10-12 11:00,SIP,500,IMS-1,21\n2026-10-12 11:00,SIP,500,IMS-2,14\n2026-10-12 12:00,SIP,500,IMS-1,24\n2026-10-12 12:00,SIP,500,IMS-2,16\n2026-10-12 13:00,SIP,500,IMS-1,24\n2026-10-12 13:00,SIP,500,IMS-2,16\n2026-10-12 14:00,SIP,500,IMS-1,21\n2026-10-12 14:00,SIP,500,IMS-2,14\n2026-10-12 15:00,SIP,500,IMS-1,21\n2026-10-12 15:00,SIP,500,IMS-2,14\n2026-10-12 16:00,SIP,500,IMS-1,24\n2026-10-12 16:00,SIP,500,IMS-2,16\n2026-10-12 17:00,SIP,500,IMS-1,28\n2026-10-12 17:00,SIP,500,IMS-2,18\n2026-10-12 18:00,SIP,500,IMS-1,31\n2026-10-12 18:00,SIP,500,IMS-2,21\n2026-10-12 19:00,SIP,500,IMS-1,35\n2026-10-12 19:00,SIP,500,IMS-2,24\n2026-10-12 20:00,SIP,500,IMS-1,21\n2026-10-12 20:00,SIP,500,IMS-2,14\n2026-10-12 21:00,SIP,500,IMS-1,14\n2026-10-12 21:00,SIP,500,IMS-2,9\n2026-10-12 22:00,SIP,500,IMS-1,10\n2026-10-12 22:00,SIP,500,IMS-2,7\n2026-10-12 23:00,SIP,500,IMS-1,7\n2026-10-12 23:00,SIP,500,IMS-2,4\n2026-10-12 00:00,SIP,404,IMS-1,9\n2026-10-12 00:00,SIP,404,IMS-2,6\n2026-10-12 01:00,SIP,404,IMS-1,4\n2026-10-12 01:00,SIP,404,IMS-2,3\n2026-10-12 02:00,SIP,404,IMS-1,4\n2026-10-12 02:00,SIP,404,IMS-2,3\n2026-10-12 03:00,SIP,404,IMS-1,4\n2026-10-12 03:00,SIP,404,IMS-2,3\n2026-10-12 04:00,SIP,404,IMS-1,4\n2026-10-12 04:00,SIP,404,IMS-2,3\n2026-10-12 05:00,SIP,404,IMS-1,9\n2026-10-12 05:00,SIP,404,IMS-2,6\n2026-10-12 06:00,SIP,404,IMS-1,18\n2026-10-12 06:00,SIP,404,IMS-2,12\n2026-10-12 07:00,SIP,404,IMS-1,27\n2026-10-12 07:00,SIP,404,IMS-2,18\n2026-10-12 08:00,SIP,404,IMS-1,36\n2026-10-12 08:00,SIP,404,IMS-2,24\n2026-10-12 09:00,SIP,404,IMS-1,36\n2026-10-12 09:00,SIP,404,IMS-2,24\n2026-10-12 10:00,SIP,404,IMS-1,31\n2026-10-12 10:00,SIP,404,IMS-2,21\n2026-10-12 11:00,SIP,404,IMS-1,27\n2026-10-12 11:00,SIP,404,IMS-2,18\n2026-10-12 12:00,SIP,404,IMS-1,31\n2026-10-12 12:00,SIP,404,IMS-2,21\n2026-10-12 13:00,SIP,404,IMS-1,31\n2026-10-12 13:00,SIP,404,IMS-2,21\n2026-10-12 14:00,SIP,404,IMS-1,27\n2026-10-12 14:00,SIP,404,IMS-2,18\n2026-10-12 15:00,SIP,404,IMS-1,27\n2026-10-12 15:00,SIP,404,IMS-2,18\n2026-10-12 16:00,SIP,404,IMS-1,31\n2026-10-12 16:00,SIP,404,IMS-2,21\n2026-10-12 17:00,SIP,404,IMS-1,36\n2026-10-12 17:00,SIP,404,IMS-2,24\n2026-10-12 18:00,SIP,404,IMS-1,40\n2026-10-12 18:00,SIP,404,IMS-2,27\n2026-10-12 19:00,SIP,404,IMS-1,39\n2026-10-12 19:00,SIP,404,IMS-2,26\n2026-10-12 20:00,SIP,404,IMS-1,27\n2026-10-12 20:00,SIP,404,IMS-2,18\n2026-10-12 21:00,SIP,404,IMS-1,18\n2026-10-12 21:00,SIP,404,IMS-2,12\n2026-10-12 22:00,SIP,404,IMS-1,13\n2026-10-12 22:00,SIP,404,IMS-2,9\n2026-10-12 23:00,SIP,404,IMS-1,9\n2026-10-12 23:00,SIP,404,IMS-2,6\n2026-10-12 00:00,SIP,403,IMS-1,4\n2026-10-12 00:00,SIP,403,IMS-2,2\n2026-10-12 01:00,SIP,403,IMS-1,2\n2026-10-12 01:00,SIP,403,IMS-2,1\n2026-10-12 02:00,SIP,403,IMS-1,2\n2026-10-12 02:00,SIP,403,IMS-2,1\n2026-10-12 03:00,SIP,403,IMS-1,2\n2026-10-12 03:00,SIP,403,IMS-2,1\n2026-10-12 04:00,SIP,403,IMS-1,2\n2026-10-12 04:00,SIP,403,IMS-2,1\n2026-10-12 05:00,SIP,403,IMS-1,4\n2026-10-12 05:00,SIP,403,IMS-2,2\n2026-10-12 06:00,SIP,403,IMS-1,8\n2026-10-12 06:00,SIP,403,IMS-2,5\n2026-10-12 07:00,SIP,403,IMS-1,12\n2026-10-12 07:00,SIP,403,IMS-2,8\n2026-10-12 08:00,SIP,403,IMS-1,16\n2026-10-12 08:00,SIP,403,IMS-2,10\n2026-10-12 09:00,SIP,403,IMS-1,16\n2026-10-12 09:00,SIP,403,IMS-2,10\n2026-10-12 10:00,SIP,403,IMS-1,14\n2026-10-12 10:00,SIP,403,IMS-2,9\n2026-10-12 11:00,SIP,403,IMS-1,12\n2026-10-12 11:00,SIP,403,IMS-2,8\n2026-10-12 12:00,SIP,403,IMS-1,14\n2026-10-12 12:00,SIP,403,IMS-2,9\n2026-10-12 13:00,SIP,403,IMS-1,14\n2026-10-12 13:00,SIP,403,IMS-2,9\n2026-10-12 14:00,SIP,403,IMS-1,12\n2026-10-12 14:00,SIP,403,IMS-2,8\n2026-10-12 15:00,SIP,403,IMS-1,12\n2026-10-12 15:00,SIP,403,IMS-2,8\n2026-10-12 16:00,SIP,403,IMS-1,14\n2026-10-12 16:00,SIP,403,IMS-2,9\n2026-10-12 17:00,SIP,403,IMS-1,16\n2026-10-12 17:00,SIP,403,IMS-2,10\n2026-10-12 18:00,SIP,403,IMS-1,18\n2026-10-12 18:00,SIP,403,IMS-2,12\n2026-10-12 19:00,SIP,403,IMS-1,20\n2026-10-12 19:00,SIP,403,IMS-2,14\n2026-10-12 20:00,SIP,403,IMS-1,12\n2026-10-12 20:00,SIP,403,IMS-2,8\n2026-10-12 21:00,SIP,403,IMS-1,8\n2026-10-12 21:00,SIP,403,IMS-2,5\n2026-10-12 22:00,SIP,403,IMS-1,6\n2026-10-12 22:00,SIP,403,IMS-2,4\n2026-10-12 23:00,SIP,403,IMS-1,4\n2026-10-12 23:00,SIP,403,IMS-2,2\n2026-10-12 00:00,SIP,488,IMS-1,3\n2026-10-12 00:00,SIP,488,IMS-2,2\n2026-10-12 01:00,SIP,488,IMS-1,1\n2026-10-12 01:00,SIP,488,IMS-2,1\n2026-10-12 02:00,SIP,488,IMS-1,1\n2026-10-12 02:00,SIP,488,IMS-2,1\n2026-10-12 03:00,SIP,488,IMS-1,1\n2026-10-12 03:00,SIP,488,IMS-2,1\n2026-10-12 04:00,SIP,488,IMS-1,1\n2026-10-12 04:00,SIP,488,IMS-2,1\n2026-10-12 05:00,SIP,488,IMS-1,3\n2026-10-12 05:00,SIP,488,IMS-2,2\n2026-10-12 06:00,SIP,488,IMS-1,7\n2026-10-12 06:00,SIP,488,IMS-2,4\n2026-10-12 07:00,SIP,488,IMS-1,10\n2026-10-12 07:00,SIP,488,IMS-2,7\n2026-10-12 08:00,SIP,488,IMS-1,14\n2026-10-12 08:00,SIP,488,IMS-2,9\n2026-10-12 09:00,SIP,488,IMS-1,14\n2026-10-12 09:00,SIP,488,IMS-2,9\n2026-10-12 10:00,SIP,488,IMS-1,12\n2026-10-12 10:00,SIP,488,IMS-2,8\n2026-10-12 11:00,SIP,488,IMS-1,10\n2026-10-12 11:00,SIP,488,IMS-2,7\n2026-10-12 12:00,SIP,488,IMS-1,12\n2026-10-12 12:00,SIP,488,IMS-2,8\n2026-10-12 13:00,SIP,488,IMS-1,12\n2026-10-12 13:00,SIP,488,IMS-2,8\n2026-10-12 14:00,SIP,488,IMS-1,10\n2026-10-12 14:00,SIP,488,IMS-2,7\n2026-10-12 15:00,SIP,488,IMS-1,10\n2026-10-12 15:00,SIP,488,IMS-2,7\n2026-10-12 16:00,SIP,488,IMS-1,12\n2026-10-12 16:00,SIP,488,IMS-2,8\n2026-10-12 17:00,SIP,488,IMS-1,14\n2026-10-12 17:00,SIP,488,IMS-2,9\n2026-10-12 18:00,SIP,488,IMS-1,16\n2026-10-12 18:00,SIP,488,IMS-2,10\n2026-10-12 19:00,SIP,488,IMS-1,22\n2026-10-12 19:00,SIP,488,IMS-2,15\n2026-10-12 20:00,SIP,488,IMS-1,10\n2026-10-12 20:00,SIP,488,IMS-2,7\n2026-10-12 21:00,SIP,488,IMS-1,7\n2026-10-12 21:00,SIP,488,IMS-2,4\n2026-10-12 22:00,SIP,488,IMS-1,5\n2026-10-12 22:00,SIP,488,IMS-2,3\n2026-10-12 23:00,SIP,488,IMS-1,3\n2026-10-12 23:00,SIP,488,IMS-2,2\n2026-10-12 00:00,SIP,603,IMS-1,6\n2026-10-12 00:00,SIP,603,IMS-2,4\n2026-10-12 01:00,SIP,603,IMS-1,3\n2026-10-12 01:00,SIP,603,IMS-2,2\n2026-10-12 02:00,SIP,603,IMS-1,3\n2026-10-12 02:00,SIP,603,IMS-2,2\n2026-10-12 03:00,SIP,603,IMS-1,3\n2026-10-12 03:00,SIP,603,IMS-2,2\n2026-10-12 04:00,SIP,603,IMS-1,3\n2026-10-12 04:00,SIP,603,IMS-2,2\n2026-10-12 05:00,SIP,603,IMS-1,6\n2026-10-12 05:00,SIP,603,IMS-2,4\n2026-10-12 06:00,SIP,603,IMS-1,12\n2026-10-12 06:00,SIP,603,IMS-2,8\n2026-10-12 07:00,SIP,603,IMS-1,18\n2026-10-12 07:00,SIP,603,IMS-2,12\n2026-10-12 08:00,SIP,603,IMS-1,24\n2026-10-12 08:00,SIP,603,IMS-2,16\n2026-10-12 09:00,SIP,603,IMS-1,24\n2026-10-12 09:00,SIP,603,IMS-2,16\n2026-10-12 10:00,SIP,603,IMS-1,21\n2026-10-12 10:00,SIP,603,IMS-2,14\n2026-10-12 11:00,SIP,603,IMS-1,18\n2026-10-12 11:00,SIP,603,IMS-2,12\n2026-10-12 12:00,SIP,603,IMS-1,21\n2026-10-12 12:00,SIP,603,IMS-2,14\n2026-10-12 13:00,SIP,603,IMS-1,21\n2026-10-12 13:00,SIP,603,IMS-2,14\n2026-10-12 14:00,SIP,603,IMS-1,18\n2026-10-12 14:00,SIP,603,IMS-2,12\n2026-10-12 15:00,SIP,603,IMS-1,18\n2026-10-12 15:00,SIP,603,IMS-2,12\n2026-10-12 16:00,SIP,603,IMS-1,21\n2026-10-12 16:00,SIP,603,IMS-2,14\n2026-10-12 17:00,SIP,603,IMS-1,24\n2026-10-12 17:00,SIP,603,IMS-2,16\n2026-10-12 18:00,SIP,603,IMS-1,27\n2026-10-12 18:00,SIP,603,IMS-2,18\n2026-10-12 19:00,SIP,603,IMS-1,24\n2026-10-12 19:00,SIP,603,IMS-2,16\n2026-10-12 20:00,SIP,603,IMS-1,18\n2026-10-12 20:00,SIP,603,IMS-2,12\n2026-10-12 21:00,SIP,603,IMS-1,12\n2026-10-12 21:00,SIP,603,IMS-2,8\n2026-10-12 22:00,SIP,603,IMS-1,9\n2026-10-12 22:00,SIP,603,IMS-2,6\n2026-10-12 23:00,SIP,603,IMS-1,6\n2026-10-12 23:00,SIP,603,IMS-2,4\n2026-10-12 00:00,Q.850,17,Interconnect-GW,35\n2026-10-12 01:00,Q.850,17,Interconnect-GW,17\n2026-10-12 02:00,Q.850,17,Interconnect-GW,17\n2026-10-12 03:00,Q.850,17,Interconnect-GW,17\n2026-10-12 04:00,Q.850,17,Interconnect-GW,17\n2026-10-12 05:00,Q.850,17,Interconnect-GW,35\n2026-10-12 06:00,Q.850,17,Interconnect-GW,70\n2026-10-12 07:00,Q.850,17,Interconnect-GW,105\n2026-10-12 08:00,Q.850,17,Interconnect-GW,140\n2026-10-12 09:00,Q.850,17,Interconnect-GW,140\n2026-10-12 10:00,Q.850,17,Interconnect-GW,122\n2026-10-12 11:00,Q.850,17,Interconnect-GW,105\n2026-10-12 12:00,Q.850,17,Interconnect-GW,122\n2026-10-12 13:00,Q.850,17,Interconnect-GW,122\n2026-10-12 14:00,Q.850,17,Interconnect-GW,105\n2026-10-12 15:00,Q.850,17,Interconnect-GW,105\n2026-10-12 16:00,Q.850,17,Interconnect-GW,122\n2026-10-12 17:00,Q.850,17,Interconnect-GW,140\n2026-10-12 18:00,Q.850,17,Interconnect-GW,157\n2026-10-12 19:00,Q.850,17,Interconnect-GW,145\n2026-10-12 20:00,Q.850,17,Interconnect-GW,105\n2026-10-12 21:00,Q.850,17,Interconnect-GW,70\n2026-10-12 22:00,Q.850,17,Interconnect-GW,52\n2026-10-12 23:00,Q.850,17,Interconnect-GW,35\n2026-10-12 00:00,Q.850,19,Interconnect-GW,30\n2026-10-12 01:00,Q.850,19,Interconnect-GW,15\n2026-10-12 02:00,Q.850,19,Interconnect-GW,15\n2026-10-12 03:00,Q.850,19,Interconnect-GW,15\n2026-10-12 04:00,Q.850,19,Interconnect-GW,15\n2026-10-12 05:00,Q.850,19,Interconnect-GW,30\n2026-10-12 06:00,Q.850,19,Interconnect-GW,60\n2026-10-12 07:00,Q.850,19,Interconnect-GW,90\n2026-10-12 08:00,Q.850,19,Interconnect-GW,120\n2026-10-12 09:00,Q.850,19,Interconnect-GW,120\n2026-10-12 10:00,Q.850,19,Interconnect-GW,105\n2026-10-12 11:00,Q.850,19,Interconnect-GW,90\n2026-10-12 12:00,Q.850,19,Interconnect-GW,105\n2026-10-12 13:00,Q.850,19,Interconnect-GW,105\n2026-10-12 14:00,Q.850,19,Interconnect-GW,90\n2026-10-12 15:00,Q.850,19,Interconnect-GW,90\n2026-10-12 16:00,Q.850,19,Interconnect-GW,105\n2026-10-12 17:00,Q.850,19,Interconnect-GW,120\n2026-10-12 18:00,Q.850,19,Interconnect-GW,135\n2026-10-12 19:00,Q.850,19,Interconnect-GW,120\n2026-10-12 20:00,Q.850,19,Interconnect-GW,90\n2026-10-12 21:00,Q.850,19,Interconnect-GW,60\n2026-10-12 22:00,Q.850,19,Interconnect-GW,45\n2026-10-12 23:00,Q.850,19,Interconnect-GW,30\n2026-10-12 00:00,Q.850,18,Interconnect-GW,15\n2026-10-12 01:00,Q.850,18,Interconnect-GW,7\n2026-10-12 02:00,Q.850,18,Interconnect-GW,7\n2026-10-12 03:00,Q.850,18,Interconnect-GW,7\n2026-10-12 04:00,Q.850,18,Interconnect-GW,7\n2026-10-12 05:00,Q.850,18,Interconnect-GW,15\n2026-10-12 06:00,Q.850,18,Interconnect-GW,30\n2026-10-12 07:00,Q.850,18,Interconnect-GW,45\n2026-10-12 08:00,Q.850,18,Interconnect-GW,60\n2026-10-12 09:00,Q.850,18,Interconnect-GW,60\n2026-10-12 10:00,Q.850,18,Interconnect-GW,52\n2026-10-12 11:00,Q.850,18,Interconnect-GW,45\n2026-10-12 12:00,Q.850,18,Interconnect-GW,52\n2026-10-12 13:00,Q.850,18,Interconnect-GW,52\n2026-10-12 14:00,Q.850,18,Interconnect-GW,45\n2026-10-12 15:00,Q.850,18,Interconnect-GW,45\n2026-10-12 16:00,Q.850,18,Interconnect-GW,52\n2026-10-12 17:00,Q.850,18,Interconnect-GW,60\n2026-10-12 18:00,Q.850,18,Interconnect-GW,67\n2026-10-12 19:00,Q.850,18,Interconnect-GW,65\n2026-10-12 20:00,Q.850,18,Interconnect-GW,45\n2026-10-12 21:00,Q.850,18,Interconnect-GW,30\n2026-10-12 22:00,Q.850,18,Interconnect-GW,22\n2026-10-12 23:00,Q.850,18,Interconnect-GW,15\n2026-10-12 00:00,Q.850,1,Interconnect-GW,18\n2026-10-12 01:00,Q.850,1,Interconnect-GW,9\n2026-10-12 02:00,Q.850,1,Interconnect-GW,9\n2026-10-12 03:00,Q.850,1,Interconnect-GW,9\n2026-10-12 04:00,Q.850,1,Interconnect-GW,9\n2026-10-12 05:00,Q.850,1,Interconnect-GW,18\n2026-10-12 06:00,Q.850,1,Interconnect-GW,36\n2026-10-12 07:00,Q.850,1,Interconnect-GW,55\n2026-10-12 08:00,Q.850,1,Interconnect-GW,73\n2026-10-12 09:00,Q.850,1,Interconnect-GW,73\n2026-10-12 10:00,Q.850,1,Interconnect-GW,64\n2026-10-12 11:00,Q.850,1,Interconnect-GW,55\n2026-10-12 12:00,Q.850,1,Interconnect-GW,64\n2026-10-12 13:00,Q.850,1,Interconnect-GW,64\n2026-10-12 14:00,Q.850,1,Interconnect-GW,55\n2026-10-12 15:00,Q.850,1,Interconnect-GW,55\n2026-10-12 16:00,Q.850,1,Interconnect-GW,64\n2026-10-12 17:00,Q.850,1,Interconnect-GW,73\n2026-10-12 18:00,Q.850,1,Interconnect-GW,82\n2026-10-12 19:00,Q.850,1,Interconnect-GW,79\n2026-10-12 20:00,Q.850,1,Interconnect-GW,55\n2026-10-12 21:00,Q.850,1,Interconnect-GW,36\n2026-10-12 22:00,Q.850,1,Interconnect-GW,27\n2026-10-12 23:00,Q.850,1,Interconnect-GW,18\n2026-10-12 00:00,Q.850,34,Interconnect-GW,17\n2026-10-12 01:00,Q.850,34,Interconnect-GW,8\n2026-10-12 02:00,Q.850,34,Interconnect-GW,8\n2026-10-12 03:00,Q.850,34,Interconnect-GW,8\n2026-10-12 04:00,Q.850,34,Interconnect-GW,8\n2026-10-12 05:00,Q.850,34,Interconnect-GW,17\n2026-10-12 06:00,Q.850,34,Interconnect-GW,35\n2026-10-12 07:00,Q.850,34,Interconnect-GW,52\n2026-10-12 08:00,Q.850,34,Interconnect-GW,70\n2026-10-12 09:00,Q.850,34,Interconnect-GW,70\n2026-10-12 10:00,Q.850,34,Interconnect-GW,61\n2026-10-12 11:00,Q.850,34,Interconnect-GW,52\n2026-10-12 12:00,Q.850,34,Interconnect-GW,61\n2026-10-12 13:00,Q.850,34,Interconnect-GW,61\n2026-10-12 14:00,Q.850,34,Interconnect-GW,52\n2026-10-12 15:00,Q.850,34,Interconnect-GW,52\n2026-10-12 16:00,Q.850,34,Interconnect-GW,61\n2026-10-12 17:00,Q.850,34,Interconnect-GW,70\n2026-10-12 18:00,Q.850,34,Interconnect-GW,253\n2026-10-12 19:00,Q.850,34,Interconnect-GW,238\n2026-10-12 20:00,Q.850,34,Interconnect-GW,168\n2026-10-12 21:00,Q.850,34,Interconnect-GW,35\n2026-10-12 22:00,Q.850,34,Interconnect-GW,26\n2026-10-12 23:00,Q.850,34,Interconnect-GW,17\n2026-10-12 00:00,Q.850,38,Interconnect-GW,5\n2026-10-12 01:00,Q.850,38,Interconnect-GW,2\n2026-10-12 02:00,Q.850,38,Interconnect-GW,2\n2026-10-12 03:00,Q.850,38,Interconnect-GW,2\n2026-10-12 04:00,Q.850,38,Interconnect-GW,2\n2026-10-12 05:00,Q.850,38,Interconnect-GW,5\n2026-10-12 06:00,Q.850,38,Interconnect-GW,10\n2026-10-12 07:00,Q.850,38,Interconnect-GW,15\n2026-10-12 08:00,Q.850,38,Interconnect-GW,20\n2026-10-12 09:00,Q.850,38,Interconnect-GW,20\n2026-10-12 10:00,Q.850,38,Interconnect-GW,17\n2026-10-12 11:00,Q.850,38,Interconnect-GW,15\n2026-10-12 12:00,Q.850,38,Interconnect-GW,17\n2026-10-12 13:00,Q.850,38,Interconnect-GW,17\n2026-10-12 14:00,Q.850,38,Interconnect-GW,15\n2026-10-12 15:00,Q.850,38,Interconnect-GW,15\n2026-10-12 16:00,Q.850,38,Interconnect-GW,17\n2026-10-12 17:00,Q.850,38,Interconnect-GW,20\n2026-10-12 18:00,Q.850,38,Interconnect-GW,22\n2026-10-12 19:00,Q.850,38,Interconnect-GW,25\n2026-10-12 20:00,Q.850,38,Interconnect-GW,15\n2026-10-12 21:00,Q.850,38,Interconnect-GW,10\n2026-10-12 22:00,Q.850,38,Interconnect-GW,7\n2026-10-12 23:00,Q.850,38,Interconnect-GW,5\n2026-10-12 00:00,Q.850,41,Interconnect-GW,10\n2026-10-12 01:00,Q.850,41,Interconnect-GW,5\n2026-10-12 02:00,Q.850,41,Interconnect-GW,5\n2026-10-12 03:00,Q.850,41,Interconnect-GW,5\n2026-10-12 04:00,Q.850,41,Interconnect-GW,5\n2026-10-12 05:00,Q.850,41,Interconnect-GW,10\n2026-10-12 06:00,Q.850,41,Interconnect-GW,21\n2026-10-12 07:00,Q.850,41,Interconnect-GW,32\n2026-10-12 08:00,Q.850,41,Interconnect-GW,43\n2026-10-12 09:00,Q.850,41,Interconnect-GW,43\n2026-10-12 10:00,Q.850,41,Interconnect-GW,37\n2026-10-12 11:00,Q.850,41,Interconnect-GW,32\n2026-10-12 12:00,Q.850,41,Interconnect-GW,37\n2026-10-12 13:00,Q.850,41,Interconnect-GW,37\n2026-10-12 14:00,Q.850,41,Interconnect-GW,32\n2026-10-12 15:00,Q.850,41,Interconnect-GW,32\n2026-10-12 16:00,Q.850,41,Interconnect-GW,37\n2026-10-12 17:00,Q.850,41,Interconnect-GW,43\n2026-10-12 18:00,Q.850,41,Interconnect-GW,48\n2026-10-12 19:00,Q.850,41,Interconnect-GW,57\n2026-10-12 20:00,Q.850,41,Interconnect-GW,32\n2026-10-12 21:00,Q.850,41,Interconnect-GW,21\n2026-10-12 22:00,Q.850,41,Interconnect-GW,16\n2026-10-12 23:00,Q.850,41,Interconnect-GW,10\n2026-10-12 00:00,Q.850,42,Interconnect-GW,10\n2026-10-12 01:00,Q.850,42,Interconnect-GW,5\n2026-10-12 02:00,Q.850,42,Interconnect-GW,5\n2026-10-12 03:00,Q.850,42,Interconnect-GW,5\n2026-10-12 04:00,Q.850,42,Interconnect-GW,5\n2026-10-12 05:00,Q.850,42,Interconnect-GW,10\n2026-10-12 06:00,Q.850,42,Interconnect-GW,21\n2026-10-12 07:00,Q.850,42,Interconnect-GW,31\n2026-10-12 08:00,Q.850,42,Interconnect-GW,42\n2026-10-12 09:00,Q.850,42,Interconnect-GW,42\n2026-10-12 10:00,Q.850,42,Interconnect-GW,36\n2026-10-12 11:00,Q.850,42,Interconnect-GW,31\n2026-10-12 12:00,Q.850,42,Interconnect-GW,36\n2026-10-12 13:00,Q.850,42,Interconnect-GW,36\n2026-10-12 14:00,Q.850,42,Interconnect-GW,31\n2026-10-12 15:00,Q.850,42,Interconnect-GW,31\n2026-10-12 16:00,Q.850,42,Interconnect-GW,36\n2026-10-12 17:00,Q.850,42,Interconnect-GW,42\n2026-10-12 18:00,Q.850,42,Interconnect-GW,151\n2026-10-12 19:00,Q.850,42,Interconnect-GW,147\n2026-10-12 20:00,Q.850,42,Interconnect-GW,101\n2026-10-12 21:00,Q.850,42,Interconnect-GW,21\n2026-10-12 22:00,Q.850,42,Interconnect-GW,15\n2026-10-12 23:00,Q.850,42,Interconnect-GW,10\n2026-10-12 00:00,Q.850,127,Interconnect-GW,6\n2026-10-12 01:00,Q.850,127,Interconnect-GW,3\n2026-10-12 02:00,Q.850,127,Interconnect-GW,3\n2026-10-12 03:00,Q.850,127,Interconnect-GW,3\n2026-10-12 04:00,Q.850,127,Interconnect-GW,3\n2026-10-12 05:00,Q.850,127,Interconnect-GW,6\n2026-10-12 06:00,Q.850,127,Interconnect-GW,13\n2026-10-12 07:00,Q.850,127,Interconnect-GW,20\n2026-10-12 08:00,Q.850,127,Interconnect-GW,26\n2026-10-12 09:00,Q.850,127,Interconnect-GW,26\n2026-10-12 10:00,Q.850,127,Interconnect-GW,23\n2026-10-12 11:00,Q.850,127,Interconnect-GW,20\n2026-10-12 12:00,Q.850,127,Interconnect-GW,23\n2026-10-12 13:00,Q.850,127,Interconnect-GW,23\n2026-10-12 14:00,Q.850,127,Interconnect-GW,20\n2026-10-12 15:00,Q.850,127,Interconnect-GW,20\n2026-10-12 16:00,Q.850,127,Interconnect-GW,23\n2026-10-12 17:00,Q.850,127,Interconnect-GW,26\n2026-10-12 18:00,Q.850,127,Interconnect-GW,30\n2026-10-12 19:00,Q.850,127,Interconnect-GW,34\n2026-10-12 20:00,Q.850,127,Interconnect-GW,20\n2026-10-12 21:00,Q.850,127,Interconnect-GW,13\n2026-10-12 22:00,Q.850,127,Interconnect-GW,10\n2026-10-12 23:00,Q.850,127,Interconnect-GW,6\n2026-10-12 00:00,Q.850,16,Interconnect-GW,416\n2026-10-12 01:00,Q.850,16,Interconnect-GW,208\n2026-10-12 02:00,Q.850,16,Interconnect-GW,208\n2026-10-12 03:00,Q.850,16,Interconnect-GW,208\n2026-10-12 04:00,Q.850,16,Interconnect-GW,208\n2026-10-12 05:00,Q.850,16,Interconnect-GW,416\n2026-10-12 06:00,Q.850,16,Interconnect-GW,833\n2026-10-12 07:00,Q.850,16,Interconnect-GW,1250\n2026-10-12 08:00,Q.850,16,Interconnect-GW,1666\n2026-10-12 09:00,Q.850,16,Interconnect-GW,1666\n2026-10-12 10:00,Q.850,16,Interconnect-GW,1458\n2026-10-12 11:00,Q.850,16,Interconnect-GW,1250\n2026-10-12 12:00,Q.850,16,Interconnect-GW,1458\n2026-10-12 13:00,Q.850,16,Interconnect-GW,1458\n2026-10-12 14:00,Q.850,16,Interconnect-GW,1250\n2026-10-12 15:00,Q.850,16,Interconnect-GW,1250\n2026-10-12 16:00,Q.850,16,Interconnect-GW,1458\n2026-10-12 17:00,Q.850,16,Interconnect-GW,1666\n2026-10-12 18:00,Q.850,16,Interconnect-GW,1875\n2026-10-12 19:00,Q.850,16,Interconnect-GW,1674\n2026-10-12 20:00,Q.850,16,Interconnect-GW,1250\n2026-10-12 21:00,Q.850,16,Interconnect-GW,833\n2026-10-12 22:00,Q.850,16,Interconnect-GW,625\n2026-10-12 23:00,Q.850,16,Interconnect-GW,416\n2026-10-12 00:00,Q.850,31,Interconnect-GW,20\n2026-10-12 01:00,Q.850,31,Interconnect-GW,10\n2026-10-12 02:00,Q.850,31,Interconnect-GW,10\n2026-10-12 03:00,Q.850,31,Interconnect-GW,10\n2026-10-12 04:00,Q.850,31,Interconnect-GW,10\n2026-10-12 05:00,Q.850,31,Interconnect-GW,20\n2026-10-12 06:00,Q.850,31,Interconnect-GW,40\n2026-10-12 07:00,Q.850,31,Interconnect-GW,60\n2026-10-12 08:00,Q.850,31,Interconnect-GW,80\n2026-10-12 09:00,Q.850,31,Interconnect-GW,80\n2026-10-12 10:00,Q.850,31,Interconnect-GW,70\n2026-10-12 11:00,Q.850,31,Interconnect-GW,60\n2026-10-12 12:00,Q.850,31,Interconnect-GW,70\n2026-10-12 13:00,Q.850,31,Interconnect-GW,70\n2026-10-12 14:00,Q.850,31,Interconnect-GW,60\n2026-10-12 15:00,Q.850,31,Interconnect-GW,60\n2026-10-12 16:00,Q.850,31,Interconnect-GW,70\n2026-10-12 17:00,Q.850,31,Interconnect-GW,80\n2026-10-12 18:00,Q.850,31,Interconnect-GW,90\n2026-10-12 19:00,Q.850,31,Interconnect-GW,80\n2026-10-12 20:00,Q.850,31,Interconnect-GW,60\n2026-10-12 21:00,Q.850,31,Interconnect-GW,40\n2026-10-12 22:00,Q.850,31,Interconnect-GW,30\n2026-10-12 23:00,Q.850,31,Interconnect-GW,20\n2026-10-12 00:00,Diameter,3002,Signalling-DRA,10\n2026-10-12 01:00,Diameter,3002,Signalling-DRA,5\n2026-10-12 02:00,Diameter,3002,Signalling-DRA,5\n2026-10-12 03:00,Diameter,3002,Signalling-DRA,5\n2026-10-12 04:00,Diameter,3002,Signalling-DRA,5\n2026-10-12 05:00,Diameter,3002,Signalling-DRA,10\n2026-10-12 06:00,Diameter,3002,Signalling-DRA,20\n2026-10-12 07:00,Diameter,3002,Signalling-DRA,30\n2026-10-12 08:00,Diameter,3002,Signalling-DRA,40\n2026-10-12 09:00,Diameter,3002,Signalling-DRA,40\n2026-10-12 10:00,Diameter,3002,Signalling-DRA,35\n2026-10-12 11:00,Diameter,3002,Signalling-DRA,30\n2026-10-12 12:00,Diameter,3002,Signalling-DRA,35\n2026-10-12 13:00,Diameter,3002,Signalling-DRA,35\n2026-10-12 14:00,Diameter,3002,Signalling-DRA,30\n2026-10-12 15:00,Diameter,3002,Signalling-DRA,30\n2026-10-12 16:00,Diameter,3002,Signalling-DRA,35\n2026-10-12 17:00,Diameter,3002,Signalling-DRA,40\n2026-10-12 18:00,Diameter,3002,Signalling-DRA,45\n2026-10-12 19:00,Diameter,3002,Signalling-DRA,40\n2026-10-12 20:00,Diameter,3002,Signalling-DRA,30\n2026-10-12 21:00,Diameter,3002,Signalling-DRA,20\n2026-10-12 22:00,Diameter,3002,Signalling-DRA,15\n2026-10-12 23:00,Diameter,3002,Signalling-DRA,10\n2026-10-12 00:00,Diameter,3004,Signalling-DRA,5\n2026-10-12 01:00,Diameter,3004,Signalling-DRA,2\n2026-10-12 02:00,Diameter,3004,Signalling-DRA,2\n2026-10-12 03:00,Diameter,3004,Signalling-DRA,2\n2026-10-12 04:00,Diameter,3004,Signalling-DRA,2\n2026-10-12 05:00,Diameter,3004,Signalling-DRA,5\n2026-10-12 06:00,Diameter,3004,Signalling-DRA,10\n2026-10-12 07:00,Diameter,3004,Signalling-DRA,15\n2026-10-12 08:00,Diameter,3004,Signalling-DRA,21\n2026-10-12 09:00,Diameter,3004,Signalling-DRA,21\n2026-10-12 10:00,Diameter,3004,Signalling-DRA,18\n2026-10-12 11:00,Diameter,3004,Signalling-DRA,15\n2026-10-12 12:00,Diameter,3004,Signalling-DRA,18\n2026-10-12 13:00,Diameter,3004,Signalling-DRA,18\n2026-10-12 14:00,Diameter,3004,Signalling-DRA,15\n2026-10-12 15:00,Diameter,3004,Signalling-DRA,15\n2026-10-12 16:00,Diameter,3004,Signalling-DRA,18\n2026-10-12 17:00,Diameter,3004,Signalling-DRA,21\n2026-10-12 18:00,Diameter,3004,Signalling-DRA,75\n2026-10-12 19:00,Diameter,3004,Signalling-DRA,80\n2026-10-12 20:00,Diameter,3004,Signalling-DRA,50\n2026-10-12 21:00,Diameter,3004,Signalling-DRA,10\n2026-10-12 22:00,Diameter,3004,Signalling-DRA,7\n2026-10-12 23:00,Diameter,3004,Signalling-DRA,5\n2026-10-12 00:00,Diameter,5003,Signalling-DRA,5\n2026-10-12 01:00,Diameter,5003,Signalling-DRA,2\n2026-10-12 02:00,Diameter,5003,Signalling-DRA,2\n2026-10-12 03:00,Diameter,5003,Signalling-DRA,2\n2026-10-12 04:00,Diameter,5003,Signalling-DRA,2\n2026-10-12 05:00,Diameter,5003,Signalling-DRA,5\n2026-10-12 06:00,Diameter,5003,Signalling-DRA,10\n2026-10-12 07:00,Diameter,5003,Signalling-DRA,15\n2026-10-12 08:00,Diameter,5003,Signalling-DRA,20\n2026-10-12 09:00,Diameter,5003,Signalling-DRA,20\n2026-10-12 10:00,Diameter,5003,Signalling-DRA,17\n2026-10-12 11:00,Diameter,5003,Signalling-DRA,15\n2026-10-12 12:00,Diameter,5003,Signalling-DRA,17\n2026-10-12 13:00,Diameter,5003,Signalling-DRA,17\n2026-10-12 14:00,Diameter,5003,Signalling-DRA,15\n2026-10-12 15:00,Diameter,5003,Signalling-DRA,15\n2026-10-12 16:00,Diameter,5003,Signalling-DRA,17\n2026-10-12 17:00,Diameter,5003,Signalling-DRA,20\n2026-10-12 18:00,Diameter,5003,Signalling-DRA,22\n2026-10-12 19:00,Diameter,5003,Signalling-DRA,25\n2026-10-12 20:00,Diameter,5003,Signalling-DRA,15\n2026-10-12 21:00,Diameter,5003,Signalling-DRA,10\n2026-10-12 22:00,Diameter,5003,Signalling-DRA,7\n2026-10-12 23:00,Diameter,5003,Signalling-DRA,5\n2026-10-12 00:00,Diameter,5012,Signalling-DRA,4\n2026-10-12 01:00,Diameter,5012,Signalling-DRA,2\n2026-10-12 02:00,Diameter,5012,Signalling-DRA,2\n2026-10-12 03:00,Diameter,5012,Signalling-DRA,2\n2026-10-12 04:00,Diameter,5012,Signalling-DRA,2\n2026-10-12 05:00,Diameter,5012,Signalling-DRA,4\n2026-10-12 06:00,Diameter,5012,Signalling-DRA,8\n2026-10-12 07:00,Diameter,5012,Signalling-DRA,12\n2026-10-12 08:00,Diameter,5012,Signalling-DRA,16\n2026-10-12 09:00,Diameter,5012,Signalling-DRA,16\n2026-10-12 10:00,Diameter,5012,Signalling-DRA,14\n2026-10-12 11:00,Diameter,5012,Signalling-DRA,12\n2026-10-12 12:00,Diameter,5012,Signalling-DRA,14\n2026-10-12 13:00,Diameter,5012,Signalling-DRA,14\n2026-10-12 14:00,Diameter,5012,Signalling-DRA,12\n2026-10-12 15:00,Diameter,5012,Signalling-DRA,12\n2026-10-12 16:00,Diameter,5012,Signalling-DRA,14\n2026-10-12 17:00,Diameter,5012,Signalling-DRA,16\n2026-10-12 18:00,Diameter,5012,Signalling-DRA,18\n2026-10-12 19:00,Diameter,5012,Signalling-DRA,26\n2026-10-12 20:00,Diameter,5012,Signalling-DRA,12\n2026-10-12 21:00,Diameter,5012,Signalling-DRA,8\n2026-10-12 22:00,Diameter,5012,Signalling-DRA,6\n2026-10-12 23:00,Diameter,5012,Signalling-DRA,4\n2026-10-12 00:00,Diameter,2001,Signalling-DRA,833\n2026-10-12 01:00,Diameter,2001,Signalling-DRA,416\n2026-10-12 02:00,Diameter,2001,Signalling-DRA,416\n2026-10-12 03:00,Diameter,2001,Signalling-DRA,416\n2026-10-12 04:00,Diameter,2001,Signalling-DRA,416\n2026-10-12 05:00,Diameter,2001,Signalling-DRA,833\n2026-10-12 06:00,Diameter,2001,Signalling-DRA,1666\n2026-10-12 07:00,Diameter,2001,Signalling-DRA,2500\n2026-10-12 08:00,Diameter,2001,Signalling-DRA,3333\n2026-10-12 09:00,Diameter,2001,Signalling-DRA,3333\n2026-10-12 10:00,Diameter,2001,Signalling-DRA,2916\n2026-10-12 11:00,Diameter,2001,Signalling-DRA,2500\n2026-10-12 12:00,Diameter,2001,Signalling-DRA,2916\n2026-10-12 13:00,Diameter,2001,Signalling-DRA,2916\n2026-10-12 14:00,Diameter,2001,Signalling-DRA,2500\n2026-10-12 15:00,Diameter,2001,Signalling-DRA,2500\n2026-10-12 16:00,Diameter,2001,Signalling-DRA,2916\n2026-10-12 17:00,Diameter,2001,Signalling-DRA,3333\n2026-10-12 18:00,Diameter,2001,Signalling-DRA,3750\n2026-10-12 19:00,Diameter,2001,Signalling-DRA,3342\n2026-10-12 20:00,Diameter,2001,Signalling-DRA,2500\n2026-10-12 21:00,Diameter,2001,Signalling-DRA,1666\n2026-10-12 22:00,Diameter,2001,Signalling-DRA,1250\n2026-10-12 23:00,Diameter,2001,Signalling-DRA,833\n2026-10-12 00:00,GTPv2,73,Packet-Core-1,4\n2026-10-12 01:00,GTPv2,73,Packet-Core-1,2\n2026-10-12 02:00,GTPv2,73,Packet-Core-1,2\n2026-10-12 03:00,GTPv2,73,Packet-Core-1,2\n2026-10-12 04:00,GTPv2,73,Packet-Core-1,2\n2026-10-12 05:00,GTPv2,73,Packet-Core-1,4\n2026-10-12 06:00,GTPv2,73,Packet-Core-1,8\n2026-10-12 07:00,GTPv2,73,Packet-Core-1,13\n2026-10-12 08:00,GTPv2,73,Packet-Core-1,17\n2026-10-12 09:00,GTPv2,73,Packet-Core-1,17\n2026-10-12 10:00,GTPv2,73,Packet-Core-1,15\n2026-10-12 11:00,GTPv2,73,Packet-Core-1,13\n2026-10-12 12:00,GTPv2,73,Packet-Core-1,15\n2026-10-12 13:00,GTPv2,73,Packet-Core-1,15\n2026-10-12 14:00,GTPv2,73,Packet-Core-1,13\n2026-10-12 15:00,GTPv2,73,Packet-Core-1,13\n2026-10-12 16:00,GTPv2,73,Packet-Core-1,15\n2026-10-12 17:00,GTPv2,73,Packet-Core-1,17\n2026-10-12 18:00,GTPv2,73,Packet-Core-1,64\n2026-10-12 19:00,GTPv2,73,Packet-Core-1,69\n2026-10-12 20:00,GTPv2,73,Packet-Core-1,42\n2026-10-12 21:00,GTPv2,73,Packet-Core-1,8\n2026-10-12 22:00,GTPv2,73,Packet-Core-1,6\n2026-10-12 23:00,GTPv2,73,Packet-Core-1,4\n2026-10-12 00:00,GTPv2,72,Packet-Core-1,2\n2026-10-12 01:00,GTPv2,72,Packet-Core-1,1\n2026-10-12 02:00,GTPv2,72,Packet-Core-1,1\n2026-10-12 03:00,GTPv2,72,Packet-Core-1,1\n2026-10-12 04:00,GTPv2,72,Packet-Core-1,1\n2026-10-12 05:00,GTPv2,72,Packet-Core-1,2\n2026-10-12 06:00,GTPv2,72,Packet-Core-1,4\n2026-10-12 07:00,GTPv2,72,Packet-Core-1,6\n2026-10-12 08:00,GTPv2,72,Packet-Core-1,8\n2026-10-12 09:00,GTPv2,72,Packet-Core-1,8\n2026-10-12 10:00,GTPv2,72,Packet-Core-1,7\n2026-10-12 11:00,GTPv2,72,Packet-Core-1,6\n2026-10-12 12:00,GTPv2,72,Packet-Core-1,7\n2026-10-12 13:00,GTPv2,72,Packet-Core-1,7\n2026-10-12 14:00,GTPv2,72,Packet-Core-1,6\n2026-10-12 15:00,GTPv2,72,Packet-Core-1,6\n2026-10-12 16:00,GTPv2,72,Packet-Core-1,7\n2026-10-12 17:00,GTPv2,72,Packet-Core-1,8\n2026-10-12 18:00,GTPv2,72,Packet-Core-1,9\n2026-10-12 19:00,GTPv2,72,Packet-Core-1,8\n2026-10-12 20:00,GTPv2,72,Packet-Core-1,6\n2026-10-12 21:00,GTPv2,72,Packet-Core-1,4\n2026-10-12 22:00,GTPv2,72,Packet-Core-1,3\n2026-10-12 23:00,GTPv2,72,Packet-Core-1,2\n2026-10-12 00:00,GTPv2,78,Packet-Core-1,4\n2026-10-12 01:00,GTPv2,78,Packet-Core-1,2\n2026-10-12 02:00,GTPv2,78,Packet-Core-1,2\n2026-10-12 03:00,GTPv2,78,Packet-Core-1,2\n2026-10-12 04:00,GTPv2,78,Packet-Core-1,2\n2026-10-12 05:00,GTPv2,78,Packet-Core-1,4\n2026-10-12 06:00,GTPv2,78,Packet-Core-1,8\n2026-10-12 07:00,GTPv2,78,Packet-Core-1,13\n2026-10-12 08:00,GTPv2,78,Packet-Core-1,17\n2026-10-12 09:00,GTPv2,78,Packet-Core-1,17\n2026-10-12 10:00,GTPv2,78,Packet-Core-1,15\n2026-10-12 11:00,GTPv2,78,Packet-Core-1,13\n2026-10-12 12:00,GTPv2,78,Packet-Core-1,15\n2026-10-12 13:00,GTPv2,78,Packet-Core-1,15\n2026-10-12 14:00,GTPv2,78,Packet-Core-1,13\n2026-10-12 15:00,GTPv2,78,Packet-Core-1,13\n2026-10-12 16:00,GTPv2,78,Packet-Core-1,15\n2026-10-12 17:00,GTPv2,78,Packet-Core-1,17\n2026-10-12 18:00,GTPv2,78,Packet-Core-1,19\n2026-10-12 19:00,GTPv2,78,Packet-Core-1,23\n2026-10-12 20:00,GTPv2,78,Packet-Core-1,13\n2026-10-12 21:00,GTPv2,78,Packet-Core-1,8\n2026-10-12 22:00,GTPv2,78,Packet-Core-1,6\n2026-10-12 23:00,GTPv2,78,Packet-Core-1,4\n2026-10-12 00:00,GTPv2,87,Packet-Core-1,15\n2026-10-12 01:00,GTPv2,87,Packet-Core-1,7\n2026-10-12 02:00,GTPv2,87,Packet-Core-1,7\n2026-10-12 03:00,GTPv2,87,Packet-Core-1,7\n2026-10-12 04:00,GTPv2,87,Packet-Core-1,7\n2026-10-12 05:00,GTPv2,87,Packet-Core-1,15\n2026-10-12 06:00,GTPv2,87,Packet-Core-1,30\n2026-10-12 07:00,GTPv2,87,Packet-Core-1,45\n2026-10-12 08:00,GTPv2,87,Packet-Core-1,60\n2026-10-12 09:00,GTPv2,87,Packet-Core-1,60\n2026-10-12 10:00,GTPv2,87,Packet-Core-1,52\n2026-10-12 11:00,GTPv2,87,Packet-Core-1,45\n2026-10-12 12:00,GTPv2,87,Packet-Core-1,52\n2026-10-12 13:00,GTPv2,87,Packet-Core-1,52\n2026-10-12 14:00,GTPv2,87,Packet-Core-1,45\n2026-10-12 15:00,GTPv2,87,Packet-Core-1,45\n2026-10-12 16:00,GTPv2,87,Packet-Core-1,52\n2026-10-12 17:00,GTPv2,87,Packet-Core-1,60\n2026-10-12 18:00,GTPv2,87,Packet-Core-1,67\n2026-10-12 19:00,GTPv2,87,Packet-Core-1,65\n2026-10-12 20:00,GTPv2,87,Packet-Core-1,45\n2026-10-12 21:00,GTPv2,87,Packet-Core-1,30\n2026-10-12 22:00,GTPv2,87,Packet-Core-1,22\n2026-10-12 23:00,GTPv2,87,Packet-Core-1,15\n2026-10-12 00:00,GTPv2,100,Packet-Core-1,2\n2026-10-12 01:00,GTPv2,100,Packet-Core-1,1\n2026-10-12 02:00,GTPv2,100,Packet-Core-1,1\n2026-10-12 03:00,GTPv2,100,Packet-Core-1,1\n2026-10-12 04:00,GTPv2,100,Packet-Core-1,1\n2026-10-12 05:00,GTPv2,100,Packet-Core-1,2\n2026-10-12 06:00,GTPv2,100,Packet-Core-1,5\n2026-10-12 07:00,GTPv2,100,Packet-Core-1,7\n2026-10-12 08:00,GTPv2,100,Packet-Core-1,10\n2026-10-12 09:00,GTPv2,100,Packet-Core-1,10\n2026-10-12 10:00,GTPv2,100,Packet-Core-1,8\n2026-10-12 11:00,GTPv2,100,Packet-Core-1,7\n2026-10-12 12:00,GTPv2,100,Packet-Core-1,8\n2026-10-12 13:00,GTPv2,100,Packet-Core-1,8\n2026-10-12 14:00,GTPv2,100,Packet-Core-1,7\n2026-10-12 15:00,GTPv2,100,Packet-Core-1,7\n2026-10-12 16:00,GTPv2,100,Packet-Core-1,8\n2026-10-12 17:00,GTPv2,100,Packet-Core-1,10\n2026-10-12 18:00,GTPv2,100,Packet-Core-1,11\n2026-10-12 19:00,GTPv2,100,Packet-Core-1,19\n2026-10-12 20:00,GTPv2,100,Packet-Core-1,7\n2026-10-12 21:00,GTPv2,100,Packet-Core-1,5\n2026-10-12 22:00,GTPv2,100,Packet-Core-1,3\n2026-10-12 23:00,GTPv2,100,Packet-Core-1,2\n2026-10-12 00:00,GTPv2,16,Packet-Core-1,1333\n2026-10-12 01:00,GTPv2,16,Packet-Core-1,666\n2026-10-12 02:00,GTPv2,16,Packet-Core-1,666\n2026-10-12 03:00,GTPv2,16,Packet-Core-1,666\n2026-10-12 04:00,GTPv2,16,Packet-Core-1,666\n2026-10-12 05:00,GTPv2,16,Packet-Core-1,1333\n2026-10-12 06:00,GTPv2,16,Packet-Core-1,2666\n2026-10-12 07:00,GTPv2,16,Packet-Core-1,4000\n2026-10-12 08:00,GTPv2,16,Packet-Core-1,5333\n2026-10-12 09:00,GTPv2,16,Packet-Core-1,5333\n2026-10-12 10:00,GTPv2,16,Packet-Core-1,4666\n2026-10-12 11:00,GTPv2,16,Packet-Core-1,4000\n2026-10-12 12:00,GTPv2,16,Packet-Core-1,4666\n2026-10-12 13:00,GTPv2,16,Packet-Core-1,4666\n2026-10-12 14:00,GTPv2,16,Packet-Core-1,4000\n2026-10-12 15:00,GTPv2,16,Packet-Core-1,4000\n2026-10-12 16:00,GTPv2,16,Packet-Core-1,4666\n2026-10-12 17:00,GTPv2,16,Packet-Core-1,5333\n2026-10-12 18:00,GTPv2,16,Packet-Core-1,6000\n2026-10-12 19:00,GTPv2,16,Packet-Core-1,5342\n2026-10-12 20:00,GTPv2,16,Packet-Core-1,4000\n2026-10-12 21:00,GTPv2,16,Packet-Core-1,2666\n2026-10-12 22:00,GTPv2,16,Packet-Core-1,2000\n2026-10-12 23:00,GTPv2,16,Packet-Core-1,1333\n2026-10-12 00:00,5GMM,22,5G-Core-1,2\n2026-10-12 01:00,5GMM,22,5G-Core-1,1\n2026-10-12 02:00,5GMM,22,5G-Core-1,1\n2026-10-12 03:00,5GMM,22,5G-Core-1,1\n2026-10-12 04:00,5GMM,22,5G-Core-1,1\n2026-10-12 05:00,5GMM,22,5G-Core-1,2\n2026-10-12 06:00,5GMM,22,5G-Core-1,4\n2026-10-12 07:00,5GMM,22,5G-Core-1,7\n2026-10-12 08:00,5GMM,22,5G-Core-1,9\n2026-10-12 09:00,5GMM,22,5G-Core-1,9\n2026-10-12 10:00,5GMM,22,5G-Core-1,8\n2026-10-12 11:00,5GMM,22,5G-Core-1,7\n2026-10-12 12:00,5GMM,22,5G-Core-1,8\n2026-10-12 13:00,5GMM,22,5G-Core-1,8\n2026-10-12 14:00,5GMM,22,5G-Core-1,7\n2026-10-12 15:00,5GMM,22,5G-Core-1,7\n2026-10-12 16:00,5GMM,22,5G-Core-1,8\n2026-10-12 17:00,5GMM,22,5G-Core-1,9\n2026-10-12 18:00,5GMM,22,5G-Core-1,35\n2026-10-12 19:00,5GMM,22,5G-Core-1,44\n2026-10-12 20:00,5GMM,22,5G-Core-1,23\n2026-10-12 21:00,5GMM,22,5G-Core-1,4\n2026-10-12 22:00,5GMM,22,5G-Core-1,3\n2026-10-12 23:00,5GMM,22,5G-Core-1,2\n2026-10-12 00:00,5GMM,62,5G-Core-1,1\n2026-10-12 05:00,5GMM,62,5G-Core-1,1\n2026-10-12 06:00,5GMM,62,5G-Core-1,3\n2026-10-12 07:00,5GMM,62,5G-Core-1,4\n2026-10-12 08:00,5GMM,62,5G-Core-1,6\n2026-10-12 09:00,5GMM,62,5G-Core-1,6\n2026-10-12 10:00,5GMM,62,5G-Core-1,5\n2026-10-12 11:00,5GMM,62,5G-Core-1,4\n2026-10-12 12:00,5GMM,62,5G-Core-1,5\n2026-10-12 13:00,5GMM,62,5G-Core-1,5\n2026-10-12 14:00,5GMM,62,5G-Core-1,4\n2026-10-12 15:00,5GMM,62,5G-Core-1,4\n2026-10-12 16:00,5GMM,62,5G-Core-1,5\n2026-10-12 17:00,5GMM,62,5G-Core-1,6\n2026-10-12 18:00,5GMM,62,5G-Core-1,6\n2026-10-12 19:00,5GMM,62,5G-Core-1,15\n2026-10-12 20:00,5GMM,62,5G-Core-1,4\n2026-10-12 21:00,5GMM,62,5G-Core-1,3\n2026-10-12 22:00,5GMM,62,5G-Core-1,2\n2026-10-12 23:00,5GMM,62,5G-Core-1,1\n2026-10-12 00:00,5GMM,7,5G-Core-1,2\n2026-10-12 01:00,5GMM,7,5G-Core-1,1\n2026-10-12 02:00,5GMM,7,5G-Core-1,1\n2026-10-12 03:00,5GMM,7,5G-Core-1,1\n2026-10-12 04:00,5GMM,7,5G-Core-1,1\n2026-10-12 05:00,5GMM,7,5G-Core-1,2\n2026-10-12 06:00,5GMM,7,5G-Core-1,4\n2026-10-12 07:00,5GMM,7,5G-Core-1,7\n2026-10-12 08:00,5GMM,7,5G-Core-1,9\n2026-10-12 09:00,5GMM,7,5G-Core-1,9\n2026-10-12 10:00,5GMM,7,5G-Core-1,8\n2026-10-12 11:00,5GMM,7,5G-Core-1,7\n2026-10-12 12:00,5GMM,7,5G-Core-1,8\n2026-10-12 13:00,5GMM,7,5G-Core-1,8\n2026-10-12 14:00,5GMM,7,5G-Core-1,7\n2026-10-12 15:00,5GMM,7,5G-Core-1,7\n2026-10-12 16:00,5GMM,7,5G-Core-1,8\n2026-10-12 17:00,5GMM,7,5G-Core-1,9\n2026-10-12 18:00,5GMM,7,5G-Core-1,10\n2026-10-12 19:00,5GMM,7,5G-Core-1,15\n2026-10-12 20:00,5GMM,7,5G-Core-1,7\n2026-10-12 21:00,5GMM,7,5G-Core-1,4\n2026-10-12 22:00,5GMM,7,5G-Core-1,3\n2026-10-12 23:00,5GMM,7,5G-Core-1,2\n2026-10-12 00:00,5GMM,11,5G-Core-1,1\n2026-10-12 05:00,5GMM,11,5G-Core-1,1\n2026-10-12 06:00,5GMM,11,5G-Core-1,2\n2026-10-12 07:00,5GMM,11,5G-Core-1,3\n2026-10-12 08:00,5GMM,11,5G-Core-1,4\n2026-10-12 09:00,5GMM,11,5G-Core-1,4\n2026-10-12 10:00,5GMM,11,5G-Core-1,3\n2026-10-12 11:00,5GMM,11,5G-Core-1,3\n2026-10-12 12:00,5GMM,11,5G-Core-1,3\n2026-10-12 13:00,5GMM,11,5G-Core-1,3\n2026-10-12 14:00,5GMM,11,5G-Core-1,3\n2026-10-12 15:00,5GMM,11,5G-Core-1,3\n2026-10-12 16:00,5GMM,11,5G-Core-1,3\n2026-10-12 17:00,5GMM,11,5G-Core-1,4\n2026-10-12 18:00,5GMM,11,5G-Core-1,4\n2026-10-12 19:00,5GMM,11,5G-Core-1,9\n2026-10-12 20:00,5GMM,11,5G-Core-1,3\n2026-10-12 21:00,5GMM,11,5G-Core-1,2\n2026-10-12 22:00,5GMM,11,5G-Core-1,1\n2026-10-12 23:00,5GMM,11,5G-Core-1,1\n2026-10-12 00:00,5GMM,15,5G-Core-1,1\n2026-10-12 05:00,5GMM,15,5G-Core-1,1\n2026-10-12 06:00,5GMM,15,5G-Core-1,3\n2026-10-12 07:00,5GMM,15,5G-Core-1,5\n2026-10-12 08:00,5GMM,15,5G-Core-1,7\n2026-10-12 09:00,5GMM,15,5G-Core-1,7\n2026-10-12 10:00,5GMM,15,5G-Core-1,6\n2026-10-12 11:00,5GMM,15,5G-Core-1,5\n2026-10-12 12:00,5GMM,15,5G-Core-1,6\n2026-10-12 13:00,5GMM,15,5G-Core-1,6\n2026-10-12 14:00,5GMM,15,5G-Core-1,5\n2026-10-12 15:00,5GMM,15,5G-Core-1,5\n2026-10-12 16:00,5GMM,15,5G-Core-1,6\n2026-10-12 17:00,5GMM,15,5G-Core-1,7\n2026-10-12 18:00,5GMM,15,5G-Core-1,8\n2026-10-12 19:00,5GMM,15,5G-Core-1,21\n2026-10-12 20:00,5GMM,15,5G-Core-1,5\n2026-10-12 21:00,5GMM,15,5G-Core-1,3\n2026-10-12 22:00,5GMM,15,5G-Core-1,2\n2026-10-12 23:00,5GMM,15,5G-Core-1,1\n"];
+var $=function(id){return document.getElementById(id);};
+var inst=$("inst"), errEl=$("err"), isSample=false, lastParsed=null, texts=[null,null];
+var U={};
+U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
+U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
+U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };
+U.pct=function(a,b){ return b? Math.round(a/b*1000)/10 : 0; };
+U.median=function(a){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; };
+U.pctl=function(a,p){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}); var i=Math.max(0,Math.ceil(p/100*s.length)-1); return s[i]; };
+U.parseCSV=function(text){
+  text=String(text).replace(/^﻿/,"");
+  var lines=text.replace(/\r\n?/g,"\n").split("\n").filter(function(l){ return l.trim().length; });
+  if(!lines.length) return null;
+  var h0=lines[0], cnt={",":0,";":0,"\t":0,"|":0}, qq=false, D=",";
+  for(var z=0;z<h0.length;z++){ var cz=h0[z]; if(cz==='"') qq=!qq; else if(!qq&&cnt.hasOwnProperty(cz)) cnt[cz]++; }
+  Object.keys(cnt).forEach(function(k){ if(cnt[k]>cnt[D]) D=k; });
+  function cells(line){ var o=[],c="",q=false; for(var i=0;i<line.length;i++){ var ch=line[i];
+    if(q){ if(ch==='"'){ if(line[i+1]==='"'){c+='"';i++;} else q=false; } else c+=ch; }
+    else { if(ch==='"') q=true; else if(ch===D){ o.push(c); c=""; } else c+=ch; } } o.push(c); return o; }
+  var H=cells(h0).map(function(h){ return h.trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,""); }), R=[];
+  for(var i=1;i<lines.length;i++){ var c=cells(lines[i]), o={}; for(var j=0;j<H.length;j++) o[H[j]]=(c[j]===undefined?"":String(c[j]).trim()); R.push(o); }
+  return {header:H, rows:R};
+};
+U.pick=function(H,al){ var a,h; for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h]===al[a]) return H[h];
+  for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h].indexOf(al[a])>=0) return H[h]; return null; };
+U.time=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim(); if(!s) return NaN;
+  if(/^\d{13}$/.test(s)) return parseInt(s,10); if(/^\d{10}$/.test(s)) return parseInt(s,10)*1000;
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?)?\s*(Z|[+-]\d{2}:?\d{2})?$/);
+  if(m){ var ms=m[7]?Math.round(parseFloat("0."+m[7])*1000):0;
+    var y=+m[1], mo=+m[2]-1, d=+m[3], hh=+(m[4]||0), mi=+(m[5]||0), se=+(m[6]||0);
+    if(m[8]){ var t=Date.UTC(y,mo,d,hh,mi,se,ms); if(m[8]!=="Z"){ var z=m[8].replace(":",""), sg=z[0]==="-"?-1:1; t-=sg*(parseInt(z.slice(1,3),10)*60+parseInt(z.slice(3,5),10))*60000; } return t; }
+    return new Date(y,mo,d,hh,mi,se,ms).getTime(); }
+  var d2=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:[T ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?)?$/);
+  if(d2){ var A1=+d2[1], A2=+d2[2], dd=A1, mm=A2; if(A2>12&&A1<=12){ dd=A2; mm=A1; } var H2=+(d2[4]||0);
+    if(d2[7]){ var pm=/p/i.test(d2[7]); if(pm&&H2<12) H2+=12; if(!pm&&H2===12) H2=0; }
+    return new Date(+d2[3],mm-1,dd,H2,+(d2[5]||0),+(d2[6]||0)).getTime(); }
+  return Date.parse(s); };
+U.hour=function(v){ if(!v) return null; var m=String(v).match(/(?:^|[T\s,])(\d{1,2}):\d{2}(?::\d{2})?(?:\.\d+)?\s*([AaPp][Mm])?/); if(m){ var h=parseInt(m[1],10);
+  if(m[2]){ var pm=/p/i.test(m[2]); if(pm&&h<12) h+=12; if(!pm&&h===12) h=0; } return (h>=0&&h<24)?h:null; } return null; };
+U.hh=function(h){ if(h===null||h===undefined) return "—"; var ap=h<12?"am":"pm", r=h%12; if(r===0) r=12; return r+ap; };
+U.mask=function(v){ var d=String(v||"").replace(/\D/g,""); if(d.length<4) return "•••"; return "••• "+d.slice(-3); };
+U.tile=function(k,v,s,cls){ var m=String(v).match(/^(.*?)\s(L|kWh|t|h|s|min|agents|links)$/);
+  var vv=m?U.esc(m[1])+'<small class="u"> '+m[2]+'</small>':U.esc(v), m2=String(v).match(/^RWF\s(.+)$/);
+  if(m2) vv='<small class="u">RWF </small>'+U.esc(m2[1]);
+  return '<div class="tile"><div class="k">'+U.esc(k)+'</div><div class="v '+(cls||'')+'">'+vv+'</div><div class="s">'+U.esc(s||"")+'</div></div>'; };
+U.bars=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){ var w=Math.max(0,Math.min(100,r.w));
+  h+='<div class="brow"><div class="bl" title="'+U.esc(r.label)+'">'+U.esc(r.label)+'</div><div class="bb"><span class="'+(r.cls||'')+'" style="width:'+w+'%"></span></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.pairs=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){
+  h+='<div class="brow pair"><div class="bl">'+U.esc(r.label)+'</div><div class="bbs"><div class="bb"><span class="'+(r.cls1||'')+'" style="width:'+Math.min(100,r.w1)+'%"></span></div><div class="bb"><span class="'+(r.cls2||'dim')+'" style="width:'+Math.min(100,r.w2)+'%"></span></div></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.stack=function(parts){ var tot=0; parts.forEach(function(p){ tot+=p.v; }); var h='<div class="stack">';
+  parts.forEach(function(p){ if(p.v>0) h+='<span title="'+U.esc(p.label)+'" style="width:'+(tot?p.v/tot*100:0)+'%;background:'+p.color+'"></span>'; });
+  h+='</div><div class="legend">'; parts.forEach(function(p){ h+='<span><i style="background:'+p.color+'"></i>'+U.esc(p.label)+' '+U.esc(p.text)+'</span>'; }); return h+'</div>'; };
+U.heat=function(vals, mode, ref, labs){ // mode "count": raw counts, darker red = more; mode "level": ratios against a reference
+  var mx=0, i; if(mode==="count") vals.forEach(function(v){ if(v>mx) mx=v; });
+  var h='<div class="hours">';
+  for(i=0;i<24;i++){ var v=vals[i], col="var(--panel2)";
+    if(v!==null&&v!==undefined&&!isNaN(v)){
+      if(mode==="count"){ if(v>0&&mx>0) col="color-mix(in srgb, var(--bad) "+Math.round(22+78*v/mx)+"%, var(--panel2))"; }
+      else col = v>=ref-1e-9 ? "var(--accent)" : (v>=ref-0.10 ? "var(--warn)" : "var(--bad)"); }
+    h+='<div class="hcell" style="background:'+col+'"></div>'; }
+  h+='</div><div class="hlabels">'; ["12a","","","3","","","6","","","9","","","12p","","","3","","","6","","","9","",""].forEach(function(l){ h+='<span>'+l+'</span>'; });
+  h+='</div><div class="legend">';
+  if(mode==="count") h+='<span><i style="background:color-mix(in srgb, var(--bad) 22%, var(--panel2))"></i>Fewer</span><span><i style="background:var(--bad)"></i>Most</span><span><i style="background:var(--panel2)"></i>None</span>';
+  else { labs=labs||["At or above target","Up to 10 points below","More than 10 points below"];
+    h+='<span><i style="background:var(--accent)"></i>'+U.esc(labs[0])+'</span><span><i style="background:var(--warn)"></i>'+U.esc(labs[1])+'</span><span><i style="background:var(--bad)"></i>'+U.esc(labs[2])+'</span><span><i style="background:var(--panel2)"></i>No data</span>'; }
+  return h+'</div>'; };
+U.table=function(head, rows, numCols){ numCols=numCols||[]; var h='<div class="tblwrap"><table class="tbl"><thead><tr>';
+  head.forEach(function(c,i){ h+='<th class="'+(numCols.indexOf(i)>=0?'num':'')+'">'+U.esc(c)+'</th>'; }); h+='</tr></thead><tbody>';
+  rows.forEach(function(r){ h+='<tr>'; r.forEach(function(c,i){ var cls=(numCols.indexOf(i)>=0?'num':''), txt=c;
+    if(c&&typeof c==="object"){ cls+=' '+(c.cls||''); txt=c.t; } h+='<td class="'+cls+'">'+U.esc(txt)+'</td>'; }); h+='</tr>'; });
+  return h+'</tbody></table></div>'; };
+
+try{ var sv=localStorage.getItem(CFG.slug+"_theme"); if(sv) document.documentElement.setAttribute("data-theme",sv); }catch(e){}
+$("theme").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dk=window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var nx=cur?(cur==="dark"?"light":"dark"):(dk?"light":"dark");
+  document.documentElement.setAttribute("data-theme",nx);
+  try{ localStorage.setItem(CFG.slug+"_theme",nx); }catch(e){}
+});
+var mem=null, KEY=CFG.slug+"_runs_v1";
+function getRuns(){ try{ var v=parseInt(localStorage.getItem(KEY)||"0",10); return isNaN(v)?0:v; }catch(e){ return mem===null?0:mem; } }
+function setRuns(v){ mem=v; try{ localStorage.setItem(KEY,String(v)); }catch(e){} }
+function paintRuns(){ var u=getRuns(), h="Trial runs used&nbsp;&nbsp;";
+  for(var i=0;i<CFG.maxRuns;i++) h+='<span class="pip'+(i<u?' used':'')+'"></span>';
+  $("runs").innerHTML=h+'&nbsp;&nbsp;'+Math.max(0,CFG.maxRuns-u)+' of '+CFG.maxRuns+' left'; }
+paintRuns();
+function name(){ return inst.value.trim()||CFG.defaultFor; }
+try{ var qf=new URLSearchParams(location.search).get("for"); if(qf){ inst.value=qf.slice(0,60); } }catch(e){}
+$("gate-inst").textContent=name();
+inst.addEventListener("input",function(){ $("gate-inst").textContent=name(); });
+function inputs(){ var o={}; document.querySelectorAll("[data-in]").forEach(function(el){ o[el.getAttribute("data-in")]=el.value; }); return o; }
+function showErr(m){ errEl.textContent=m; errEl.hidden=false; }
+
+function readInto(i,f){ var r=new FileReader();
+  r.onload=function(){ texts[i]=String(r.result); var fn=$("fn"+i); if(fn) fn.textContent=f.name;
+    if(CFG.files===1){ isSample=false; go([texts[0]]); } else { $("runbtn").disabled=!(texts[0]&&texts[1]); } };
+  r.onerror=function(){ showErr("Could not read that file."); }; r.readAsText(f); }
+for(var i=0;i<CFG.files;i++)(function(i){
+  var d=$("drop"+i), p=$("pick"+i), fi=$("file"+i);
+  p.addEventListener("click",function(){ fi.click(); });
+  fi.addEventListener("change",function(e){ var f=e.target.files&&e.target.files[0]; if(f) readInto(i,f); });
+  ["dragenter","dragover"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.add("over"); }); });
+  ["dragleave","drop"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.remove("over"); }); });
+  d.addEventListener("drop",function(e){ var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) readInto(i,f); });
+})(i);
+if(CFG.files===2){ $("runbtn").addEventListener("click",function(){ isSample=false; go([texts[0],texts[1]]); }); }
+$("sample").addEventListener("click",function(){ isSample=true; go(SAMPLES); });
+
+function go(arr){
+  errEl.hidden=true;
+  var u=getRuns(); if(u>=CFG.maxRuns){ gate(); return; }
+  var ps=[], R;
+  try{ arr.forEach(function(t,ix){ var p=U.parseCSV(t); if(!p||!p.rows.length) throw (CFG.files===2?(CFG.fileLabels[ix]+": "):"")+"I couldn't find any rows in that file."; ps.push(p); });
+       R=TOOL.analyse(ps, inputs(), U); }
+  catch(e){ showErr(typeof e==="string"?e:"That file couldn't be read."); return; }
+  setRuns(u+1); paintRuns(); lastParsed=ps; draw(R);
+  if(getRuns()>=CFG.maxRuns) setTimeout(gate,400);
+}
+document.querySelectorAll("[data-in]").forEach(function(el){ el.addEventListener("change",function(){
+  if(!lastParsed) return; try{ draw(TOOL.analyse(lastParsed, inputs(), U)); }catch(e){} }); });
+
+function draw(R){
+  var out=TOOL.render(R, inputs(), U, {name:name(), sample:isSample});
+  var H='<div class="verdict"><p class="vh">What the data shows'+(isSample?' · illustrative sample, not your data':'')+'</p><p>'+out.verdict+'</p></div>';
+  if(out.tiles&&out.tiles.length) H+='<div class="tiles">'+out.tiles.join("")+'</div>';
+  (out.sections||[]).forEach(function(s){ H+='<div class="card"><h3>'+U.esc(s.title)+'</h3>'+(s.cap?'<p class="cap">'+U.esc(s.cap)+'</p>':'')+s.html+'</div>'; });
+  H+='<div class="summary"><div class="summary-h"><h3>'+U.esc(CFG.summaryTitle)+'</h3><button class="copy" id="copy" type="button">Copy</button></div><pre id="smtext">'+U.esc(out.summary)+'</pre></div>';
+  var rep=$("report"); rep.innerHTML=H; rep.hidden=false;
+  var cp=$("copy"); cp.addEventListener("click",function(){ var t=$("smtext").textContent;
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ cp.textContent="Copied"; cp.classList.add("done"); }); } });
+  rep.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function gate(){
+  var v=name();
+  $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+  $("gate-inst").textContent=v; $("gate").hidden=false;
+  $("gate").scrollIntoView({behavior:"smooth",block:"center"});
+}
+$("foot").textContent=CFG.foot.replace("{n}",CFG.maxRuns);
+})();
+</script>
+</body>
+</html>
