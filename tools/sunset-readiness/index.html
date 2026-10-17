@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3G Switch-off Readiness</title>
+<meta name="description" content="A self-serve trial that turns device-capability snapshots into VoLTE readiness, 3G-at-best devices by area, and the weeks needed at the current pace against the 30 June 2027 switch-off. Prepared by Frutos.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="3G Switch-off Readiness · trial by Frutos">
+<meta property="og:description" content="A self-serve trial that turns device-capability snapshots into VoLTE readiness, 3G-at-best devices by area, and the weeks needed at the current pace against the 30 June 2027 switch-off. Prepared by Frutos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1512; --panel:#14201B; --panel2:#0B130F; --ink:#E8F0EA; --dim:#8BA596; --line:#27372F;
+  --grid:rgba(190,242,100,.07); --accent:#BEF264; --accent2:#A3E635; --warn:#F2B134; --bad:#FF6B5E; --good:#39D98A;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+    --grid:rgba(20,80,50,.06); --accent:#4D7C0F; --accent2:#3F6212; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+  --grid:rgba(20,80,50,.06); --accent:#4D7C0F; --accent2:#3F6212; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+.wrap{max-width:860px; margin:0 auto; padding-inline:16px; padding-block:22px 40px}
+.exp{font-family:"Archivo",sans-serif; font-stretch:125%}
+.mono{font-family:var(--mono)}
+
+/* Header / title block */
+.head{border:1.5px solid var(--ink); background:var(--panel)}
+.head-top{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:14px 16px}
+.brandline{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 6px}
+.title{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:26px; line-height:1.05; margin:0; letter-spacing:-.01em}
+.subtitle{margin:6px 0 0; font-size:14.5px; color:var(--dim); max-width:46ch}
+.theme{flex:none; border:1.5px solid var(--line); background:transparent; color:var(--dim); font:inherit; font-size:13px; padding:6px 10px; cursor:pointer; border-radius:8px}
+.head-grid{display:grid; grid-template-columns:1fr 1fr; border-top:1.5px solid var(--ink)}
+.head-grid>div{padding:9px 16px; min-width:0}
+.head-grid>div:first-child{border-right:1px solid var(--line)}
+.head-grid dt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim)}
+.head-grid dd{margin:3px 0 0; font-weight:600; font-size:14.5px}
+.inst-field{display:inline-block; min-width:12ch; border:0; border-bottom:1.5px dashed var(--line); background:transparent; color:var(--ink); font:inherit; font-weight:600; font-size:14.5px; padding:0 2px}
+.inst-field:focus{outline:0; border-bottom-color:var(--accent)}
+
+/* Intake */
+.intake{margin-top:16px; border:1.5px solid var(--line); background:var(--panel); border-radius:0}
+.intake-in{padding:16px}
+.drop{border:1.6px dashed var(--line); background:var(--panel2); border-radius:12px; padding:20px 16px; text-align:center; transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,var(--panel2))}
+.drop h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; margin:0 0 4px}
+.drop p{margin:0 0 14px; font-size:14px; color:var(--dim)}
+.btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+.btn{border:1.5px solid var(--ink); background:var(--ink); color:var(--bg); font:inherit; font-weight:700; font-size:15px; padding:11px 16px; border-radius:10px; cursor:pointer}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.hint{margin:12px 2px 0; font-family:var(--mono); font-size:11.5px; color:var(--dim); line-height:1.6}
+.runs{display:flex; align-items:center; gap:8px; margin-top:14px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+.pip{width:9px; height:9px; border-radius:50%; border:1.5px solid var(--line)}
+.pip.used{background:var(--accent); border-color:var(--accent)}
+
+/* Report */
+#report[hidden]{display:none}
+.report{margin-top:16px; display:flex; flex-direction:column; gap:14px}
+.verdict{border:1.5px solid var(--ink); background:var(--panel); padding:16px; border-left:5px solid var(--accent)}
+.verdict .vh{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin:0 0 6px}
+.verdict p{margin:0; font-size:16.5px; line-height:1.45}
+.verdict b{color:var(--accent)}
+.tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+.tile{border:1.5px solid var(--line); background:var(--panel); padding:12px}
+.tile .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+.tile .v{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:25px; line-height:1.1; margin-top:5px; font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px; color:var(--dim); margin-top:2px}
+.tile .v.warn{color:var(--warn)} .tile .v.bad{color:var(--bad)} .tile .v.good{color:var(--good)}
+.card{border:1.5px solid var(--line); background:var(--panel); padding:14px 16px}
+.card h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:15px; margin:0 0 2px}
+.card .cap{font-size:12.5px; color:var(--dim); margin:0 0 12px}
+.funnel{display:flex; flex-direction:column; gap:7px}
+.frow{display:grid; grid-template-columns:92px 1fr auto; align-items:center; gap:10px}
+.frow .fl{font-size:13px; color:var(--dim)}
+.fbar{height:26px; background:var(--panel2); border:1px solid var(--line); position:relative; overflow:hidden}
+.fbar>span{position:absolute; inset:0 auto 0 0; background:linear-gradient(90deg,var(--accent2),var(--accent)); opacity:.9}
+.frow .fv{font-family:var(--mono); font-size:12.5px; font-variant-numeric:tabular-nums; min-width:68px; text-align:right}
+.drop-tag{display:inline-block; font-family:var(--mono); font-size:10.5px; color:var(--bad); margin-left:6px}
+.net{display:flex; flex-direction:column; gap:9px}
+.nrow{display:grid; grid-template-columns:70px 1fr auto; align-items:center; gap:10px}
+.nrow .nl{font-size:13.5px; font-weight:600}
+.nbar{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.nbar>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.nbar>span.low{background:var(--bad)}
+.nrow .nv{font-family:var(--mono); font-size:12.5px; min-width:48px; text-align:right}
+.hours{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:4px}
+.hcell{aspect-ratio:1/2.2; border:1px solid var(--line); position:relative}
+.hlabels{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:5px; font-family:var(--mono); font-size:8.5px; color:var(--dim)}
+.hlabels span{text-align:center}
+.lat{display:flex; gap:10px}
+.lat .lc{flex:1; border:1px solid var(--line); background:var(--panel2); padding:10px; text-align:center}
+.lat .lk{font-family:var(--mono); font-size:10.5px; color:var(--dim); text-transform:uppercase}
+.lat .lv{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:20px; margin-top:3px; font-variant-numeric:tabular-nums}
+.legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--dim)}
+.legend i{display:inline-block; width:11px; height:11px; margin-right:5px; vertical-align:-1px}
+.summary{border:1.5px solid var(--ink); background:var(--panel2)}
+.summary-h{display:flex; justify-content:space-between; align-items:center; padding:11px 16px; border-bottom:1.5px solid var(--line)}
+.summary-h h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:14px; margin:0}
+.copy{border:1.5px solid var(--line); background:transparent; color:var(--ink); font:inherit; font-size:13px; font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer}
+.copy.done{border-color:var(--accent); color:var(--accent)}
+.summary pre{margin:0; padding:16px; font-family:var(--mono); font-size:12.5px; line-height:1.65; white-space:pre-wrap; color:var(--ink)}
+
+/* Gate */
+.gate{margin-top:16px; border:1.5px solid var(--accent); background:var(--panel); padding:20px 16px; text-align:center}
+.gate h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:19px; margin:0 0 6px}
+.gate p{margin:0 auto 14px; font-size:14.5px; color:var(--dim); max-width:48ch}
+.gate .btn{background:var(--accent); border-color:var(--accent); color:#06140D; text-decoration:none; display:inline-block}
+
+.foot{margin-top:20px; font-family:var(--mono); font-size:11px; color:var(--dim); line-height:1.7}
+.err{color:var(--bad); font-family:var(--mono); font-size:12.5px; margin-top:10px}
+@media (max-width:560px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .title{font-size:22px}
+  .frow{grid-template-columns:70px 1fr auto}
+  .lat{flex-wrap:wrap}
+}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+.drops{display:grid; grid-template-columns:1fr; gap:12px}
+.drops.two{grid-template-columns:1fr 1fr}
+.fname{margin:10px 0 0; font-family:var(--mono); font-size:12px; color:var(--accent); min-height:1.3em; overflow-wrap:anywhere}
+.runrow{display:flex; justify-content:center; gap:10px; margin-top:12px; flex-wrap:wrap}
+.assume{display:flex; flex-wrap:wrap; gap:12px; margin-top:14px}
+.assume label{font-family:var(--mono); font-size:11.5px; color:var(--dim); display:flex; flex-direction:column; gap:4px}
+.assume input{width:140px; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font:inherit; font-family:var(--mono); font-size:13px; padding:7px 8px; border-radius:8px}
+.bars{display:flex; flex-direction:column; gap:9px}
+.brow{display:grid; grid-template-columns:minmax(70px,24%) 1fr auto; align-items:center; gap:10px}
+.brow .bl{font-size:13px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.brow .bb{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.brow .bb>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.brow .bb>span.bad{background:var(--bad)}
+.brow .bb>span.warn{background:var(--warn)}
+.brow .bb>span.dim{background:var(--dim); opacity:.55}
+.brow .bv{font-family:var(--mono); font-size:12.5px; text-align:right; min-width:70px; font-variant-numeric:tabular-nums}
+.brow.pair .bb{height:9px}
+.brow.pair .bbs{display:flex; flex-direction:column; gap:3px}
+.stack{display:flex; height:24px; border:1px solid var(--line); overflow:hidden}
+.stack span{display:block; height:100%}
+.tbl{width:100%; border-collapse:collapse; font-size:13px}
+.tbl th{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); text-align:left; padding:6px 6px; border-bottom:1.5px solid var(--line)}
+.tbl td{padding:8px 6px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; vertical-align:top}
+.tbl td.num,.tbl th.num{text-align:right}
+.tbl td.flag{color:var(--bad); font-weight:700}
+.tbl td.ok{color:var(--good); font-weight:700}
+.tblwrap{overflow-x:auto}
+.tile .v .u{font-size:.56em; font-weight:600; font-stretch:100%; color:var(--dim); letter-spacing:0}
+.note-s{font-size:12px; color:var(--dim); margin:10px 0 0; line-height:1.5}
+.why{margin:10px 0 0; font-size:13px; line-height:1.5; max-width:62ch; border-left:3px solid var(--accent); padding:2px 0 2px 10px}
+.why-k{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-right:6px}
+.why a{color:var(--dim); white-space:nowrap}
+.chip{display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; padding:2px 7px; border:1px solid var(--line); border-radius:999px; color:var(--dim); white-space:nowrap}
+@media (max-width:560px){ .drops.two{grid-template-columns:1fr} .brow{grid-template-columns:minmax(60px,30%) 1fr auto} }
+
+.runs{display:block; line-height:1.65}
+.runs b{color:var(--ink); font-weight:700}
+.gdot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--warn); margin-right:8px; vertical-align:0}
+.gdot.ok{background:var(--good)} .gdot.end{background:var(--bad)}
+.glink{border:0; background:none; color:var(--accent); font:inherit; font-family:var(--mono); font-size:12px; text-decoration:underline; text-underline-offset:2px; cursor:pointer; padding:0 2px; margin-left:8px; white-space:nowrap}
+.unlock{position:relative; margin-top:14px; border:1.5px solid var(--accent); background:var(--panel); padding:16px 16px 14px; text-align:left}
+.unlock h3{margin:0 30px 4px 0; font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; line-height:1.2}
+.unlock p{margin:0; font-size:14px; color:var(--dim); line-height:1.5}
+.unlock label{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin:12px 0 5px}
+.urow{display:flex; gap:8px; flex-wrap:wrap}
+.urow input{flex:1 1 220px; min-width:0; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font-family:var(--mono); font-size:13px; padding:10px; border-radius:9px}
+.urow input:focus{outline:0; border-color:var(--accent)}
+.urow .btn{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+.unlock .uerr{margin-top:9px; color:var(--bad); font-family:var(--mono); font-size:12.5px}
+.unlock .uask{margin-top:12px; font-size:13.5px}
+.unlock .uask a{color:var(--accent); font-weight:700}
+.uclose{position:absolute; top:6px; right:6px; border:0; background:none; color:var(--dim); font-size:24px; line-height:1; cursor:pointer; padding:4px 9px}
+.gate .btn{color:var(--bg)}
+.summary-h .acts{display:flex; gap:8px}
+@media print{
+  :root,:root[data-theme]{--bg:#fff; --panel:#fff; --panel2:#f4f4f4; --ink:#111; --dim:#555; --line:#ccc; color-scheme:light}
+  body{background:#fff!important}
+  .intake,.gate,.unlock,#theme,.copy,.pdf,.foot{display:none!important}
+  .card,.tiles,.verdict,.summary{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="head">
+    <div class="head-top">
+      <div>
+        <p class="brandline">Network migration · Trial</p>
+        <h1 class="title">3G Switch-off Readiness</h1>
+        <p class="subtitle">See what share of your subscribers keep calls and data when 3G is switched off, which areas hold the devices at risk, and whether the migration pace beats the date.</p>
+        <p class="why"><span class="why-k">Why now</span>In July 2026 the ICT ministry set the nationwide 3G switch-off for 30 June 2027, with pilot shutdowns during 2026; 2G is retired later, after a coverage assessment. <a href="https://www.ktpress.rw/2026/07/rwanda-to-phase-out-2g-and-3g-networks-by-2027/" target="_blank" rel="noopener">KT Press, 28 Jul 2026 ↗</a></p>
+      </div>
+      <button class="theme" id="theme" type="button" aria-label="Switch light or dark">◐ Theme</button>
+    </div>
+    <dl class="head-grid">
+      <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your network" aria-label="Organisation name" spellcheck="false"></dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+    </dl>
+  </header>
+  <section class="intake">
+    <div class="intake-in">
+      <div class="drop" id="drop0"><h2>Drop in device snapshots</h2><p>A CSV of active subscribers by device capability, one row per district or cell and week, or one row per SIM. It is read in your browser and never leaves this page.</p><div class="btns"><button class="btn" id="pick0" type="button">Choose a CSV file</button><button class="btn ghost" id="sample" type="button">Run an illustrative sample</button></div><input id="file0" type="file" accept=".csv,text/csv" hidden></div>
+      <p class="hint">Expected columns (any order, matched loosely): <b>area</b> (district or cell), optional <b>week</b> (snapshot date), <b>subscribers</b>, device counts <b>twog_only</b>, <b>threeg_max</b>, <b>lte_no_volte</b>, <b>volte</b>, optional <b>traffic_3g_pct</b>. Or one row per SIM or device with <b>area</b> and a <b>capability</b> column (2G, 3G, 4G, VoLTE), counted for you. Method: VoLTE-capable devices keep calls and data after 3G is switched off on 30 June 2027; 3G-at-best devices lose 3G that day; the pace is the fall in 3G-at-best devices over the last 4 weekly snapshots.</p>
+      <div class="assume"><label>VoLTE-ready target, %<input data-in="target" type="number" step="any" value="95"></label></div>
+      <div class="runs" id="runs" aria-live="polite"></div>
+      <div class="unlock" id="unlock" hidden>
+        <button class="uclose" id="uclose" type="button" aria-label="Close">×</button>
+        <h3>Your own file needs a 3-day trial code</h3>
+        <p>The illustrative sample is free. To read your own export, enter the code Frutos sent you. Your file still never leaves this page.</p>
+        <form id="uform" autocomplete="off">
+          <label for="ucode">Trial code</label>
+          <div class="urow"><input id="ucode" name="code" spellcheck="false" autocapitalize="off" placeholder="FK1… or the full link"><button class="btn" type="submit">Unlock</button></div>
+        </form>
+        <p class="uerr" id="uerr" role="alert" hidden></p>
+        <p class="uask">No code yet? <a id="uwa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a> · or call +250 731 000 163</p>
+      </div>
+      <p class="err" id="err" hidden></p>
+    </div>
+  </section>
+  <section id="report" class="report" hidden aria-live="polite"></section>
+  <section id="gate" class="gate" hidden>
+    <h2>Your 3-day trial has ended</h2>
+    <p>The full version tracks every cell each week, ranks the cells to switch off first, and warns you as soon as an area falls behind the 30 June 2027 date. Let's set it up for <b id="gate-inst">your network</b>.</p>
+    <a class="btn" id="gate-wa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a>
+    <p class="hint" style="margin-top:12px">Or call +250 731 000 163</p>
+  </section>
+  <p class="foot" id="foot"></p>
+</main>
+<script>
+var T3G=new Date(2027,5,30).getTime(), WK=7*864e5, MINUS="−";
+function yes(v){ return /^(y|yes|true|1|on|supported|capable|enabled)$/i.test(String(v||"").trim()); }
+function no(v){ return /^(n|no|false|0|off|unsupported|not supported|disabled|none)$/i.test(String(v||"").trim()); }
+function wkTime(v,U,R){ // a date, or an ISO week such as 2026-W40; a bare week number (40, W40) is read in the current year
+  var s=String(v||"").trim(), m=s.match(/^(\d{4})\s*-?\s*W(\d{1,2})$/i)||s.match(/^()W?(\d{1,2})$/i);
+  if(!m) return U.time(s); var y=+m[1]; if(!m[1]){ y=new Date().getFullYear(); R.yearGuess=y; }
+  var j4=new Date(y,0,4), dw=(j4.getDay()+6)%7; return new Date(y,0,4-dw+(+m[2]-1)*7).getTime(); }
+function capOf(c,f){ // one device: "v" VoLTE-capable, "n4" 4G without VoLTE, "q" 4G with VoLTE not stated, "g3" 3G at best, "g2" 2G only
+  var x=String(c||"").toLowerCase().replace(/[_\-\/()]+/g," ").replace(/\s+/g," ").trim(), k=null;
+  if(/\b(no|non|without|w o)\s?volte\b|\bvolte\s?(no|off|none|not)\b|data only/.test(x)) k="n4";
+  else if(/volte|vonr|\b5g\b|\bnr\b/.test(x)) k="v";
+  else if(/\b4g\b|\blte\b/.test(x)) k="q";
+  else if(/\b3g\b|umts|wcdma|hspa/.test(x)) k="g3";
+  else if(/\b2g\b|\bgsm\b|gprs|\bedge\b/.test(x)) k="g2";
+  if(f!==null&&f!==undefined&&String(f).trim()!==""){ if(yes(f)&&(k===null||k==="q"||k==="n4"||k==="v")) k="v"; else if(no(f)&&(k==="q"||k==="v")) k="n4"; }
+  return k; }
+var TOOL={
+ analyse:function(ps,inp,U){
+  var P=ps[0],H=P.header,used=[];
+  function pk(al){ var c=U.pick(H.filter(function(h){return used.indexOf(h)<0;}),al); if(c) used.push(c); return c; }
+  var cX=pk(["traffic_3g_pct","3g_traffic_pct","traffic_3g","3g_traffic","3g_traffic_share","traffic_share_3g"]);
+  var cN=pk(["lte_no_volte","4g_no_volte","no_volte","non_volte","without_volte","lte_only","4g_only","4g_data_only"]);
+  var cW=pk(["week","week_start","week_ending","snapshot","snapshot_date","as_of","date","period"]);
+  var cS=pk(["subscribers","active_subscribers","active_subs","subs","active","sims","users","total"]);
+  var cV=pk(["volte","volte_capable","volte_ready","volte_devices","4g_volte","lte_volte","vonr"]);
+  var c3=pk(["threeg_max","3g_max","max_3g","threeg","3g_at_best","3g_only","3g"]);
+  var c2=pk(["twog_only","2g_only","only_2g","twog","2g"]);
+  var cA=pk(["area","district","cell","cell_id","cell_name","sector","site","region","zone","province","location"]);
+  var cC=pk(["capability","device_capability","max_rat","rat","technology","generation","network","device_type","category","class","type"]);
+  function isNum(c){ if(!c) return false; var n=0,k=0; for(var i=0;i<P.rows.length&&n<60;i++){ var v=String(P.rows[i][c]||"").trim(); if(!v) continue; n++; if(/^[\d.,\s]+$/.test(v)) k++; } return n>0&&k/n>=0.8; }
+  var agg=isNum(c3)&&isNum(cV);
+  if(!agg&&!cC&&!cV) throw "I need device counts per area ('threeg_max', 'volte', ...) or one row per device with a 'capability' column.";
+  var S={}, bad=0, assumed=0, over=0, trMax=0, G={yearGuess:0};
+  function slot(t,a){ var w=S[t]||(S[t]={}); return w[a]||(w[a]={s:0,g2:0,g3:0,n4:0,v:0,unk:0,trS:0,trW:0}); }
+  P.rows.forEach(function(r){
+    var t=0; if(cW){ t=wkTime(r[cW],U,G); if(isNaN(t)){ bad++; return; } var d=new Date(t); t=new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime(); }
+    var a=cA?(String(r[cA]||"").trim()||"(blank)"):"All", o;
+    if(agg){ var g3=U.num(r[c3]), v=U.num(r[cV]); if(isNaN(g3)||isNaN(v)){ bad++; return; }
+      var g2=c2?U.num(r[c2]):0, n4=cN?U.num(r[cN]):0; if(isNaN(g2)) g2=0; if(isNaN(n4)) n4=0;
+      var sum=g2+g3+n4+v, s=cS?U.num(r[cS]):NaN; if(isNaN(s)) s=sum; if(s<sum){ over++; s=sum; }
+      o=slot(t,a); o.s+=s; o.g2+=g2; o.g3+=g3; o.n4+=n4; o.v+=v; o.unk+=s-sum;
+      if(cX){ var x=U.num(r[cX]); if(!isNaN(x)){ o.trS+=x*s; o.trW+=s; if(x>trMax) trMax=x; } } }
+    else { var k=capOf(cC?r[cC]:"", (cV&&!isNum(cV))?r[cV]:null); o=slot(t,a); o.s++; if(k==="q"){ assumed++; k="n4"; } if(k) o[k]++; else o.unk++; }
+  });
+  var W=Object.keys(S).map(Number).sort(function(a,b){return a-b;});
+  if(!W.length) throw "No rows with readable device counts.";
+  return {S:S,W:W,agg:agg,hasW:!!cW,hasX:agg&&!!cX&&trMax>0,frac:trMax>0&&trMax<=1,bad:bad,assumed:assumed,over:over,yearGuess:G.yearGuess};
+ },
+ render:function(R,inp,U,ctx){
+  var tg=U.num(inp.target); if(!(tg>0&&tg<=100)) tg=95;
+  var last=R.W[R.W.length-1], cur=R.S[last], base=null, i;
+  if(R.hasW&&R.W.length>1){ for(i=R.W.length-2;i>=0;i--) if(R.W[i]<=last-27*864e5){ base=R.W[i]; break; } if(base===null) base=R.W[0]; }
+  var wks=base!==null?(last-base)/WK:0, WL=Math.max(0,(T3G-(R.hasW?last:Date.now()))/WK);
+  function tot(t){ var o={s:0,g2:0,g3:0,n4:0,v:0,unk:0}; Object.keys(R.S[t]).forEach(function(a){ var x=R.S[t][a]; o.s+=x.s; o.g2+=x.g2; o.g3+=x.g3; o.n4+=x.n4; o.v+=x.v; o.unk+=x.unk; }); return o; }
+  var T=tot(last), ready=T.s?T.v/T.s*100:0, pace=base!==null?(tot(base).g3-T.g3)/wks:null;
+  var need=pace===null?null:(pace>0?T.g3/pace:(T.g3>0?Infinity:0));
+  var A=Object.keys(cur).map(function(a){ var x=cur[a], p=null;
+    if(base!==null){ var b0=R.S[base][a], tb=base; if(!b0){ for(var j=0;j<R.W.length&&R.W[j]<last;j++) if(R.W[j]>base&&R.S[R.W[j]][a]){ b0=R.S[R.W[j]][a]; tb=R.W[j]; break; } }
+      if(b0) p=(b0.g3-x.g3)/((last-tb)/WK); }
+    var nd=p===null?null:(p>0?x.g3/p:(x.g3>0?Infinity:0));
+    return {k:a,s:x.s,g3:x.g3,tr:x.trW?x.trS/x.trW*(R.frac?100:1):NaN,p:p,need:nd,behind:p!==null&&x.g3>0&&nd>WL,left:p===null?0:Math.max(0,x.g3-Math.max(0,p)*WL)}; });
+  var left=0; A.forEach(function(a){ left+=a.left; });
+  var byRisk=A.slice().sort(function(a,b){ return (b.g3-a.g3)||(b.g3/(b.s||1)-a.g3/(a.s||1)); });
+  var behind=A.filter(function(a){return a.behind;}).sort(function(a,b){ return b.left-a.left; }), nb=behind.length;
+  var st=nb?behind[0]:byRisk[0], wl=U.fmt(WL), wlab=U.fmt(wks);
+  function trend(a){ if(a.p===null) return "—"; var r=Math.round(a.p); return {t:(r>0?MINUS:(r<0?"+":""))+U.fmt(Math.abs(a.p))+"/wk",cls:a.behind?"flag":""}; }
+  function nw(n){ return isFinite(n)?U.fmt(n):"never at this pace"; }
+  var v="Of <b>"+U.fmt(T.s)+"</b> active subscribers, <b>"+U.pct(T.v,T.s)+"%</b> use VoLTE-capable devices, which keep calls and data after 3G is switched off. ";
+  v+="<b>"+U.fmt(T.g3)+"</b> devices are 3G at best: on <b>30 June 2027</b> they lose 3G and drop to 2G at most, until 2G is retired too (provisionally December 2028). ";
+  if(pace!==null){
+    if(pace>0) v+="At the pace of the last <b>"+wlab+" weeks</b> (<b>"+U.fmt(pace)+"</b> fewer a week), moving them all would take <b>"+nw(need)+" weeks</b>; <b>"+wl+" weeks</b> are left. ";
+    else v+="Their number did not fall over the last <b>"+wlab+" weeks</b>, and <b>"+wl+" weeks</b> are left. ";
+    if(nb) v+=(pace>0&&need<=WL?"But ":"")+"<b>"+nb+" of "+A.length+" areas</b> "+(nb===1?"is behind: at its own pace it":"are behind: at their own pace they")+" would still hold <b>"+U.fmt(left)+"</b> of these devices on switch-off day. "; }
+  else v+="<b>"+wl+" weeks</b> are left"+(R.hasW?"":" from today")+"; add weekly snapshots to see whether the pace is enough. ";
+  if(st&&st.g3>0&&A.length>1) v+="Start with <b>"+U.esc(st.k)+"</b>: <b>"+U.fmt(st.g3)+"</b> devices at risk, <b>"+U.pct(st.g3,st.s)+"%</b> of its subscribers"+(st.p===null?"":(st.p>0?", falling <b>"+U.fmt(st.p)+"</b> a week":", not falling"))+".";
+  var tiles=[U.tile("VoLTE-ready",U.pct(T.v,T.s)+"%","target "+tg+"%",ready>=tg?"good":(ready>=tg-10?"warn":"bad")),
+    U.tile("Devices at risk",U.fmt(T.g3),"3G at best, "+U.pct(T.g3,T.s)+"% of subscribers",T.g3?"bad":"good"),
+    U.tile("Weeks needed",pace===null?"—":(pace>0?nw(need):"—"),pace===null?"needs weekly snapshots":(pace>0?"at current pace; "+wl+" left":"not falling; "+wl+" left"),pace===null?"":(need>WL?"bad":"good")),
+    U.tile("Areas behind",pace===null?"—":String(nb),pace===null?"needs weekly snapshots":"of "+A.length+", at their own pace",pace===null?"":(nb?"bad":"good"))];
+  var Sc=[], head=["Area","Subscribers","At risk","Share"], nc=[1,2,3]; if(pace!==null){ head.push("Trend"); nc.push(head.length-1); } if(R.hasX){ head.push("3G traffic"); nc.push(head.length-1); }
+  Sc.push({title:"Areas ranked by devices at risk",cap:U.of("3G-at-best devices"+(R.hasW?" on "+U.dd(last):"")+(pace!==null?"; trend is the weekly change over the last "+wlab+" weeks":""),12,A.length),
+    html:U.table(head,byRisk.slice(0,12).map(function(a){ var r=[a.k,U.fmt(a.s),U.fmt(a.g3),U.pct(a.g3,a.s)+"%"]; if(pace!==null) r.push(trend(a)); if(R.hasX) r.push(isNaN(a.tr)?"—":U.fmt(a.tr,1)+"%"); return r; }),nc)});
+  function part(l,n,c){ return {label:l,v:n,text:U.fmt(n)+" · "+U.pct(n,T.s)+"%",color:c}; }
+  var mix=[part("VoLTE-capable",T.v,"var(--accent)"),part("4G without VoLTE",T.n4,"var(--warn)"),part("2G only",T.g2,"color-mix(in srgb, var(--warn) 45%, var(--panel2))"),part("3G at best",T.g3,"var(--bad)")];
+  if(T.unk>0) mix.push(part("Not reported",T.unk,"var(--line)"));
+  Sc.push({title:"Device capability mix",cap:"Active subscribers by the best network their device supports. VoLTE-capable keep calls and data; 3G at best lose 3G on 30 June 2027; 2G only, and calls on 4G without VoLTE, run on 2G until it is retired.",html:U.stack(mix)});
+  if(R.hasW&&R.W.length>1){ var ser=R.W.map(function(t){ return {t:t,n:tot(t).g3}; }), mx=0; ser.forEach(function(x){ if(x.n>mx) mx=x.n; });
+    var br=ser.map(function(x){ return {label:U.dd(x.t,true),w:mx?x.n/mx*100:0,text:U.fmt(x.n),cls:x.t>=base?"":"dim"}; });
+    if(pace!==null) br.push({label:"30 Jun 2027",w:mx?left/mx*100:0,text:U.fmt(left)+" left",cls:left>0?"bad":""});
+    Sc.push({title:"Weekly at-risk trend",cap:"3G-at-best devices in each snapshot; bright bars are the weeks the pace is measured on, and the last bar is what remains on 30 June 2027 if each area keeps its pace",html:U.bars(br)}); }
+  if(pace!==null) Sc.push({title:"Areas behind schedule",cap:U.of("Areas that do not move all their 3G-at-best devices by 30 June 2027 at the pace of their last "+wlab+" weeks",12,nb),
+    html:nb?U.table(["Area","At risk","Weekly fall","Weeks needed","Left on 30 Jun 2027"],behind.slice(0,12).map(function(a){ return [a.k,U.fmt(a.g3),a.p>0?U.fmt(a.p):"none",{t:nw(a.need),cls:"flag"},U.fmt(a.left)]; }),[1,2,3,4]):'<p class="cap">Every area moves its 3G-at-best devices before 30 June 2027 at its current pace.</p>'});
+  var L=[]; L.push("3G SWITCH-OFF READINESS — "+ctx.name.toUpperCase());
+  L.push(A.length+" areas, "+U.fmt(T.s)+" active subscribers"+(R.hasW?", "+R.W.length+" snapshots to "+U.dd(last):"")+"   |   Prepared by Frutos"); L.push("");
+  L.push("FINDING");
+  L.push("- VoLTE-capable: "+U.pct(T.v,T.s)+"% (target "+tg+"%)"+(ready<tg?"; "+U.fmt(Math.ceil(tg/100*T.s-T.v))+" more devices needed to reach it":""));
+  L.push("- 3G at best: "+U.fmt(T.g3)+" devices ("+U.pct(T.g3,T.s)+"%) lose 3G on 30 June 2027 and drop to 2G at most");
+  L.push("- 2G only: "+U.fmt(T.g2)+"; 4G without VoLTE: "+U.fmt(T.n4)+". Both keep calls on 2G until it is retired (provisionally December 2028)");
+  if(pace!==null){ var b2=null; for(i=R.W.length-1;i>=0;i--) if(R.W[i]<=base-27*864e5){ b2=R.W[i]; break; }
+    var pp=b2!==null?(tot(b2).g3-tot(base).g3)/((base-b2)/WK):null;
+    L.push("- Pace over the last "+wlab+" weeks: "+U.fmt(pace)+" fewer 3G-at-best devices a week"+(pp!==null?" ("+U.fmt(pp)+" in the "+U.fmt((base-b2)/WK)+" weeks before)":"")+"; "+(pace>0?nw(need):"no")+" weeks needed, "+wl+" left");
+    if(nb){ L.push("- Behind at their own pace: "+nb+" of "+A.length+" areas, still holding "+U.fmt(left)+" devices at risk on 30 June 2027");
+      behind.slice(0,6).forEach(function(a){ L.push("  "+a.k+": "+U.fmt(a.g3)+" at risk ("+U.pct(a.g3,a.s)+"%), falling "+(a.p>0?U.fmt(a.p):"0")+" a week, "+nw(a.need)+" weeks needed"); }); }
+    else L.push("- Every area moves its 3G-at-best devices before 30 June 2027 at its current pace"); }
+  if(R.hasX){ var gp=A.filter(function(a){ return !isNaN(a.tr)&&a.tr>=10&&a.tr>=2*a.g3/a.s*100; }).sort(function(a,b){ return (b.tr-b.g3/b.s*100)-(a.tr-a.g3/a.s*100); })[0];
+    if(gp) L.push("- "+gp.k+": 3G still carries "+U.fmt(gp.tr,1)+"% of traffic though only "+U.pct(gp.g3,gp.s)+"% of its devices are 3G at best; check 4G coverage there first"); }
+  if(R.assumed) L.push("- "+U.fmt(R.assumed)+" devices listed as 4G with no VoLTE flag were counted as 4G without VoLTE");
+  if(R.over) L.push("- "+R.over+" rows had more devices than subscribers; the device total was used");
+  if(R.yearGuess) L.push("- Week numbers without a year were read as weeks of "+R.yearGuess);
+  if(R.bad) L.push("- "+R.bad+" rows skipped (unreadable date or counts)");
+  L.push(""); L.push("NEXT STEP");
+  L.push("- Share weekly device and traffic snapshots per cell; I return the district migration plan, the cells to");
+  L.push("  switch off first and the weekly tracker, in 10 working days, at a fixed price.");
+  L.push(""); L.push("Method: readiness from device capability per subscriber; pace from the last 4 weekly snapshots.");
+  L.push("Dates as announced by the ICT ministry: 3G off nationwide on 30 June 2027; 2G later (working towards December 2028).");
+  L.push("Note: a trial read. Figures are indicative until run on your full records.");
+  return {verdict:v,tiles:tiles,sections:Sc,summary:L.join("\n")};
+ }
+};
+</script>
+<script>
+(function(){
+"use strict";
+var CFG={"slug": "sunset-readiness", "wa": "250788312423", "defaultFor": "your network", "files": 1, "fileLabels": [], "summaryTitle": "CTO-ready summary", "waMsg": "Muraho Frutos. I tried the 3G Switch-off Readiness for {name} and I'd like the full version.", "foot": "Read entirely in your browser \u00b7 nothing is uploaded \u00b7 personal numbers are masked on sight. 3-day trial with a code. \u00a9 2026 Frutos.", "plainTitle": "3G Switch-off Readiness", "preset": "", "api": ""}, SAMPLES=["area,week,subscribers,twog_only,threeg_max,lte_no_volte,volte,traffic_3g_pct\nDistrict 01,2026-07-20,123398,23192,9132,11046,78999,5.5\nDistrict 01,2026-07-27,123535,23135,8840,11003,79526,5.6\nDistrict 01,2026-08-03,123672,23079,8593,10961,80007,5.4\nDistrict 01,2026-08-10,123810,23022,8331,10919,80505,5.2\nDistrict 01,2026-08-17,123947,22966,8042,10876,81029,5.1\nDistrict 01,2026-08-24,124085,22910,7762,10834,81544,4.8\nDistrict 01,2026-08-31,124222,22853,7451,10792,82090,4.8\nDistrict 01,2026-09-07,124359,22797,7147,10749,82629,4.4\nDistrict 01,2026-09-14,124497,22740,6852,10707,83159,4.5\nDistrict 01,2026-09-21,124634,22684,6620,10665,83625,4.2\nDistrict 01,2026-09-28,124772,22627,6385,10622,84097,4.0\nDistrict 01,2026-10-05,124909,22571,6106,10580,84610,3.9\nDistrict 02,2026-07-20,127312,21846,12264,10508,81509,6.1\nDistrict 02,2026-07-27,127453,21793,11870,10468,82136,6.3\nDistrict 02,2026-08-03,127595,21739,11431,10427,82811,5.8\nDistrict 02,2026-08-10,127737,21686,10948,10387,83527,5.9\nDistrict 02,2026-08-17,127879,21633,10483,10347,84226,5.7\nDistrict 02,2026-08-24,128020,21580,10039,10307,84903,5.8\nDistrict 02,2026-08-31,128162,21527,9558,10266,85618,5.5\nDistrict 02,2026-09-07,128304,21474,9100,10226,86310,5.1\nDistrict 02,2026-09-14,128446,21420,8598,10186,87047,5.4\nDistrict 02,2026-09-21,128587,21367,8182,10146,87696,5.2\nDistrict 02,2026-09-28,128729,21314,7674,10105,88438,4.7\nDistrict 02,2026-10-05,128871,21261,7223,10065,89123,4.7\nDistrict 03,2026-07-20,185897,53471,28830,18511,84067,17.7\nDistrict 03,2026-07-27,186104,53341,28495,18440,84809,17.2\nDistrict 03,2026-08-03,186311,53211,28141,18369,85570,17.2\nDistrict 03,2026-08-10,186518,53081,27757,18298,86360,17.1\nDistrict 03,2026-08-17,186725,52951,27397,18227,87127,17.1\nDistrict 03,2026-08-24,186932,52821,27056,18157,87874,16.9\nDistrict 03,2026-08-31,187139,52690,26688,18086,88650,16.9\nDistrict 03,2026-09-07,187346,52560,26306,18015,89439,16.6\nDistrict 03,2026-09-14,187553,52430,26208,17944,89944,16.2\nDistrict 03,2026-09-21,187760,52300,26092,17873,90467,16.4\nDistrict 03,2026-09-28,187967,52170,25971,17802,90995,15.9\nDistrict 03,2026-10-05,188174,52040,25863,17731,91509,15.8\nDistrict 04,2026-07-20,122809,25157,10716,9664,76238,6.8\nDistrict 04,2026-07-27,122946,25096,10426,9627,76762,6.9\nDistrict 04,2026-08-03,123082,25035,10132,9590,77289,6.5\nDistrict 04,2026-08-10,123219,24974,9835,9553,77820,6.6\nDistrict 04,2026-08-17,123356,24912,9486,9516,78404,6.2\nDistrict 04,2026-08-24,123493,24851,9177,9479,78947,6.0\nDistrict 04,2026-08-31,123629,24790,8897,9442,79459,5.7\nDistrict 04,2026-09-07,123766,24729,8567,9405,80023,6.1\nDistrict 04,2026-09-14,123903,24668,8277,9368,80547,5.8\nDistrict 04,2026-09-21,124040,24606,8013,9331,81046,5.7\nDistrict 04,2026-09-28,124176,24545,7724,9294,81568,5.6\nDistrict 04,2026-10-05,124313,24484,7417,9257,82109,5.3\nDistrict 05,2026-07-20,63805,16497,4562,6751,35557,5.2\nDistrict 05,2026-07-27,63876,16456,4388,6725,35869,4.8\nDistrict 05,2026-08-03,63947,16416,4223,6699,36170,4.9\nDistrict 05,2026-08-10,64018,16376,4032,6673,36498,4.6\nDistrict 05,2026-08-17,64089,16336,3873,6647,36793,4.4\nDistrict 05,2026-08-24,64160,16296,3716,6621,37087,4.2\nDistrict 05,2026-08-31,64231,16256,3520,6595,37420,4.1\nDistrict 05,2026-09-07,64302,16216,3322,6569,37754,4.3\nDistrict 05,2026-09-14,64373,16175,3143,6544,38070,4.1\nDistrict 05,2026-09-21,64444,16135,2983,6518,38366,3.5\nDistrict 05,2026-09-28,64515,16095,2815,6492,38671,3.8\nDistrict 05,2026-10-05,64586,16055,2654,6466,38968,3.7\nDistrict 06,2026-07-20,106728,24208,6165,9780,65897,5.2\nDistrict 06,2026-07-27,106847,24149,6013,9743,66263,5.1\nDistrict 06,2026-08-03,106965,24090,5831,9705,66660,4.9\nDistrict 06,2026-08-10,107084,24031,5659,9668,67046,4.7\nDistrict 06,2026-08-17,107203,23972,5511,9630,67409,4.3\nDistrict 06,2026-08-24,107322,23913,5348,9593,67786,4.4\nDistrict 06,2026-08-31,107441,23854,5170,9555,68180,4.3\nDistrict 06,2026-09-07,107560,23796,5029,9518,68534,3.9\nDistrict 06,2026-09-14,107678,23737,4854,9480,68923,4.0\nDistrict 06,2026-09-21,107797,23678,4692,9443,69299,4.0\nDistrict 06,2026-09-28,107916,23619,4501,9405,69706,3.5\nDistrict 06,2026-10-05,108035,23560,4311,9368,70110,3.5\nDistrict 07,2026-07-20,106881,27248,5804,8456,64409,5.3\nDistrict 07,2026-07-27,107000,27182,5666,8424,64763,5.1\nDistrict 07,2026-08-03,107119,27116,5516,8392,65129,5.1\nDistrict 07,2026-08-10,107238,27049,5379,8359,65484,4.8\nDistrict 07,2026-08-17,107357,26983,5233,8327,65846,4.6\nDistrict 07,2026-08-24,107476,26917,5102,8294,66194,4.6\nDistrict 07,2026-08-31,107595,26850,4971,8262,66542,4.6\nDistrict 07,2026-09-07,107714,26784,4813,8230,66916,4.6\nDistrict 07,2026-09-14,107833,26718,4633,8197,67313,4.2\nDistrict 07,2026-09-21,107952,26652,4466,8165,67696,4.0\nDistrict 07,2026-09-28,108071,26585,4300,8132,68080,3.9\nDistrict 07,2026-10-05,108190,26519,4163,8100,68432,3.7\nDistrict 08,2026-07-20,228768,58752,32603,28395,106619,16.7\nDistrict 08,2026-07-27,229023,58609,32270,28286,107457,16.9\nDistrict 08,2026-08-03,229277,58467,31947,28177,108282,16.5\nDistrict 08,2026-08-10,229532,58324,31664,28068,109069,16.4\nDistrict 08,2026-08-17,229787,58181,31353,27960,109884,16.5\nDistrict 08,2026-08-24,230042,58038,31059,27851,110682,16.1\nDistrict 08,2026-08-31,230296,57895,30735,27742,111509,15.8\nDistrict 08,2026-09-07,230551,57752,30395,27633,112354,15.9\nDistrict 08,2026-09-14,230806,57609,30257,27524,112996,15.9\nDistrict 08,2026-09-21,231061,57466,30115,27416,113641,15.8\nDistrict 08,2026-09-28,231315,57323,29976,27307,114284,15.3\nDistrict 08,2026-10-05,231570,57180,29847,27198,114917,15.1\nDistrict 09,2026-07-20,124186,28522,9658,14297,70881,6.8\nDistrict 09,2026-07-27,124324,28453,9452,14242,71348,6.7\nDistrict 09,2026-08-03,124463,28384,9232,14187,71830,6.4\nDistrict 09,2026-08-10,124601,28314,8973,14132,72351,6.3\nDistrict 09,2026-08-17,124739,28245,8762,14077,72823,6.1\nDistrict 09,2026-08-24,124877,28175,8540,14023,73306,5.8\nDistrict 09,2026-08-31,125016,28106,8302,13968,73806,6.0\nDistrict 09,2026-09-07,125154,28037,8095,13913,74274,5.9\nDistrict 09,2026-09-14,125292,27967,7800,13858,74831,5.8\nDistrict 09,2026-09-21,125430,27898,7571,13804,75320,5.2\nDistrict 09,2026-09-28,125569,27828,7288,13749,75867,5.1\nDistrict 09,2026-10-05,125707,27759,6995,13694,76421,5.0\nDistrict 10,2026-07-20,113520,26398,8487,11810,65728,5.9\nDistrict 10,2026-07-27,113646,26333,8220,11764,66231,5.5\nDistrict 10,2026-08-03,113772,26269,7978,11719,66707,5.5\nDistrict 10,2026-08-10,113899,26205,7742,11674,67177,5.4\nDistrict 10,2026-08-17,114025,26141,7496,11629,67657,5.3\nDistrict 10,2026-08-24,114152,26076,7261,11583,68129,5.1\nDistrict 10,2026-08-31,114278,26012,7032,11538,68592,5.0\nDistrict 10,2026-09-07,114404,25948,6758,11493,69100,5.1\nDistrict 10,2026-09-14,114531,25884,6527,11448,69565,4.8\nDistrict 10,2026-09-21,114657,25819,6275,11402,70053,4.5\nDistrict 10,2026-09-28,114784,25755,6043,11357,70520,4.7\nDistrict 10,2026-10-05,114910,25691,5769,11312,71028,4.3\nDistrict 11,2026-07-20,107912,17513,6410,8470,74607,18.1\nDistrict 11,2026-07-27,108032,17470,6173,8438,75038,17.8\nDistrict 11,2026-08-03,108153,17427,5969,8405,75438,17.8\nDistrict 11,2026-08-10,108273,17385,5724,8373,75876,17.8\nDistrict 11,2026-08-17,108393,17342,5473,8340,76322,17.3\nDistrict 11,2026-08-24,108513,17300,5268,8308,76720,17.3\nDistrict 11,2026-08-31,108633,17257,5018,8275,77165,16.9\nDistrict 11,2026-09-07,108753,17214,4770,8243,77607,16.7\nDistrict 11,2026-09-14,108874,17172,4525,8210,78047,17.0\nDistrict 11,2026-09-21,108994,17129,4312,8178,78454,16.7\nDistrict 11,2026-09-28,109114,17087,4070,8145,78890,16.6\nDistrict 11,2026-10-05,109234,17044,3841,8113,79313,16.3\nDistrict 12,2026-07-20,89291,19370,7926,8588,52443,5.9\nDistrict 12,2026-07-27,89391,19323,7728,8555,52820,5.6\nDistrict 12,2026-08-03,89490,19276,7484,8522,53241,5.5\nDistrict 12,2026-08-10,89590,19229,7227,8489,53677,5.7\nDistrict 12,2026-08-17,89689,19182,7001,8456,54081,5.3\nDistrict 12,2026-08-24,89788,19135,6763,8423,54497,5.4\nDistrict 12,2026-08-31,89888,19088,6532,8391,54906,5.4\nDistrict 12,2026-09-07,89987,19041,6336,8358,55280,5.1\nDistrict 12,2026-09-14,90087,18993,6119,8325,55677,5.0\nDistrict 12,2026-09-21,90186,18946,5913,8292,56061,4.6\nDistrict 12,2026-09-28,90286,18899,5712,8259,56441,4.4\nDistrict 12,2026-10-05,90385,18852,5495,8226,56836,4.3\nDistrict 13,2026-07-20,87002,17083,5870,8609,55000,5.6\nDistrict 13,2026-07-27,87099,17042,5694,8576,55347,5.9\nDistrict 13,2026-08-03,87196,17000,5542,8543,55670,5.8\nDistrict 13,2026-08-10,87293,16959,5402,8510,55981,5.6\nDistrict 13,2026-08-17,87390,16917,5251,8477,56303,5.3\nDistrict 13,2026-08-24,87487,16875,5106,8444,56620,5.0\nDistrict 13,2026-08-31,87584,16834,4936,8411,56960,5.0\nDistrict 13,2026-09-07,87681,16792,4789,8378,57279,5.0\nDistrict 13,2026-09-14,87777,16751,4633,8345,57604,4.8\nDistrict 13,2026-09-21,87874,16709,4464,8312,57945,4.7\nDistrict 13,2026-09-28,87971,16668,4288,8279,58291,4.3\nDistrict 13,2026-10-05,88068,16626,4146,8246,58605,4.2\nDistrict 14,2026-07-20,253183,77368,36377,28506,109518,17.6\nDistrict 14,2026-07-27,253465,77179,35933,28397,110541,17.5\nDistrict 14,2026-08-03,253747,76991,35540,28288,111511,17.4\nDistrict 14,2026-08-10,254029,76803,35116,28179,112513,17.2\nDistrict 14,2026-08-17,254311,76615,34710,28070,113496,17.2\nDistrict 14,2026-08-24,254593,76426,34248,27960,114537,16.7\nDistrict 14,2026-08-31,254874,76238,33773,27851,115589,16.6\nDistrict 14,2026-09-07,255156,76050,33326,27742,116613,16.6\nDistrict 14,2026-09-14,255438,75862,33168,27633,117349,16.5\nDistrict 14,2026-09-21,255720,75673,33010,27523,118086,16.5\nDistrict 14,2026-09-28,256002,75485,32827,27414,118847,16.4\nDistrict 14,2026-10-05,256284,75297,32630,27305,119621,16.3\nDistrict 15,2026-07-20,129024,20716,7434,10709,89220,5.0\nDistrict 15,2026-07-27,129167,20666,7195,10668,89692,4.9\nDistrict 15,2026-08-03,129311,20616,7006,10627,90115,4.7\nDistrict 15,2026-08-10,129455,20565,6806,10586,90550,4.7\nDistrict 15,2026-08-17,129598,20515,6599,10545,90990,4.7\nDistrict 15,2026-08-24,129742,20464,6412,10504,91412,4.4\nDistrict 15,2026-08-31,129886,20414,6215,10463,91843,4.0\nDistrict 15,2026-09-07,130029,20364,6020,10422,92271,4.2\nDistrict 15,2026-09-14,130173,20313,5796,10381,92730,4.0\nDistrict 15,2026-09-21,130317,20263,5620,10340,93140,4.1\nDistrict 15,2026-09-28,130460,20212,5401,10299,93593,3.5\nDistrict 15,2026-10-05,130604,20162,5190,10258,94038,3.8\nDistrict 16,2026-07-20,61421,13145,3687,4962,39318,5.4\nDistrict 16,2026-07-27,61489,13113,3592,4943,39532,5.3\nDistrict 16,2026-08-03,61557,13081,3497,4924,39746,5.4\nDistrict 16,2026-08-10,61626,13049,3408,4905,39954,5.2\nDistrict 16,2026-08-17,61694,13017,3332,4886,40149,4.9\nDistrict 16,2026-08-24,61763,12985,3250,4867,40351,4.9\nDistrict 16,2026-08-31,61831,12953,3170,4848,40549,4.4\nDistrict 16,2026-09-07,61899,12921,3072,4829,40766,4.5\nDistrict 16,2026-09-14,61968,12889,2985,4810,40973,4.3\nDistrict 16,2026-09-21,62036,12857,2895,4791,41181,4.4\nDistrict 16,2026-09-28,62105,12825,2810,4772,41386,4.4\nDistrict 16,2026-10-05,62173,12793,2718,4753,41597,3.8\nDistrict 17,2026-07-20,111949,24787,10890,8894,66810,6.5\nDistrict 17,2026-07-27,112073,24727,10556,8860,67362,6.6\nDistrict 17,2026-08-03,112198,24667,10175,8826,67961,6.0\nDistrict 17,2026-08-10,112323,24606,9815,8792,68540,6.0\nDistrict 17,2026-08-17,112447,24546,9488,8758,69085,5.9\nDistrict 17,2026-08-24,112572,24486,9191,8723,69601,5.7\nDistrict 17,2026-08-31,112697,24426,8833,8689,70178,5.7\nDistrict 17,2026-09-07,112821,24365,8530,8655,70699,5.4\nDistrict 17,2026-09-14,112946,24305,8149,8621,71298,5.6\nDistrict 17,2026-09-21,113071,24245,7824,8587,71842,5.1\nDistrict 17,2026-09-28,113195,24184,7527,8553,72357,5.1\nDistrict 17,2026-10-05,113320,24124,7226,8519,72876,4.7\nDistrict 18,2026-07-20,126037,30594,12004,12606,69935,7.2\nDistrict 18,2026-07-27,126178,30519,11714,12558,70488,7.2\nDistrict 18,2026-08-03,126318,30445,11394,12510,71069,6.8\nDistrict 18,2026-08-10,126458,30370,11017,12461,71709,6.6\nDistrict 18,2026-08-17,126599,30296,10666,12413,72322,6.6\nDistrict 18,2026-08-24,126739,30222,10314,12365,72935,6.4\nDistrict 18,2026-08-31,126879,30147,9983,12316,73529,6.4\nDistrict 18,2026-09-07,127020,30073,9678,12268,74096,6.3\nDistrict 18,2026-09-14,127160,29998,9280,12220,74756,6.0\nDistrict 18,2026-09-21,127300,29924,8934,12172,75363,5.7\nDistrict 18,2026-09-28,127441,29849,8558,12123,76003,5.6\nDistrict 18,2026-10-05,127581,29775,8236,12075,76586,5.8\nDistrict 19,2026-07-20,294394,77410,49147,28766,137185,19.0\nDistrict 19,2026-07-27,294722,77221,48727,28656,138229,18.8\nDistrict 19,2026-08-03,295050,77033,48264,28546,139316,18.5\nDistrict 19,2026-08-10,295378,76845,47791,28436,140413,18.4\nDistrict 19,2026-08-17,295705,76656,47364,28326,141464,18.4\nDistrict 19,2026-08-24,296033,76468,46912,28215,142541,18.0\nDistrict 19,2026-08-31,296361,76280,46467,28105,143610,18.1\nDistrict 19,2026-09-07,296689,76091,46023,27995,144679,17.7\nDistrict 19,2026-09-14,297017,75903,45825,27885,145501,17.7\nDistrict 19,2026-09-21,297344,75715,45665,27774,146285,17.5\nDistrict 19,2026-09-28,297672,75526,45497,27664,147078,17.5\nDistrict 19,2026-10-05,298000,75338,45296,27554,147902,17.5\nDistrict 20,2026-07-20,77619,13579,5387,9001,48862,5.7\nDistrict 20,2026-07-27,77706,13546,5257,8967,49145,5.5\nDistrict 20,2026-08-03,77792,13513,5097,8932,49458,5.6\nDistrict 20,2026-08-10,77879,13480,4946,8898,49762,5.1\nDistrict 20,2026-08-17,77965,13447,4818,8863,50043,5.1\nDistrict 20,2026-08-24,78051,13414,4687,8829,50327,5.1\nDistrict 20,2026-08-31,78138,13381,4564,8794,50604,5.0\nDistrict 20,2026-09-07,78224,13348,4405,8760,50915,4.6\nDistrict 20,2026-09-14,78311,13315,4286,8725,51188,4.5\nDistrict 20,2026-09-21,78397,13282,4160,8691,51466,4.4\nDistrict 20,2026-09-28,78484,13249,4033,8656,51747,4.5\nDistrict 20,2026-10-05,78570,13216,3898,8622,52034,4.3\nDistrict 21,2026-07-20,120885,31992,6625,10574,70529,5.7\nDistrict 21,2026-07-27,121020,31914,6404,10533,71003,5.1\nDistrict 21,2026-08-03,121155,31837,6208,10493,71450,5.3\nDistrict 21,2026-08-10,121289,31759,5975,10452,71935,5.0\nDistrict 21,2026-08-17,121424,31681,5760,10412,72401,4.8\nDistrict 21,2026-08-24,121558,31603,5559,10371,72854,5.0\nDistrict 21,2026-08-31,121693,31525,5323,10331,73342,4.8\nDistrict 21,2026-09-07,121828,31447,5106,10290,73811,4.4\nDistrict 21,2026-09-14,121962,31370,4882,10250,74285,4.5\nDistrict 21,2026-09-21,122097,31292,4703,10209,74717,4.1\nDistrict 21,2026-09-28,122231,31214,4494,10169,75177,3.9\nDistrict 21,2026-10-05,122366,31136,4313,10128,75610,4.0\nDistrict 22,2026-07-20,121119,29181,9617,12244,69552,5.7\nDistrict 22,2026-07-27,121253,29110,9408,12197,70012,5.5\nDistrict 22,2026-08-03,121388,29039,9146,12150,70527,5.5\nDistrict 22,2026-08-10,121523,28968,8926,12103,70999,5.5\nDistrict 22,2026-08-17,121658,28897,8720,12056,71458,5.2\nDistrict 22,2026-08-24,121793,28826,8456,12009,71974,5.0\nDistrict 22,2026-08-31,121928,28755,8210,11963,72471,5.1\nDistrict 22,2026-09-07,122063,28684,7961,11916,72973,4.6\nDistrict 22,2026-09-14,122197,28613,7746,11869,73439,4.5\nDistrict 22,2026-09-21,122332,28542,7479,11822,73959,4.7\nDistrict 22,2026-09-28,122467,28471,7273,11775,74417,4.5\nDistrict 22,2026-10-05,122602,28400,7027,11728,74915,4.2\nDistrict 23,2026-07-20,279434,85965,38518,29571,123716,16.8\nDistrict 23,2026-07-27,279746,85756,37979,29458,124887,16.6\nDistrict 23,2026-08-03,280057,85546,37453,29345,126045,16.6\nDistrict 23,2026-08-10,280368,85337,37014,29231,127116,16.2\nDistrict 23,2026-08-17,280679,85128,36566,29118,128195,16.1\nDistrict 23,2026-08-24,280990,84919,36147,29005,129246,15.9\nDistrict 23,2026-08-31,281301,84710,35620,28892,130404,16.0\nDistrict 23,2026-09-07,281612,84501,35127,28778,131529,15.9\nDistrict 23,2026-09-14,281924,84291,34988,28665,132301,15.4\nDistrict 23,2026-09-21,282235,84082,34834,28552,133086,15.7\nDistrict 23,2026-09-28,282546,83873,34648,28438,133904,15.2\nDistrict 23,2026-10-05,282857,83664,34478,28325,134705,15.3\nDistrict 24,2026-07-20,72701,17257,4808,5467,44373,5.1\nDistrict 24,2026-07-27,72781,17215,4634,5446,44689,5.1\nDistrict 24,2026-08-03,72862,17173,4469,5426,44996,4.8\nDistrict 24,2026-08-10,72943,17131,4291,5405,45317,4.6\nDistrict 24,2026-08-17,73024,17089,4127,5384,45625,4.7\nDistrict 24,2026-08-24,73105,17047,3984,5363,45911,4.7\nDistrict 24,2026-08-31,73186,17005,3810,5342,46228,4.2\nDistrict 24,2026-09-07,73267,16963,3632,5321,46549,4.1\nDistrict 24,2026-09-14,73348,16921,3457,5300,46867,3.8\nDistrict 24,2026-09-21,73429,16879,3317,5279,47150,4.1\nDistrict 24,2026-09-28,73510,16837,3145,5258,47465,3.7\nDistrict 24,2026-10-05,73591,16795,3007,5237,47746,3.8\nDistrict 25,2026-07-20,95940,24578,6661,10997,53274,6.0\nDistrict 25,2026-07-27,96047,24518,6474,10955,53670,5.9\nDistrict 25,2026-08-03,96154,24458,6247,10913,54105,5.4\nDistrict 25,2026-08-10,96260,24398,6063,10871,54497,5.2\nDistrict 25,2026-08-17,96367,24339,5880,10829,54887,5.4\nDistrict 25,2026-08-24,96474,24279,5639,10787,55337,5.3\nDistrict 25,2026-08-31,96581,24219,5421,10745,55763,4.9\nDistrict 25,2026-09-07,96688,24159,5188,10703,56205,4.9\nDistrict 25,2026-09-14,96795,24099,4970,10660,56633,4.9\nDistrict 25,2026-09-21,96901,24040,4776,10618,57033,4.4\nDistrict 25,2026-09-28,97008,23980,4590,10576,57428,4.6\nDistrict 25,2026-10-05,97115,23920,4392,10534,57834,4.3\nDistrict 26,2026-07-20,95372,24837,5203,10173,54540,4.7\nDistrict 26,2026-07-27,95478,24776,5087,10134,54861,4.7\nDistrict 26,2026-08-03,95584,24716,4953,10095,55200,4.5\nDistrict 26,2026-08-10,95690,24655,4821,10056,55537,4.2\nDistrict 26,2026-08-17,95797,24595,4696,10017,55867,4.1\nDistrict 26,2026-08-24,95903,24535,4566,9978,56201,4.1\nDistrict 26,2026-08-31,96009,24474,4452,9939,56521,4.2\nDistrict 26,2026-09-07,96115,24414,4322,9900,56855,3.8\nDistrict 26,2026-09-14,96221,24353,4180,9861,57202,3.9\nDistrict 26,2026-09-21,96328,24293,4049,9822,57539,3.5\nDistrict 26,2026-09-28,96434,24232,3907,9783,57886,3.2\nDistrict 26,2026-10-05,96540,24172,3766,9744,58231,3.3\nDistrict 27,2026-07-20,254005,81245,39720,30429,101311,17.3\nDistrict 27,2026-07-27,254288,81048,39058,30313,102568,17.0\nDistrict 27,2026-08-03,254571,80850,38489,30196,103733,16.9\nDistrict 27,2026-08-10,254853,80652,37812,30080,105005,16.6\nDistrict 27,2026-08-17,255136,80455,37152,29963,106261,16.8\nDistrict 27,2026-08-24,255419,80257,36451,29847,107557,16.5\nDistrict 27,2026-08-31,255702,80059,35862,29730,108743,16.7\nDistrict 27,2026-09-07,255985,79862,35334,29613,109866,16.3\nDistrict 27,2026-09-14,256268,79664,35111,29497,110685,16.3\nDistrict 27,2026-09-21,256550,79466,34923,29380,111468,16.0\nDistrict 27,2026-09-28,256833,79269,34747,29264,112239,15.9\nDistrict 27,2026-10-05,257116,79071,34572,29147,113010,15.8\nDistrict 28,2026-07-20,98808,18902,10492,10579,58068,7.2\nDistrict 28,2026-07-27,98918,18856,10160,10538,58596,6.8\nDistrict 28,2026-08-03,99028,18810,9809,10498,59142,6.8\nDistrict 28,2026-08-10,99138,18764,9446,10457,59701,6.8\nDistrict 28,2026-08-17,99248,18718,9037,10417,60305,6.6\nDistrict 28,2026-08-24,99358,18672,8613,10376,60925,6.3\nDistrict 28,2026-08-31,99468,18626,8218,10336,61516,6.4\nDistrict 28,2026-09-07,99578,18580,7800,10295,62130,6.2\nDistrict 28,2026-09-14,99688,18534,7474,10255,62651,5.6\nDistrict 28,2026-09-21,99798,18488,7107,10214,63214,5.9\nDistrict 28,2026-09-28,99908,18442,6744,10174,63772,5.4\nDistrict 28,2026-10-05,100018,18396,6404,10133,64308,5.2\nDistrict 29,2026-07-20,94730,17142,4758,7521,64690,5.6\nDistrict 29,2026-07-27,94835,17100,4626,7492,64997,5.3\nDistrict 29,2026-08-03,94941,17058,4507,7463,65293,5.3\nDistrict 29,2026-08-10,95046,17017,4381,7435,65592,5.0\nDistrict 29,2026-08-17,95152,16975,4246,7406,65903,5.0\nDistrict 29,2026-08-24,95257,16933,4116,7377,66209,5.0\nDistrict 29,2026-08-31,95363,16892,3994,7348,66506,4.7\nDistrict 29,2026-09-07,95468,16850,3884,7319,66791,4.3\nDistrict 29,2026-09-14,95574,16808,3753,7290,67099,4.5\nDistrict 29,2026-09-21,95679,16766,3645,7262,67381,4.0\nDistrict 29,2026-09-28,95785,16725,3528,7233,67673,4.0\nDistrict 29,2026-10-05,95890,16683,3383,7204,67994,4.0\nDistrict 30,2026-07-20,104063,16267,6708,9440,70594,6.0\nDistrict 30,2026-07-27,104179,16228,6536,9404,70955,5.8\nDistrict 30,2026-08-03,104295,16188,6371,9368,71311,5.9\nDistrict 30,2026-08-10,104411,16149,6179,9331,71694,5.7\nDistrict 30,2026-08-17,104527,16109,5964,9295,72100,5.2\nDistrict 30,2026-08-24,104643,16069,5749,9259,72506,5.3\nDistrict 30,2026-08-31,104759,16030,5527,9223,72918,5.4\nDistrict 30,2026-09-07,104875,15990,5306,9187,73329,5.1\nDistrict 30,2026-09-14,104990,15951,5154,9151,73670,5.1\nDistrict 30,2026-09-21,105106,15911,4997,9114,74019,4.6\nDistrict 30,2026-09-28,105222,15872,4833,9078,74373,4.8\nDistrict 30,2026-10-05,105338,15832,4667,9042,74730,4.6\n"];
+var $=function(id){return document.getElementById(id);};
+var inst=$("inst"), errEl=$("err"), isSample=false, lastParsed=null, texts=[null,null];
+var U={};
+U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
+U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
+U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.of=function(c,k,n){ return n>k ? c+" \u00b7 "+k+" of "+U.fmt(n)+" shown" : c; };
+U.MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+U.dd=function(t,noYear){ var d=new Date(t); return d.getDate()+" "+U.MON[d.getMonth()]+(noYear?"":" "+d.getFullYear()); };
+U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };
+U.pct=function(a,b){ return b? Math.round(a/b*1000)/10 : 0; };
+U.median=function(a){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; };
+U.pctl=function(a,p){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}); var i=Math.max(0,Math.ceil(p/100*s.length)-1); return s[i]; };
+U.parseCSV=function(text){
+  text=String(text).replace(/^﻿/,"");
+  var lines=text.replace(/\r\n?/g,"\n").split("\n").filter(function(l){ return l.trim().length; });
+  if(!lines.length) return null;
+  var h0=lines[0], cnt={",":0,";":0,"\t":0,"|":0}, qq=false, D=",";
+  for(var z=0;z<h0.length;z++){ var cz=h0[z]; if(cz==='"') qq=!qq; else if(!qq&&cnt.hasOwnProperty(cz)) cnt[cz]++; }
+  Object.keys(cnt).forEach(function(k){ if(cnt[k]>cnt[D]) D=k; });
+  function cells(line){ var o=[],c="",q=false; for(var i=0;i<line.length;i++){ var ch=line[i];
+    if(q){ if(ch==='"'){ if(line[i+1]==='"'){c+='"';i++;} else q=false; } else c+=ch; }
+    else { if(ch==='"') q=true; else if(ch===D){ o.push(c); c=""; } else c+=ch; } } o.push(c); return o; }
+  var H=cells(h0).map(function(h){ return h.trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,""); }), R=[];
+  for(var i=1;i<lines.length;i++){ var c=cells(lines[i]), o={}; for(var j=0;j<H.length;j++) o[H[j]]=(c[j]===undefined?"":String(c[j]).trim()); R.push(o); }
+  return {header:H, rows:R};
+};
+U.pick=function(H,al){ var a,h; for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h]===al[a]) return H[h];
+  for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h].indexOf(al[a])>=0) return H[h]; return null; };
+U.time=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim(); if(!s) return NaN;
+  if(/^\d{13}$/.test(s)) return parseInt(s,10); if(/^\d{10}$/.test(s)) return parseInt(s,10)*1000;
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?)?\s*(Z|[+-]\d{2}:?\d{2})?$/);
+  if(m){ var ms=m[7]?Math.round(parseFloat("0."+m[7])*1000):0;
+    var y=+m[1], mo=+m[2]-1, d=+m[3], hh=+(m[4]||0), mi=+(m[5]||0), se=+(m[6]||0);
+    if(m[8]){ var t=Date.UTC(y,mo,d,hh,mi,se,ms); if(m[8]!=="Z"){ var z=m[8].replace(":",""), sg=z[0]==="-"?-1:1; t-=sg*(parseInt(z.slice(1,3),10)*60+parseInt(z.slice(3,5),10))*60000; } return t; }
+    return new Date(y,mo,d,hh,mi,se,ms).getTime(); }
+  var d2=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:[T ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?)?$/);
+  if(d2){ var A1=+d2[1], A2=+d2[2], dd=A1, mm=A2; if(A2>12&&A1<=12){ dd=A2; mm=A1; } var H2=+(d2[4]||0);
+    if(d2[7]){ var pm=/p/i.test(d2[7]); if(pm&&H2<12) H2+=12; if(!pm&&H2===12) H2=0; }
+    return new Date(+d2[3],mm-1,dd,H2,+(d2[5]||0),+(d2[6]||0)).getTime(); }
+  return Date.parse(s); };
+U.hour=function(v){ if(!v) return null; var m=String(v).match(/(?:^|[T\s,])(\d{1,2}):\d{2}(?::\d{2})?(?:\.\d+)?\s*([AaPp][Mm])?/); if(m){ var h=parseInt(m[1],10);
+  if(m[2]){ var pm=/p/i.test(m[2]); if(pm&&h<12) h+=12; if(!pm&&h===12) h=0; } return (h>=0&&h<24)?h:null; } return null; };
+U.hh=function(h){ if(h===null||h===undefined) return "—"; var ap=h<12?"am":"pm", r=h%12; if(r===0) r=12; return r+ap; };
+U.mask=function(v){ var d=String(v||"").replace(/\D/g,""); if(d.length<4) return "•••"; return "••• "+d.slice(-3); };
+U.tile=function(k,v,s,cls){ var m=String(v).match(/^(.*?)\s(L|kWh|t|h|s|ms|min|days|agents|links|vehicles|km|L\/100 km|\u00d7)$/);
+  var vv=m?U.esc(m[1])+'<small class="u"> '+m[2]+'</small>':U.esc(v), m2=String(v).match(/^RWF\s(.+)$/);
+  if(m2) vv='<small class="u">RWF </small>'+U.esc(m2[1]);
+  return '<div class="tile"><div class="k">'+U.esc(k)+'</div><div class="v '+(cls||'')+'">'+vv+'</div><div class="s">'+U.esc(s||"")+'</div></div>'; };
+U.bars=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){ var w=Math.max(0,Math.min(100,r.w));
+  h+='<div class="brow"><div class="bl" title="'+U.esc(r.label)+'">'+U.esc(r.label)+'</div><div class="bb"><span class="'+(r.cls||'')+'" style="width:'+w+'%"></span></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.pairs=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){
+  h+='<div class="brow pair"><div class="bl">'+U.esc(r.label)+'</div><div class="bbs"><div class="bb"><span class="'+(r.cls1||'')+'" style="width:'+Math.min(100,r.w1)+'%"></span></div><div class="bb"><span class="'+(r.cls2||'dim')+'" style="width:'+Math.min(100,r.w2)+'%"></span></div></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.stack=function(parts){ var tot=0; parts.forEach(function(p){ tot+=p.v; }); var h='<div class="stack">';
+  parts.forEach(function(p){ if(p.v>0) h+='<span title="'+U.esc(p.label)+'" style="width:'+(tot?p.v/tot*100:0)+'%;background:'+p.color+'"></span>'; });
+  h+='</div><div class="legend">'; parts.forEach(function(p){ h+='<span><i style="background:'+p.color+'"></i>'+U.esc(p.label)+' '+U.esc(p.text)+'</span>'; }); return h+'</div>'; };
+U.heat=function(vals, mode, ref, labs){ // mode "count": raw counts, darker red = more; mode "level": ratios against a reference
+  var mx=0, i; if(mode==="count") vals.forEach(function(v){ if(v>mx) mx=v; });
+  var h='<div class="hours">';
+  for(i=0;i<24;i++){ var v=vals[i], col="var(--panel2)";
+    if(v!==null&&v!==undefined&&!isNaN(v)){
+      if(mode==="count"){ if(v>0&&mx>0) col="color-mix(in srgb, var(--bad) "+Math.round(22+78*v/mx)+"%, var(--panel2))"; }
+      else col = v>=ref-1e-9 ? "var(--accent)" : (v>=ref-0.10 ? "var(--warn)" : "var(--bad)"); }
+    h+='<div class="hcell" style="background:'+col+'"></div>'; }
+  h+='</div><div class="hlabels">'; ["12a","","","3","","","6","","","9","","","12p","","","3","","","6","","","9","",""].forEach(function(l){ h+='<span>'+l+'</span>'; });
+  h+='</div><div class="legend">';
+  if(mode==="count") h+='<span><i style="background:color-mix(in srgb, var(--bad) 22%, var(--panel2))"></i>Fewer</span><span><i style="background:var(--bad)"></i>Most</span><span><i style="background:var(--panel2)"></i>None</span>';
+  else { labs=labs||["At or above target","Up to 10 points below","More than 10 points below"];
+    h+='<span><i style="background:var(--accent)"></i>'+U.esc(labs[0])+'</span><span><i style="background:var(--warn)"></i>'+U.esc(labs[1])+'</span><span><i style="background:var(--bad)"></i>'+U.esc(labs[2])+'</span><span><i style="background:var(--panel2)"></i>No data</span>'; }
+  return h+'</div>'; };
+U.table=function(head, rows, numCols){ numCols=numCols||[]; var h='<div class="tblwrap"><table class="tbl"><thead><tr>';
+  head.forEach(function(c,i){ h+='<th class="'+(numCols.indexOf(i)>=0?'num':'')+'">'+U.esc(c)+'</th>'; }); h+='</tr></thead><tbody>';
+  rows.forEach(function(r){ h+='<tr>'; r.forEach(function(c,i){ var cls=(numCols.indexOf(i)>=0?'num':''), txt=c;
+    if(c&&typeof c==="object"){ cls+=' '+(c.cls||''); txt=c.t; } h+='<td class="'+cls+'">'+U.esc(txt)+'</td>'; }); h+='</tr>'; });
+  return h+'</tbody></table></div>'; };
+
+try{ var sv=localStorage.getItem(CFG.slug+"_theme"); if(sv) document.documentElement.setAttribute("data-theme",sv); }catch(e){}
+$("theme").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dk=window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var nx=cur?(cur==="dark"?"light":"dark"):(dk?"light":"dark");
+  document.documentElement.setAttribute("data-theme",nx);
+  try{ localStorage.setItem(CFG.slug+"_theme",nx); }catch(e){}
+});
+
+var G=(function(H){
+  var PUB={"kty": "EC", "crv": "P-256", "x": "dd_RAcn7vNcw2otkFdNpoI6U3_RyeEOu6SawgbThnho", "y": "zjKzBb8ADm1xZQ2tioXLYUyj-bstyz4fIcvI6VBocrA"}, KID="fk1-AqEPEA", LS="fk_codes", TITLE=CFG.plainTitle, mem=null, kp=null, pending=null, timer=null;
+  var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var esc=function(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+  var st={state:"locked", exp:0, org:"", code:""};
+  var hasCrypto=!!(window.crypto&&window.crypto.subtle&&window.TextEncoder&&window.TextDecoder&&window.Promise);
+  var MSG={bad:"That code isn't valid. Check it was copied in full, or ask Frutos for a new one.",
+    scope:"That code is for another tool. Ask Frutos for a code for the "+TITLE+".",
+    expired:"That code's trial has ended. Ask Frutos for a new one.",
+    early:"That code isn't active yet. Check the date and time on this device.",
+    nocrypto:"This browser cannot check trial codes; open the link in Chrome, Safari or Firefox.",
+    revoked:"That code has been withdrawn. Ask Frutos for a new one."};
+  function now(){ return Date.now()/1000; }
+  function b2u(s){ s=String(s).replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; var bin=atob(s), a=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a; }
+  function pick(raw){ var m=String(raw||"").match(/FK1\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{40,}/); return m?m[0]:null; }
+  function key(){ if(!kp) kp=crypto.subtle.importKey("jwk",PUB,{name:"ECDSA",namedCurve:"P-256"},false,["verify"]); return kp; }
+  function all(){ try{ var v=JSON.parse(localStorage.getItem(LS)||"null"); if(v&&v.c) v=[v]; return (v&&v.length)?v:(mem||[]); }catch(e){ return mem||[]; } }
+  function find(code){ var a=all(); for(var i=0;i<a.length;i++) if(a[i]&&a[i].c===code) return a[i]; return null; }
+  function put(list){ mem=list; try{ localStorage.setItem(LS,JSON.stringify(list)); }catch(e){} }
+  function save(o){ var a=all().filter(function(x){ return x&&x.c!==o.c; }); a.unshift(o); put(a.slice(0,6)); }
+  function forget(code){ put(all().filter(function(x){ return x&&x.c!==code; })); }
+  function check(code, first){
+    if(!hasCrypto) return Promise.resolve({ok:false, why:"nocrypto"});
+    var parts=String(code).split("."), p;
+    try{ p=JSON.parse(new TextDecoder().decode(b2u(parts[1]))); }catch(e){ return Promise.resolve({ok:false, why:"bad"}); }
+    return key().then(function(k){
+      return crypto.subtle.verify({name:"ECDSA",hash:{name:"SHA-256"}},k,b2u(parts[2]),new TextEncoder().encode(parts[0]+"."+parts[1]));
+    }).then(function(good){
+      if(!good||!p||p.v!==1||p.k!==KID) return {ok:false, why:"bad"};
+      var sc=p.s||[]; if(sc.indexOf("*")<0&&sc.indexOf(CFG.slug)<0) return {ok:false, why:"scope", p:p};
+      var t=now(), exp, f=first||null;
+      if(t<(p.i||0)-600) return {ok:false, why:"early", p:p};
+      if(typeof p.e==="number") exp=p.e;
+      else if(typeof p.d==="number"&&typeof p.h==="number"){ if(!f) f=Math.floor(t); exp=Math.min(f+p.d*86400,p.h); }
+      else return {ok:false, why:"bad"};
+      if(t>=exp) return {ok:false, why:"expired", p:p, exp:exp, first:f};
+      return {ok:true, p:p, exp:exp, first:f};
+    }, function(){ return {ok:false, why:"bad"}; });
+  }
+  function left(sec){ var d=Math.floor(sec/86400), h=Math.floor(sec%86400/3600), m=Math.floor(sec%3600/60);
+    if(d>0) return d+(d===1?" day ":" days ")+h+" h left"; if(h>0) return h+" h "+m+" min left"; return Math.max(1,m)+" min left"; }
+  function when(ts){ var d=new Date(ts*1000); return d.getDate()+" "+MON[d.getMonth()]+", "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2); }
+  function orgName(){ var v=inst.value.trim(); return (v&&v!==CFG.defaultFor)?v:"my organisation"; }
+  function paint(){
+    var el=$("runs"), h;
+    if(!hasCrypto) h='<span class="gdot end"></span><span>'+esc(MSG.nocrypto)+'</span>';
+    else if(st.state==="ok") h='<span class="gdot ok"></span><span>Trial unlocked for <b>'+esc(st.org||"you")+'</b> · '+left(st.exp-now())+'</span><button type="button" class="glink" id="gopen">Change code</button>';
+    else if(st.state==="expired") h='<span class="gdot end"></span><span>Your 3-day trial ended on '+when(st.exp)+'</span><button type="button" class="glink" id="gopen">Enter a new code</button>';
+    else h='<span class="gdot"></span><span>Sample: free · Your own file: trial code needed</span><button type="button" class="glink" id="gopen">Enter a code</button>';
+    el.innerHTML=h; var b=$("gopen"); if(b) b.addEventListener("click",function(){ open(""); });
+  }
+  function msgEl(m){ var e=$("uerr"); if(m){ e.textContent=m; e.hidden=false; } else e.hidden=true; }
+  function open(m){
+    var u=$("unlock"); u.hidden=false; msgEl(m);
+    $("uwa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent("Muraho Frutos. Please send a 3-day trial code for the "+TITLE+" for "+orgName()+".");
+    u.scrollIntoView({behavior:"smooth",block:"center"}); setTimeout(function(){ try{ $("ucode").focus({preventScroll:true}); }catch(e){ $("ucode").focus(); } },60);
+  }
+  function close(){ $("unlock").hidden=true; }
+  function closing(scroll){ H.closing(scroll); }
+  function sha(s){ return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){ var a=new Uint8Array(b), o="";
+    for(var i=0;i<a.length;i++) o+=("0"+a[i].toString(16)).slice(-2); return o; }); }
+  function api(ev){
+    if(!CFG.api||!st.code||!window.fetch) return;
+    try{ sha(st.code).then(function(hx){
+        return fetch(CFG.api.replace(/\/+$/,"")+"/v1/event",{method:"POST",keepalive:true,headers:{"content-type":"application/json"},
+          body:JSON.stringify({kid:KID,codeHash:hx,slug:CFG.slug,event:ev,ts:Math.floor(now())})});
+      }).then(function(r){ return (r&&r.ok)?r.json():null; }).then(function(j){
+        if(j&&j.revoked){ forget(st.code); st={state:"locked",exp:0,org:"",code:""}; paint(); open(MSG.revoked); }
+      })["catch"](function(){});
+    }catch(e){}
+  }
+  function tick(){ if(timer) clearInterval(timer); timer=setInterval(function(){
+    if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); closing(false); } else paint(); },60000); }
+  function activate(code, quiet){
+    var prev=find(code), first=prev?prev.f:null;
+    return check(code, first).then(function(r){
+      if(!r.ok){
+        if(r.why==="expired"){ st={state:"expired", exp:r.exp, org:(r.p&&r.p.o)||"", code:""}; paint(); }
+        if(!quiet) msgEl(MSG[r.why]||MSG.bad);
+        return r;
+      }
+      var fresh=!prev;
+      save({c:code, f:r.first||null});
+      st={state:"ok", exp:r.exp, org:r.p.o||"", code:code};
+      var cur=inst.value.trim();
+      if(r.p.o&&(cur===""||cur===CFG.defaultFor)){ inst.value=r.p.o; $("gate-inst").textContent=H.name(); }
+      paint(); close(); $("gate").hidden=true; tick();
+      if(fresh) api("activate");
+      if(pending!==null){ var a=pending; pending=null; H.run(a); }
+      return r;
+    });
+  }
+  function init(){
+    paint();
+    if(!hasCrypto) return;
+    var qs=null, qc=null; try{ qs=new URLSearchParams(location.search); qc=qs.get("code"); }catch(e){}
+    if(qc!==null&&qs){ try{ qs["delete"]("code"); var rest=qs.toString(); history.replaceState(null,"",location.pathname+(rest?"?"+rest:"")+location.hash); }catch(e){} }
+    var list=[], fromLink=pick(qc);
+    if(qc!==null&&!fromLink){ open(MSG.bad); }
+    [fromLink].concat(all().map(function(x){ return x&&x.c; }), [CFG.preset||null]).forEach(function(c){ if(c&&list.indexOf(c)<0) list.push(c); });
+    var i=0, last=null;
+    (function next(){
+      if(i>=list.length){
+        if(last&&last.why==="expired"&&st.state==="expired") closing(false);
+        if(fromLink&&last&&!last.ok) open(MSG[last.why]||MSG.bad);
+        return; }
+      var c=list[i++];
+      activate(c, true).then(function(r){ last=r; if(!r.ok) next(); });
+    })();
+  }
+  $("uform").addEventListener("submit",function(e){ e.preventDefault(); var c=pick($("ucode").value);
+    if(!hasCrypto){ msgEl(MSG.nocrypto); return; } if(!c){ msgEl(MSG.bad); return; } activate(c,false); });
+  $("ucode").addEventListener("keydown",function(e){ if(e.key==="Escape"||e.keyCode===27) close(); });
+  $("uclose").addEventListener("click",close);
+  return {
+    ok:function(){ if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); } return st.state==="ok"; },
+    ask:function(arr){ pending=arr;
+      if(st.state==="expired"){ open("Your 3-day trial ended on "+when(st.exp)+". Enter a new code, or ask Frutos for one."); closing(false); }
+      else open(""); },
+    ran:function(){ api("run"); },
+    init:init
+  };
+})({
+  name:function(){ return name(); },
+  run:function(a){ isSample=false; go(a); },
+  closing:function(scroll){ var v=name(); $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+    $("gate-inst").textContent=v; $("gate").hidden=false; if(scroll) $("gate").scrollIntoView({behavior:"smooth",block:"center"}); }
+});
+
+function name(){ return inst.value.trim()||CFG.defaultFor; }
+try{ var qf=new URLSearchParams(location.search).get("for"); if(qf){ inst.value=qf.slice(0,60); } }catch(e){}
+$("gate-inst").textContent=name();
+inst.addEventListener("input",function(){ $("gate-inst").textContent=name(); });
+function inputs(){ var o={}; document.querySelectorAll("[data-in]").forEach(function(el){ o[el.getAttribute("data-in")]=el.value; }); return o; }
+function showErr(m){ errEl.textContent=m; errEl.hidden=false; }
+
+function readInto(i,f){ var r=new FileReader();
+  r.onload=function(){ texts[i]=String(r.result); var fn=$("fn"+i); if(fn) fn.textContent=f.name;
+    if(CFG.files===1){ isSample=false; go([texts[0]]); } else { $("runbtn").disabled=!(texts[0]&&texts[1]); } };
+  r.onerror=function(){ showErr("Could not read that file."); }; r.readAsText(f); }
+for(var i=0;i<CFG.files;i++)(function(i){
+  var d=$("drop"+i), p=$("pick"+i), fi=$("file"+i);
+  p.addEventListener("click",function(){ fi.click(); });
+  fi.addEventListener("change",function(e){ var f=e.target.files&&e.target.files[0]; if(f) readInto(i,f); });
+  ["dragenter","dragover"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.add("over"); }); });
+  ["dragleave","drop"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.remove("over"); }); });
+  d.addEventListener("drop",function(e){ var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) readInto(i,f); });
+})(i);
+if(CFG.files===2){ $("runbtn").addEventListener("click",function(){ isSample=false; go([texts[0],texts[1]]); }); }
+$("sample").addEventListener("click",function(){ isSample=true; go(SAMPLES); });
+
+function go(arr){
+  errEl.hidden=true;
+  if(!isSample&&!G.ok()){ G.ask(arr); return; }
+  var ps=[], R;
+  try{ arr.forEach(function(t,ix){ var p=U.parseCSV(t); if(!p||!p.rows.length) throw (CFG.files===2?(CFG.fileLabels[ix]+": "):"")+"I couldn't find any rows in that file."; ps.push(p); });
+       R=TOOL.analyse(ps, inputs(), U); }
+  catch(e){ showErr(typeof e==="string"?e:"That file couldn't be read."); return; }
+  lastParsed=ps; draw(R); if(!isSample) G.ran();
+}
+document.querySelectorAll("[data-in]").forEach(function(el){ el.addEventListener("change",function(){
+  if(!lastParsed) return; try{ draw(TOOL.analyse(lastParsed, inputs(), U)); }catch(e){} }); });
+
+function draw(R){
+  var out=TOOL.render(R, inputs(), U, {name:name(), sample:isSample});
+  var H='<div class="verdict"><p class="vh">What the data shows'+(isSample?' · illustrative sample, not your data':'')+'</p><p>'+out.verdict+'</p></div>';
+  if(out.tiles&&out.tiles.length) H+='<div class="tiles">'+out.tiles.join("")+'</div>';
+  (out.sections||[]).forEach(function(s){ H+='<div class="card"><h3>'+U.esc(s.title)+'</h3>'+(s.cap?'<p class="cap">'+U.esc(s.cap)+'</p>':'')+s.html+'</div>'; });
+  H+='<div class="summary"><div class="summary-h"><h3>'+U.esc(CFG.summaryTitle)+'</h3><span class="acts"><button class="copy pdf" id="pdf" type="button">Save PDF</button><button class="copy" id="copy" type="button">Copy</button></span></div><pre id="smtext">'+U.esc(out.summary)+'</pre></div>';
+  var rep=$("report"); rep.innerHTML=H; rep.hidden=false;
+  var cp=$("copy"); cp.addEventListener("click",function(){ var t=$("smtext").textContent;
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ cp.textContent="Copied"; cp.classList.add("done"); }); } });
+  $("pdf").addEventListener("click",function(){ window.print(); });
+  rep.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function gate(){
+  var v=name();
+  $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+  $("gate-inst").textContent=v; $("gate").hidden=false;
+  $("gate").scrollIntoView({behavior:"smooth",block:"center"});
+}
+$("foot").textContent=CFG.foot;
+G.init();
+})();
+</script>
+</body>
+</html>

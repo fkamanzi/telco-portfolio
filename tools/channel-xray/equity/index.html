@@ -140,6 +140,32 @@ body{
   .lat{flex-wrap:wrap}
 }
 button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+.runs{display:block; line-height:1.65}
+.runs b{color:var(--ink); font-weight:700}
+.gdot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--warn); margin-right:8px; vertical-align:0}
+.gdot.ok{background:var(--good)} .gdot.end{background:var(--bad)}
+.glink{border:0; background:none; color:var(--accent); font:inherit; font-family:var(--mono); font-size:12px; text-decoration:underline; text-underline-offset:2px; cursor:pointer; padding:0 2px; margin-left:8px; white-space:nowrap}
+.unlock{position:relative; margin-top:14px; border:1.5px solid var(--accent); background:var(--panel); padding:16px 16px 14px; text-align:left}
+.unlock h3{margin:0 30px 4px 0; font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; line-height:1.2}
+.unlock p{margin:0; font-size:14px; color:var(--dim); line-height:1.5}
+.unlock label{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin:12px 0 5px}
+.urow{display:flex; gap:8px; flex-wrap:wrap}
+.urow input{flex:1 1 220px; min-width:0; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font-family:var(--mono); font-size:13px; padding:10px; border-radius:9px}
+.urow input:focus{outline:0; border-color:var(--accent)}
+.urow .btn{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+.unlock .uerr{margin-top:9px; color:var(--bad); font-family:var(--mono); font-size:12.5px}
+.unlock .uask{margin-top:12px; font-size:13.5px}
+.unlock .uask a{color:var(--accent); font-weight:700}
+.uclose{position:absolute; top:6px; right:6px; border:0; background:none; color:var(--dim); font-size:24px; line-height:1; cursor:pointer; padding:4px 9px}
+.gate .btn{color:var(--bg)}
+.summary-h .acts{display:flex; gap:8px}
+@media print{
+  :root,:root[data-theme]{--bg:#fff; --panel:#fff; --panel2:#f4f4f4; --ink:#111; --dim:#555; --line:#ccc; color-scheme:light}
+  body{background:#fff!important}
+  .intake,.gate,.unlock,#theme,.copy,.pdf,.foot{display:none!important}
+  .card,.tiles,.verdict,.summary{break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -173,6 +199,17 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
       </div>
       <p class="hint">Expected columns (any order, names are matched loosely): <b>timestamp</b>, <b>network</b>, <b>stage_reached</b> (1–6), <b>status</b> (completed / timeout / error / abandoned), <b>duration_ms</b>. Phone numbers are masked on sight; only the digit count is kept.</p>
       <div class="runs" id="runs" aria-live="polite"></div>
+      <div class="unlock" id="unlock" hidden>
+        <button class="uclose" id="uclose" type="button" aria-label="Close">×</button>
+        <h3>Your own file needs a 3-day trial code</h3>
+        <p>The illustrative sample is free. To read your own export, enter the code Frutos sent you. Your file still never leaves this page.</p>
+        <form id="uform" autocomplete="off">
+          <label for="ucode">Trial code</label>
+          <div class="urow"><input id="ucode" name="code" spellcheck="false" autocapitalize="off" placeholder="FK1… or the full link"><button class="btn" type="submit">Unlock</button></div>
+        </form>
+        <p class="uerr" id="uerr" role="alert" hidden></p>
+        <p class="uask">No code yet? <a id="uwa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a> · or call +250 731 000 163</p>
+      </div>
       <p class="err" id="err" hidden></p>
     </div>
   </section>
@@ -180,7 +217,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
   <section id="report" class="report" hidden aria-live="polite"></section>
 
   <section id="gate" class="gate" hidden>
-    <h2>That's your three trial runs</h2>
+    <h2>Your 3-day trial has ended</h2>
     <p>The full version runs on your live daily export, watches every short code and every network, and sends you the morning drop report automatically. Let's set it up for <b id="gate-inst">Equity Bank Rwanda</b>.</p>
     <a class="btn" id="gate-wa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a>
     <p class="hint" style="margin-top:12px">Or call +250 731 000 163</p>
@@ -213,25 +250,138 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     document.documentElement.setAttribute("data-theme", next);
     try{ localStorage.setItem("cjx_theme", next); }catch(e){}
   });
+var CFG={slug:"channel-xray", wa:WA, defaultFor:"your institution", plainTitle:"Channel Journey X-ray", preset:"FK1.eyJ2IjoxLCJrIjoiZmsxLUFxRVBFQSIsIm8iOiJFcXVpdHkgQmFuayBSd2FuZGEiLCJzIjpbImNoYW5uZWwteHJheSJdLCJpIjoxNzkyMjU2NjEwLCJuIjoidHBtTXBoIiwiZCI6MywiaCI6MTc5ODc1NDM5OX0.RdzZrsWskHGRkDJXc05b0MVRdYeN4nncQgZV9dPhtg3NtuMigEOwDxQP1Tv4khwUPUT_FsZf9cdbY5mRcn_zjw", api:""};
 
-  // run counter (localStorage with in-memory fallback)
-  var mem = null;
-  function getRuns(){
-    try{ var v = parseInt(localStorage.getItem(KEY)||"0",10); return isNaN(v)?0:v; }
-    catch(e){ return mem===null?0:mem; }
+var G=(function(H){
+  var PUB={"kty": "EC", "crv": "P-256", "x": "dd_RAcn7vNcw2otkFdNpoI6U3_RyeEOu6SawgbThnho", "y": "zjKzBb8ADm1xZQ2tioXLYUyj-bstyz4fIcvI6VBocrA"}, KID="fk1-AqEPEA", LS="fk_codes", TITLE=CFG.plainTitle, mem=null, kp=null, pending=null, timer=null;
+  var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var esc=function(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+  var st={state:"locked", exp:0, org:"", code:""};
+  var hasCrypto=!!(window.crypto&&window.crypto.subtle&&window.TextEncoder&&window.TextDecoder&&window.Promise);
+  var MSG={bad:"That code isn't valid. Check it was copied in full, or ask Frutos for a new one.",
+    scope:"That code is for another tool. Ask Frutos for a code for the "+TITLE+".",
+    expired:"That code's trial has ended. Ask Frutos for a new one.",
+    early:"That code isn't active yet. Check the date and time on this device.",
+    nocrypto:"This browser cannot check trial codes; open the link in Chrome, Safari or Firefox.",
+    revoked:"That code has been withdrawn. Ask Frutos for a new one."};
+  function now(){ return Date.now()/1000; }
+  function b2u(s){ s=String(s).replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; var bin=atob(s), a=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a; }
+  function pick(raw){ var m=String(raw||"").match(/FK1\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{40,}/); return m?m[0]:null; }
+  function key(){ if(!kp) kp=crypto.subtle.importKey("jwk",PUB,{name:"ECDSA",namedCurve:"P-256"},false,["verify"]); return kp; }
+  function all(){ try{ var v=JSON.parse(localStorage.getItem(LS)||"null"); if(v&&v.c) v=[v]; return (v&&v.length)?v:(mem||[]); }catch(e){ return mem||[]; } }
+  function find(code){ var a=all(); for(var i=0;i<a.length;i++) if(a[i]&&a[i].c===code) return a[i]; return null; }
+  function put(list){ mem=list; try{ localStorage.setItem(LS,JSON.stringify(list)); }catch(e){} }
+  function save(o){ var a=all().filter(function(x){ return x&&x.c!==o.c; }); a.unshift(o); put(a.slice(0,6)); }
+  function forget(code){ put(all().filter(function(x){ return x&&x.c!==code; })); }
+  function check(code, first){
+    if(!hasCrypto) return Promise.resolve({ok:false, why:"nocrypto"});
+    var parts=String(code).split("."), p;
+    try{ p=JSON.parse(new TextDecoder().decode(b2u(parts[1]))); }catch(e){ return Promise.resolve({ok:false, why:"bad"}); }
+    return key().then(function(k){
+      return crypto.subtle.verify({name:"ECDSA",hash:{name:"SHA-256"}},k,b2u(parts[2]),new TextEncoder().encode(parts[0]+"."+parts[1]));
+    }).then(function(good){
+      if(!good||!p||p.v!==1||p.k!==KID) return {ok:false, why:"bad"};
+      var sc=p.s||[]; if(sc.indexOf("*")<0&&sc.indexOf(CFG.slug)<0) return {ok:false, why:"scope", p:p};
+      var t=now(), exp, f=first||null;
+      if(t<(p.i||0)-600) return {ok:false, why:"early", p:p};
+      if(typeof p.e==="number") exp=p.e;
+      else if(typeof p.d==="number"&&typeof p.h==="number"){ if(!f) f=Math.floor(t); exp=Math.min(f+p.d*86400,p.h); }
+      else return {ok:false, why:"bad"};
+      if(t>=exp) return {ok:false, why:"expired", p:p, exp:exp, first:f};
+      return {ok:true, p:p, exp:exp, first:f};
+    }, function(){ return {ok:false, why:"bad"}; });
   }
-  function setRuns(v){
-    mem = v;
-    try{ localStorage.setItem(KEY, String(v)); }catch(e){}
+  function left(sec){ var d=Math.floor(sec/86400), h=Math.floor(sec%86400/3600), m=Math.floor(sec%3600/60);
+    if(d>0) return d+(d===1?" day ":" days ")+h+" h left"; if(h>0) return h+" h "+m+" min left"; return Math.max(1,m)+" min left"; }
+  function when(ts){ var d=new Date(ts*1000); return d.getDate()+" "+MON[d.getMonth()]+", "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2); }
+  function orgName(){ var v=inst.value.trim(); return (v&&v!==CFG.defaultFor)?v:"my organisation"; }
+  function paint(){
+    var el=$("runs"), h;
+    if(!hasCrypto) h='<span class="gdot end"></span><span>'+esc(MSG.nocrypto)+'</span>';
+    else if(st.state==="ok") h='<span class="gdot ok"></span><span>Trial unlocked for <b>'+esc(st.org||"you")+'</b> · '+left(st.exp-now())+'</span><button type="button" class="glink" id="gopen">Change code</button>';
+    else if(st.state==="expired") h='<span class="gdot end"></span><span>Your 3-day trial ended on '+when(st.exp)+'</span><button type="button" class="glink" id="gopen">Enter a new code</button>';
+    else h='<span class="gdot"></span><span>Sample: free · Your own file: trial code needed</span><button type="button" class="glink" id="gopen">Enter a code</button>';
+    el.innerHTML=h; var b=$("gopen"); if(b) b.addEventListener("click",function(){ open(""); });
   }
-  function paintRuns(){
-    var used = getRuns(), box = $("runs"), left = Math.max(0, MAXRUNS-used);
-    var html = "Trial runs used&nbsp;&nbsp;";
-    for(var i=0;i<MAXRUNS;i++) html += '<span class="pip'+(i<used?' used':'')+'"></span>';
-    html += '&nbsp;&nbsp;'+left+' of '+MAXRUNS+' left';
-    box.innerHTML = html;
+  function msgEl(m){ var e=$("uerr"); if(m){ e.textContent=m; e.hidden=false; } else e.hidden=true; }
+  function open(m){
+    var u=$("unlock"); u.hidden=false; msgEl(m);
+    $("uwa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent("Muraho Frutos. Please send a 3-day trial code for the "+TITLE+" for "+orgName()+".");
+    u.scrollIntoView({behavior:"smooth",block:"center"}); setTimeout(function(){ try{ $("ucode").focus({preventScroll:true}); }catch(e){ $("ucode").focus(); } },60);
   }
-  paintRuns();
+  function close(){ $("unlock").hidden=true; }
+  function closing(scroll){ H.closing(scroll); }
+  function sha(s){ return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){ var a=new Uint8Array(b), o="";
+    for(var i=0;i<a.length;i++) o+=("0"+a[i].toString(16)).slice(-2); return o; }); }
+  function api(ev){
+    if(!CFG.api||!st.code||!window.fetch) return;
+    try{ sha(st.code).then(function(hx){
+        return fetch(CFG.api.replace(/\/+$/,"")+"/v1/event",{method:"POST",keepalive:true,headers:{"content-type":"application/json"},
+          body:JSON.stringify({kid:KID,codeHash:hx,slug:CFG.slug,event:ev,ts:Math.floor(now())})});
+      }).then(function(r){ return (r&&r.ok)?r.json():null; }).then(function(j){
+        if(j&&j.revoked){ forget(st.code); st={state:"locked",exp:0,org:"",code:""}; paint(); open(MSG.revoked); }
+      })["catch"](function(){});
+    }catch(e){}
+  }
+  function tick(){ if(timer) clearInterval(timer); timer=setInterval(function(){
+    if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); closing(false); } else paint(); },60000); }
+  function activate(code, quiet){
+    var prev=find(code), first=prev?prev.f:null;
+    return check(code, first).then(function(r){
+      if(!r.ok){
+        if(r.why==="expired"){ st={state:"expired", exp:r.exp, org:(r.p&&r.p.o)||"", code:""}; paint(); }
+        if(!quiet) msgEl(MSG[r.why]||MSG.bad);
+        return r;
+      }
+      var fresh=!prev;
+      save({c:code, f:r.first||null});
+      st={state:"ok", exp:r.exp, org:r.p.o||"", code:code};
+      var cur=inst.value.trim();
+      if(r.p.o&&(cur===""||cur===CFG.defaultFor)){ inst.value=r.p.o; $("gate-inst").textContent=H.name(); }
+      paint(); close(); $("gate").hidden=true; tick();
+      if(fresh) api("activate");
+      if(pending!==null){ var a=pending; pending=null; H.run(a); }
+      return r;
+    });
+  }
+  function init(){
+    paint();
+    if(!hasCrypto) return;
+    var qs=null, qc=null; try{ qs=new URLSearchParams(location.search); qc=qs.get("code"); }catch(e){}
+    if(qc!==null&&qs){ try{ qs["delete"]("code"); var rest=qs.toString(); history.replaceState(null,"",location.pathname+(rest?"?"+rest:"")+location.hash); }catch(e){} }
+    var list=[], fromLink=pick(qc);
+    if(qc!==null&&!fromLink){ open(MSG.bad); }
+    [fromLink].concat(all().map(function(x){ return x&&x.c; }), [CFG.preset||null]).forEach(function(c){ if(c&&list.indexOf(c)<0) list.push(c); });
+    var i=0, last=null;
+    (function next(){
+      if(i>=list.length){
+        if(last&&last.why==="expired"&&st.state==="expired") closing(false);
+        if(fromLink&&last&&!last.ok) open(MSG[last.why]||MSG.bad);
+        return; }
+      var c=list[i++];
+      activate(c, true).then(function(r){ last=r; if(!r.ok) next(); });
+    })();
+  }
+  $("uform").addEventListener("submit",function(e){ e.preventDefault(); var c=pick($("ucode").value);
+    if(!hasCrypto){ msgEl(MSG.nocrypto); return; } if(!c){ msgEl(MSG.bad); return; } activate(c,false); });
+  $("ucode").addEventListener("keydown",function(e){ if(e.key==="Escape"||e.keyCode===27) close(); });
+  $("uclose").addEventListener("click",close);
+  return {
+    ok:function(){ if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); } return st.state==="ok"; },
+    ask:function(arr){ pending=arr;
+      if(st.state==="expired"){ open("Your 3-day trial ended on "+when(st.exp)+". Enter a new code, or ask Frutos for one."); closing(false); }
+      else open(""); },
+    ran:function(){ api("run"); },
+    init:init
+  };
+})({
+  name:function(){ return inst.value.trim()||"your institution"; },
+  run:function(t){ isSampleRun=false; go(t,false); },
+  closing:function(scroll){ var v=inst.value.trim()||"your institution"; $("gate-wa").href="https://wa.me/"+WA+"?text="+encodeURIComponent("Muraho Frutos. I tried the Channel Journey X-ray for "+v+" and I'd like the full version on our live export.");
+    $("gate-inst").textContent=v; $("gate").hidden=false; if(scroll) $("gate").scrollIntoView({behavior:"smooth",block:"center"}); }
+});
+
 
   var insts = document.querySelectorAll("#inst, #gate-inst");
   inst.addEventListener("input", function(){
@@ -513,17 +663,15 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
 
   function go(text, isSample){
     clearErr();
-    var used=getRuns();
-    if(used>=MAXRUNS){ showGate(); return; }
+    if(!isSampleRun&&!G.ok()){ G.ask(text); return; }
     var parsed;
     try{ parsed=parseCSV(text); if(!parsed||!parsed.rows.length) throw "I couldn't find any rows in that file."; }
     catch(e){ showErr(typeof e==="string"?e:"That file couldn't be read as CSV."); return; }
     var a;
     try{ a=analyse(parsed); }
     catch(e){ showErr(typeof e==="string"?e:"Something in that file stopped the read."); return; }
-    setRuns(used+1); paintRuns();
     render(a);
-    if(getRuns()>=MAXRUNS){ setTimeout(showGate, 400); }
+    if(!isSampleRun) G.ran();
   }
 
   function showGate(){
@@ -535,8 +683,8 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     $("gate").scrollIntoView({behavior:"smooth", block:"center"});
   }
 
-  $("foot").innerHTML = "Read entirely in your browser · nothing is uploaded · phone numbers are masked on sight. "+
-    "A trial limited to "+MAXRUNS+" runs. © 2026 Frutos.";
+  $("foot").textContent="Read entirely in your browser · nothing is uploaded · personal numbers are masked on sight. 3-day trial with a code. © 2026 Frutos.";
+  G.init();
 })();
 </script>
 </body>
