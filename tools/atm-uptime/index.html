@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATM Uptime Lens</title>
+<meta name="description" content="A self-serve trial that turns an ATM out-of-service log into availability per ATM against a target, lost hours by reason, and when cash-outs start. Prepared by Frutos.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ATM Uptime Lens · trial by Frutos">
+<meta property="og:description" content="A self-serve trial that turns an ATM out-of-service log into availability per ATM against a target, lost hours by reason, and when cash-outs start. Prepared by Frutos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1512; --panel:#14201B; --panel2:#0B130F; --ink:#E8F0EA; --dim:#8BA596; --line:#27372F;
+  --grid:rgba(251,113,133,.07); --accent:#FB7185; --accent2:#F43F5E; --warn:#F2B134; --bad:#FF6B5E; --good:#39D98A;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+    --grid:rgba(20,80,50,.06); --accent:#BE123C; --accent2:#9F1239; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+  --grid:rgba(20,80,50,.06); --accent:#BE123C; --accent2:#9F1239; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+.wrap{max-width:860px; margin:0 auto; padding-inline:16px; padding-block:22px 40px}
+.exp{font-family:"Archivo",sans-serif; font-stretch:125%}
+.mono{font-family:var(--mono)}
+
+/* Header / title block */
+.head{border:1.5px solid var(--ink); background:var(--panel)}
+.head-top{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:14px 16px}
+.brandline{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 6px}
+.title{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:26px; line-height:1.05; margin:0; letter-spacing:-.01em}
+.subtitle{margin:6px 0 0; font-size:14.5px; color:var(--dim); max-width:46ch}
+.theme{flex:none; border:1.5px solid var(--line); background:transparent; color:var(--dim); font:inherit; font-size:13px; padding:6px 10px; cursor:pointer; border-radius:8px}
+.head-grid{display:grid; grid-template-columns:1fr 1fr; border-top:1.5px solid var(--ink)}
+.head-grid>div{padding:9px 16px; min-width:0}
+.head-grid>div:first-child{border-right:1px solid var(--line)}
+.head-grid dt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim)}
+.head-grid dd{margin:3px 0 0; font-weight:600; font-size:14.5px}
+.inst-field{display:inline-block; min-width:12ch; border:0; border-bottom:1.5px dashed var(--line); background:transparent; color:var(--ink); font:inherit; font-weight:600; font-size:14.5px; padding:0 2px}
+.inst-field:focus{outline:0; border-bottom-color:var(--accent)}
+
+/* Intake */
+.intake{margin-top:16px; border:1.5px solid var(--line); background:var(--panel); border-radius:0}
+.intake-in{padding:16px}
+.drop{border:1.6px dashed var(--line); background:var(--panel2); border-radius:12px; padding:20px 16px; text-align:center; transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,var(--panel2))}
+.drop h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; margin:0 0 4px}
+.drop p{margin:0 0 14px; font-size:14px; color:var(--dim)}
+.btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+.btn{border:1.5px solid var(--ink); background:var(--ink); color:var(--bg); font:inherit; font-weight:700; font-size:15px; padding:11px 16px; border-radius:10px; cursor:pointer}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.hint{margin:12px 2px 0; font-family:var(--mono); font-size:11.5px; color:var(--dim); line-height:1.6}
+.runs{display:flex; align-items:center; gap:8px; margin-top:14px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+.pip{width:9px; height:9px; border-radius:50%; border:1.5px solid var(--line)}
+.pip.used{background:var(--accent); border-color:var(--accent)}
+
+/* Report */
+#report[hidden]{display:none}
+.report{margin-top:16px; display:flex; flex-direction:column; gap:14px}
+.verdict{border:1.5px solid var(--ink); background:var(--panel); padding:16px; border-left:5px solid var(--accent)}
+.verdict .vh{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin:0 0 6px}
+.verdict p{margin:0; font-size:16.5px; line-height:1.45}
+.verdict b{color:var(--accent)}
+.tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+.tile{border:1.5px solid var(--line); background:var(--panel); padding:12px}
+.tile .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+.tile .v{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:25px; line-height:1.1; margin-top:5px; font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px; color:var(--dim); margin-top:2px}
+.tile .v.warn{color:var(--warn)} .tile .v.bad{color:var(--bad)} .tile .v.good{color:var(--good)}
+.card{border:1.5px solid var(--line); background:var(--panel); padding:14px 16px}
+.card h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:15px; margin:0 0 2px}
+.card .cap{font-size:12.5px; color:var(--dim); margin:0 0 12px}
+.funnel{display:flex; flex-direction:column; gap:7px}
+.frow{display:grid; grid-template-columns:92px 1fr auto; align-items:center; gap:10px}
+.frow .fl{font-size:13px; color:var(--dim)}
+.fbar{height:26px; background:var(--panel2); border:1px solid var(--line); position:relative; overflow:hidden}
+.fbar>span{position:absolute; inset:0 auto 0 0; background:linear-gradient(90deg,var(--accent2),var(--accent)); opacity:.9}
+.frow .fv{font-family:var(--mono); font-size:12.5px; font-variant-numeric:tabular-nums; min-width:68px; text-align:right}
+.drop-tag{display:inline-block; font-family:var(--mono); font-size:10.5px; color:var(--bad); margin-left:6px}
+.net{display:flex; flex-direction:column; gap:9px}
+.nrow{display:grid; grid-template-columns:70px 1fr auto; align-items:center; gap:10px}
+.nrow .nl{font-size:13.5px; font-weight:600}
+.nbar{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.nbar>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.nbar>span.low{background:var(--bad)}
+.nrow .nv{font-family:var(--mono); font-size:12.5px; min-width:48px; text-align:right}
+.hours{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:4px}
+.hcell{aspect-ratio:1/2.2; border:1px solid var(--line); position:relative}
+.hlabels{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:5px; font-family:var(--mono); font-size:8.5px; color:var(--dim)}
+.hlabels span{text-align:center}
+.lat{display:flex; gap:10px}
+.lat .lc{flex:1; border:1px solid var(--line); background:var(--panel2); padding:10px; text-align:center}
+.lat .lk{font-family:var(--mono); font-size:10.5px; color:var(--dim); text-transform:uppercase}
+.lat .lv{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:20px; margin-top:3px; font-variant-numeric:tabular-nums}
+.legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--dim)}
+.legend i{display:inline-block; width:11px; height:11px; margin-right:5px; vertical-align:-1px}
+.summary{border:1.5px solid var(--ink); background:var(--panel2)}
+.summary-h{display:flex; justify-content:space-between; align-items:center; padding:11px 16px; border-bottom:1.5px solid var(--line)}
+.summary-h h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:14px; margin:0}
+.copy{border:1.5px solid var(--line); background:transparent; color:var(--ink); font:inherit; font-size:13px; font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer}
+.copy.done{border-color:var(--accent); color:var(--accent)}
+.summary pre{margin:0; padding:16px; font-family:var(--mono); font-size:12.5px; line-height:1.65; white-space:pre-wrap; color:var(--ink)}
+
+/* Gate */
+.gate{margin-top:16px; border:1.5px solid var(--accent); background:var(--panel); padding:20px 16px; text-align:center}
+.gate h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:19px; margin:0 0 6px}
+.gate p{margin:0 auto 14px; font-size:14.5px; color:var(--dim); max-width:48ch}
+.gate .btn{background:var(--accent); border-color:var(--accent); color:#06140D; text-decoration:none; display:inline-block}
+
+.foot{margin-top:20px; font-family:var(--mono); font-size:11px; color:var(--dim); line-height:1.7}
+.err{color:var(--bad); font-family:var(--mono); font-size:12.5px; margin-top:10px}
+@media (max-width:560px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .title{font-size:22px}
+  .frow{grid-template-columns:70px 1fr auto}
+  .lat{flex-wrap:wrap}
+}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+.drops{display:grid; grid-template-columns:1fr; gap:12px}
+.drops.two{grid-template-columns:1fr 1fr}
+.fname{margin:10px 0 0; font-family:var(--mono); font-size:12px; color:var(--accent); min-height:1.3em; overflow-wrap:anywhere}
+.runrow{display:flex; justify-content:center; gap:10px; margin-top:12px; flex-wrap:wrap}
+.assume{display:flex; flex-wrap:wrap; gap:12px; margin-top:14px}
+.assume label{font-family:var(--mono); font-size:11.5px; color:var(--dim); display:flex; flex-direction:column; gap:4px}
+.assume input{width:140px; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font:inherit; font-family:var(--mono); font-size:13px; padding:7px 8px; border-radius:8px}
+.bars{display:flex; flex-direction:column; gap:9px}
+.brow{display:grid; grid-template-columns:minmax(70px,24%) 1fr auto; align-items:center; gap:10px}
+.brow .bl{font-size:13px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.brow .bb{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.brow .bb>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.brow .bb>span.bad{background:var(--bad)}
+.brow .bb>span.warn{background:var(--warn)}
+.brow .bb>span.dim{background:var(--dim); opacity:.55}
+.brow .bv{font-family:var(--mono); font-size:12.5px; text-align:right; min-width:70px; font-variant-numeric:tabular-nums}
+.brow.pair .bb{height:9px}
+.brow.pair .bbs{display:flex; flex-direction:column; gap:3px}
+.stack{display:flex; height:24px; border:1px solid var(--line); overflow:hidden}
+.stack span{display:block; height:100%}
+.tbl{width:100%; border-collapse:collapse; font-size:13px}
+.tbl th{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); text-align:left; padding:6px 6px; border-bottom:1.5px solid var(--line)}
+.tbl td{padding:8px 6px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; vertical-align:top}
+.tbl td.num,.tbl th.num{text-align:right}
+.tbl td.flag{color:var(--bad); font-weight:700}
+.tbl td.ok{color:var(--good); font-weight:700}
+.tblwrap{overflow-x:auto}
+.tile .v .u{font-size:.56em; font-weight:600; font-stretch:100%; color:var(--dim); letter-spacing:0}
+.note-s{font-size:12px; color:var(--dim); margin:10px 0 0; line-height:1.5}
+.why{margin:10px 0 0; font-size:13px; line-height:1.5; max-width:62ch; border-left:3px solid var(--accent); padding:2px 0 2px 10px}
+.why-k{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-right:6px}
+.why a{color:var(--dim); white-space:nowrap}
+.chip{display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; padding:2px 7px; border:1px solid var(--line); border-radius:999px; color:var(--dim); white-space:nowrap}
+@media (max-width:560px){ .drops.two{grid-template-columns:1fr} .brow{grid-template-columns:minmax(60px,30%) 1fr auto} }
+
+.runs{display:block; line-height:1.65}
+.runs b{color:var(--ink); font-weight:700}
+.gdot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--warn); margin-right:8px; vertical-align:0}
+.gdot.ok{background:var(--good)} .gdot.end{background:var(--bad)}
+.glink{border:0; background:none; color:var(--accent); font:inherit; font-family:var(--mono); font-size:12px; text-decoration:underline; text-underline-offset:2px; cursor:pointer; padding:0 2px; margin-left:8px; white-space:nowrap}
+.unlock{position:relative; margin-top:14px; border:1.5px solid var(--accent); background:var(--panel); padding:16px 16px 14px; text-align:left}
+.unlock h3{margin:0 30px 4px 0; font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; line-height:1.2}
+.unlock p{margin:0; font-size:14px; color:var(--dim); line-height:1.5}
+.unlock label{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin:12px 0 5px}
+.urow{display:flex; gap:8px; flex-wrap:wrap}
+.urow input{flex:1 1 220px; min-width:0; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font-family:var(--mono); font-size:13px; padding:10px; border-radius:9px}
+.urow input:focus{outline:0; border-color:var(--accent)}
+.urow .btn{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+.unlock .uerr{margin-top:9px; color:var(--bad); font-family:var(--mono); font-size:12.5px}
+.unlock .uask{margin-top:12px; font-size:13.5px}
+.unlock .uask a{color:var(--accent); font-weight:700}
+.uclose{position:absolute; top:6px; right:6px; border:0; background:none; color:var(--dim); font-size:24px; line-height:1; cursor:pointer; padding:4px 9px}
+.gate .btn{color:var(--bg)}
+.summary-h .acts{display:flex; gap:8px}
+@media print{
+  :root,:root[data-theme]{--bg:#fff; --panel:#fff; --panel2:#f4f4f4; --ink:#111; --dim:#555; --line:#ccc; color-scheme:light}
+  body{background:#fff!important}
+  .intake,.gate,.unlock,#theme,.copy,.pdf,.foot{display:none!important}
+  .card,.tiles,.verdict,.summary{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="head">
+    <div class="head-top">
+      <div>
+        <p class="brandline">Cash channels · Trial</p>
+        <h1 class="title">ATM Uptime Lens</h1>
+        <p class="subtitle">See how much of the month each ATM was out of service, why, when cash runs out, and which ATMs fall below your availability target.</p>
+        <p class="why"><span class="why-k">Why now</span>Since 14 July 2026, eKash links every bank and e-money issuer for transfers and merchant payments (BNR Directive No. 45/2026): when an ATM is down, customers can move money to any wallet instead. <a href="https://techafricanews.com/2026/07/13/rwanda-launches-full-interoperability-on-ekash-national-payment-system/" target="_blank" rel="noopener">TechAfrica News, 13 Jul 2026 ↗</a></p>
+      </div>
+      <button class="theme" id="theme" type="button" aria-label="Switch light or dark">◐ Theme</button>
+    </div>
+    <dl class="head-grid">
+      <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your bank" aria-label="Organisation name" spellcheck="false"></dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+    </dl>
+  </header>
+  <section class="intake">
+    <div class="intake-in">
+      <div class="drop" id="drop0"><h2>Drop in an ATM downtime log</h2><p>A CSV of out-of-service episodes per ATM from your monitoring or switch, with start, end and reason. It is read in your browser and never leaves this page.</p><div class="btns"><button class="btn" id="pick0" type="button">Choose a CSV file</button><button class="btn ghost" id="sample" type="button">Run an illustrative sample</button></div><input id="file0" type="file" accept=".csv,text/csv" hidden></div>
+      <p class="hint">Expected columns (any order, matched loosely): <b>atm</b> (terminal id), <b>start</b> and <b>end</b> of each out-of-service episode, <b>reason</b> or <b>state</b> (cash out, comms down, card reader fault, dispenser fault, power, maintenance, other), optional <b>location</b> or <b>branch</b>. Any time not in an episode counts as in service; the period is the whole calendar month(s) in the file; overlapping episodes on one ATM are merged, so no hour counts twice. An episode with no end runs to the end of the period.</p>
+      <div class="assume"><label>Availability target, %<input data-in="target" type="number" step="any" value="98"></label><label>Exclude planned maintenance<select data-in="planned" style="width:140px; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font:inherit; font-family:var(--mono); font-size:13px; padding:7px 8px; border-radius:8px"><option value="no" selected>No</option><option value="yes">Yes</option></select></label></div>
+      <div class="runs" id="runs" aria-live="polite"></div>
+      <div class="unlock" id="unlock" hidden>
+        <button class="uclose" id="uclose" type="button" aria-label="Close">×</button>
+        <h3>Your own file needs a 3-day trial code</h3>
+        <p>The illustrative sample is free. To read your own export, enter the code Frutos sent you. Your file still never leaves this page.</p>
+        <form id="uform" autocomplete="off">
+          <label for="ucode">Trial code</label>
+          <div class="urow"><input id="ucode" name="code" spellcheck="false" autocapitalize="off" placeholder="FK1… or the full link"><button class="btn" type="submit">Unlock</button></div>
+        </form>
+        <p class="uerr" id="uerr" role="alert" hidden></p>
+        <p class="uask">No code yet? <a id="uwa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a> · or call +250 731 000 163</p>
+      </div>
+      <p class="err" id="err" hidden></p>
+    </div>
+  </section>
+  <section id="report" class="report" hidden aria-live="polite"></section>
+  <section id="gate" class="gate" hidden>
+    <h2>Your 3-day trial has ended</h2>
+    <p>The full version reads every day's ATM status and cash-loading data, warns you before an ATM runs out of cash, and tracks each fault until the ATM is back at target. Let's set it up for <b id="gate-inst">your bank</b>.</p>
+    <a class="btn" id="gate-wa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a>
+    <p class="hint" style="margin-top:12px">Or call +250 731 000 163</p>
+  </section>
+  <p class="foot" id="foot"></p>
+</main>
+<script>
+var DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], WEEK=[1,2,3,4,5,6,0];
+var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function canon(v){ var x=String(v||"").trim(), l=x.toLowerCase();
+  if(!l) return ["Not given","other"];
+  if(/out of cash|cash ?out|no cash|cash empty|cash low|low cash|cassettes? empty|empty cassette|out of notes|no notes|notes? out/.test(l)) return ["Cash out","cash"];
+  if(/dispens|cassette|jam|presenter|pick ?(fail|module)|note ?(feed|pick)/.test(l)) return ["Dispenser fault","disp"];
+  if(/comm|network|link|offline|off-line|host|connect|line ?down|vsat|router|time ?out/.test(l)) return ["Comms down","comms"];
+  if(/card|reader|emv|chip|magstripe/.test(l)) return ["Card reader fault","card"];
+  if(/power|electric|\bups\b|mains|blackout|outage|generator|voltage/.test(l)) return ["Power","power"];
+  if(/mainten|planned|scheduled|preventive|service visit|upgrade|replenish|cash ?load|supervisor/.test(l)) return ["Maintenance","maint"];
+  return [x.charAt(0).toUpperCase()+x.slice(1),"other"]; }
+var TOOL={
+ analyse:function(ps,inp,U){
+  var P=ps[0],H=P.header;
+  var cA=U.pick(H,["atm","atm_id","atm_no","terminal","terminal_id","tid","device","machine"]);
+  var rest=H.filter(function(h){return h!==cA;});
+  var cS=U.pick(rest,["start","start_time","down_start","out_of_service_start","started","begin","down_at","from"]);
+  var cE=U.pick(rest.filter(function(h){return h!==cS;}),["end_time","restored","restored_at","back_in_service","resolved","cleared","finish","up_at","end"]);
+  var cR=U.pick(rest.filter(function(h){return h!==cS&&h!==cE;}),["reason","state","status","cause","fault","category","event","error","type","description"]);
+  var cL=U.pick(rest.filter(function(h){return h!==cS&&h!==cE&&h!==cR;}),["location","branch","site","place","address","area","region","outlet"]);
+  if(!cA||!cS||!cE) throw "I need atm, start and end columns ('atm', 'start', 'end').";
+  var T=U.num(inp.target); if(!(T>0&&T<=100)) T=98;
+  var plan=/^(y|yes|1|true|on)$/i.test(String(inp.planned||"").trim());
+  var M={}, keys=[], bad=0, open=0, s0=Infinity, s1=-Infinity;
+  P.rows.forEach(function(r){
+    var k=String(r[cA]||"").trim(); if(!k){ bad++; return; }
+    var o=M[k]; if(!o){ o=M[k]={k:k,loc:"",ev:[]}; keys.push(k); }
+    if(cL&&!o.loc) o.loc=String(r[cL]||"").trim();
+    var rs=String(r[cS]||"").trim(), re=String(r[cE]||"").trim();
+    if(!rs&&!re) return;                                   // an ATM listed with no downtime
+    var s=U.time(rs), e=re?U.time(re):Infinity;
+    if(isNaN(s)||isNaN(e)||e<=s){ bad++; return; }
+    if(e===Infinity) open++;
+    var c=canon(cR?r[cR]:"");
+    o.ev.push({s:s,e:e,lab:c[0],cat:c[1],raw:rs}); if(s<s0) s0=s; if(s>s1) s1=s; });
+  if(!isFinite(s0)) throw "No out-of-service episodes found (each needs a start before its end).";
+  var a=new Date(s0), b=new Date(s1), p0=new Date(a.getFullYear(),a.getMonth(),1).getTime(), p1=new Date(b.getFullYear(),b.getMonth()+1,1).getTime();
+  var R={T:T,plan:plan,p0:p0,p1:p1,PM:p1-p0,bad:bad,open:open,N:keys.length,D:0,nEv:0,reasons:{},cashH:0,cashAtms:0,
+    wd:[0,0,0,0,0,0,0],wdh:[0,0,0,0,0,0,0],hours:[],maintH:0,maintN:0,hasL:!!cL,A:[]};
+  for(var h=0;h<24;h++) R.hours.push(0);
+  keys.forEach(function(k){
+    var o=M[k], cov=p0, D=0, by={}, cashN=0, n=0;
+    o.ev.slice().sort(function(x,y){return x.s-y.s;}).forEach(function(x){
+      var s=Math.max(x.s,p0), e=Math.min(x.e,p1); if(e<=s) return;
+      if(plan&&x.cat==="maint"){ R.maintH+=e-s; R.maintN++; return; }
+      n++; R.nEv++; var hr=U.hour(x.raw); if(hr!==null) R.hours[hr]++;
+      var wd=new Date(x.s).getDay(); if(x.cat==="cash"){ cashN++; R.wd[wd]++; }
+      var st=Math.max(s,cov);                               // only the part not already covered counts
+      if(e>st){ var d=e-st; D+=d; by[x.lab]=(by[x.lab]||0)+d; R.reasons[x.lab]=(R.reasons[x.lab]||0)+d;
+        if(x.cat==="cash"){ R.cashH+=d; R.wdh[wd]+=d; } cov=e; } });
+    var top=null; Object.keys(by).forEach(function(l){ if(top===null||by[l]>by[top]) top=l; });
+    if(cashN) R.cashAtms++;
+    R.D+=D; R.A.push({k:k,loc:o.loc,D:D,n:n,av:(1-D/R.PM)*100,top:top}); });
+  return R;
+ },
+ render:function(R,inp,U,ctx){
+  var T=R.T, tS=String(Math.round(T*100)/100), fav=(1-R.D/(R.N*R.PM))*100;
+  var a=new Date(R.p0), z=new Date(R.p1-1);
+  var per=(a.getMonth()===z.getMonth()&&a.getFullYear()===z.getFullYear())?MONTHS[a.getMonth()]+" "+a.getFullYear():
+    MONTHS[a.getMonth()]+(a.getFullYear()!==z.getFullYear()?" "+a.getFullYear():"")+" to "+MONTHS[z.getMonth()]+" "+z.getFullYear();
+  function av(x){ return U.fmt(x,2)+"%"; }
+  function hrs(ms){ return U.fmt(ms/3600000,0)+" h"; }
+  var As=R.A.slice().sort(function(x,y){return (x.av-y.av)||(x.k<y.k?-1:(x.k>y.k?1:0));});
+  var below=As.filter(function(x){return x.av<T;}), w=As[0];
+  var rk=Object.keys(R.reasons).sort(function(x,y){return R.reasons[y]-R.reasons[x];}), top=rk[0];
+  var nCash=0, bd=-1; WEEK.forEach(function(d){ nCash+=R.wd[d]; if(R.wd[d]>0&&(bd<0||R.wd[d]>R.wd[bd])) bd=d; });
+  var v="Across <b>"+R.N+(R.N===1?" ATM":" ATMs")+"</b> in <b>"+per+"</b>, the fleet was available <b>"+av(fav)+"</b> of the time, "+(fav>=T?"meeting":"short of")+" the <b>"+tS+"%</b> target";
+  v+=below.length?"; <b>"+below.length+(below.length===1?" ATM</b> fell":" ATMs</b> fell")+" below it.":"; every ATM met it.";
+  if(top&&R.D>0) v+=" <b>"+U.esc(top)+"</b> caused the most lost hours (<b>"+U.pct(R.reasons[top],R.D)+"%</b> of <b>"+hrs(R.D)+"</b>)"+
+    (top==="Cash out"&&bd>=0?", and cash-outs start most often on a <b>"+DAYS[bd]+"</b>":"")+".";
+  if(w&&w.D>0) v+=" The worst ATM is <b>"+U.esc(w.k)+"</b>"+(w.loc?" ("+U.esc(w.loc)+")":"")+" at <b>"+av(w.av)+"</b>"+(w.top?", mostly "+U.esc(w.top.toLowerCase()):"")+".";
+  if(R.plan&&R.maintN) v+=" Planned maintenance is left out.";
+  var tiles=[U.tile("Fleet availability",av(fav),"target "+tS+"%",fav>=T?"good":(fav>=T-1?"warn":"bad")),
+    U.tile("ATMs below target",String(below.length),"of "+R.N+" ATMs",below.length?"bad":"good"),
+    U.tile("Lost hours",hrs(R.D),R.plan&&R.maintN?"planned maintenance left out":"out of service, all ATMs",R.D?"warn":""),
+    U.tile("Cash-out hours",hrs(R.cashH),R.cashAtms+(R.cashAtms===1?" ATM":" ATMs")+" ran out of cash",R.cashH?"bad":"good")];
+  var S=[], head=["ATM"]; if(R.hasL) head.push("Location"); head=head.concat(["Availability","Downtime, h","Top reason"]);
+  S.push({title:"ATMs below target, worst first",cap:U.of("Availability in "+per+" against the "+tS+"% target",12,below.length),
+    html:below.length?U.table(head,below.slice(0,12).map(function(x){ var r=[x.k]; if(R.hasL) r.push(x.loc||"—");
+      return r.concat([{t:av(x.av),cls:x.av<T-5?"flag":""},U.fmt(x.D/3600000,1),x.top||"—"]); }),R.hasL?[2,3]:[1,2])
+      :'<p class="cap">Every ATM met the '+U.esc(tS)+'% target.</p>'});
+  if(rk.length){ var rl=rk.slice(0,8).map(function(l){ return {k:l,v:R.reasons[l]}; });
+    if(rk.length>8){ var rest=0; rk.slice(7).forEach(function(l){ rest+=R.reasons[l]; }); rl=rl.slice(0,7).concat([{k:"All other reasons",v:rest}]); }
+    var rm=rl[0].v||1;
+    S.push({title:"Lost hours by reason",cap:"Out-of-service hours by recorded reason; overlapping episodes counted once"+(R.plan&&R.maintN?"; planned maintenance left out":""),
+      html:U.bars(rl.map(function(o,i){ return {label:o.k,w:o.v/rm*100,text:hrs(o.v)+" · "+U.pct(o.v,R.D)+"%",cls:i===0?"bad":""}; }))}); }
+  if(nCash){ var wm=R.wd[bd]||1;
+    S.push({title:"Cash-outs by weekday",cap:"Cash-out episodes by the day they start, with the hours they cost; load cash before the peak",
+      html:U.bars(WEEK.map(function(d){ return {label:DAYS[d],w:R.wd[d]/wm*100,text:R.wd[d]+" · "+hrs(R.wdh[d]),cls:d===bd?"bad":""}; }))}); }
+  S.push({title:"When downtime starts",cap:"Out-of-service episodes starting in each hour of the day",html:U.heat(R.hours,"count")});
+  var L=[]; L.push("ATM UPTIME — "+ctx.name.toUpperCase());
+  L.push(R.N+(R.N===1?" ATM, ":" ATMs, ")+per+", "+U.fmt(R.nEv)+" out-of-service episodes   |   Prepared by Frutos"); L.push("");
+  L.push("FINDING");
+  L.push("- Fleet availability: "+av(fav)+" against a "+tS+"% target; "+below.length+" of "+R.N+" ATMs below target");
+  if(R.D>0){ L.push("- Lost hours: "+hrs(R.D)+" out of service"+(R.plan&&R.maintN?", planned maintenance left out":"")); L.push("  by reason: "+rk.slice(0,4).map(function(l){ return l+" "+U.pct(R.reasons[l],R.D)+"%"; }).join(" · ")+(rk.length>4?" · other "+U.pct(R.D-rk.slice(0,4).reduce(function(t,l){ return t+R.reasons[l]; },0),R.D)+"%":"")); }
+  if(nCash) L.push("- Cash-outs: "+hrs(R.cashH)+" at "+R.cashAtms+(R.cashAtms===1?" ATM":" ATMs")+"; most start on "+DAYS[bd]+" ("+R.wd[bd]+" of "+nCash+")");
+  if(below.length){ L.push("- ATMs furthest below target:");
+    below.slice(0,5).forEach(function(x,i){ L.push("  "+(i+1)+". "+x.k+(x.loc?" ("+x.loc+")":"")+": "+av(x.av)+", "+U.fmt(x.D/3600000,1)+" h down, mostly "+(x.top||"—").toLowerCase()); }); }
+  if(R.plan&&R.maintN) L.push("- Planned maintenance left out: "+hrs(R.maintH)+" in "+R.maintN+" visits");
+  else if(R.reasons.Maintenance) L.push("- Maintenance is counted as downtime ("+hrs(R.reasons.Maintenance)+"); it can be left out as planned");
+  if(R.open) L.push("- "+R.open+(R.open===1?" episode has":" episodes have")+" no end and "+(R.open===1?"runs":"run")+" to the end of the period");
+  if(R.bad) L.push("- "+R.bad+(R.bad===1?" row":" rows")+" skipped (no ATM, end before start, or unreadable time)");
+  L.push(""); L.push("NEXT STEP");
+  L.push("- Share 3 months of ATM status and cash-loading data; I return the cash-loading plan and the fault");
+  L.push("  fixes that lift every ATM to target, in 10 working days, at a fixed price.");
+  L.push(""); L.push("Method: availability = 1 - downtime / period hours, overlapping episodes merged; the period is the whole");
+  L.push("calendar month(s) in the file."); L.push("Note: a trial read. Figures are indicative until run on your full records.");
+  return {verdict:v,tiles:tiles,sections:S,summary:L.join("\n")};
+ }
+};
+</script>
+<script>
+(function(){
+"use strict";
+var CFG={"slug": "atm-uptime", "wa": "250788312423", "defaultFor": "your bank", "files": 1, "fileLabels": [], "summaryTitle": "Ops-ready summary", "waMsg": "Muraho Frutos. I tried the ATM Uptime Lens for {name} and I'd like the full version.", "foot": "Read entirely in your browser \u00b7 nothing is uploaded \u00b7 personal numbers are masked on sight. 3-day trial with a code. \u00a9 2026 Frutos.", "plainTitle": "ATM Uptime Lens", "preset": "", "api": ""}, SAMPLES=["atm,location,start,end,reason\nATM-34,Hospital B,2026-09-01 02:17,2026-09-01 04:07,Comms down\nATM-02,Branch 1,2026-09-01 10:54,2026-09-01 12:52,Maintenance\nATM-14,Branch 6,2026-09-01 12:08,2026-09-01 13:47,Maintenance\nATM-01,Branch 1,2026-09-01 18:23,2026-09-01 21:15,Cash out\nATM-02,Branch 1,2026-09-02 01:38,2026-09-02 02:41,Comms down\nATM-39,Campus C,2026-09-02 10:04,2026-09-02 12:54,Maintenance\nATM-27,Branch 12,2026-09-02 11:57,2026-09-02 13:03,Comms down\nATM-29,Mall A,2026-09-02 12:58,2026-09-02 14:47,Maintenance\nATM-31,Mall A,2026-09-02 15:49,2026-09-02 17:54,Cash out\nATM-36,Campus C,2026-09-02 18:24,2026-09-03 00:12,Cash out\nATM-21,Branch 9,2026-09-03 02:33,2026-09-03 02:56,Comms down\nATM-17,Branch 7,2026-09-03 07:48,2026-09-03 11:58,Comms down\nATM-34,Hospital B,2026-09-03 12:28,2026-09-03 13:27,Comms down\nATM-16,Branch 7,2026-09-03 18:14,2026-09-03 20:43,Power\nATM-17,Branch 7,2026-09-03 18:14,2026-09-03 20:43,Power\nATM-16,Branch 7,2026-09-03 18:19,2026-09-03 21:12,Comms down\nATM-30,Mall A,2026-09-04 05:33,2026-09-04 06:23,Comms down\nATM-16,Branch 7,2026-09-04 09:23,2026-09-04 09:42,Comms down\nATM-12,Branch 5,2026-09-04 09:31,2026-09-04 11:42,Maintenance\nATM-16,Branch 7,2026-09-04 09:41,2026-09-04 12:16,Maintenance\nATM-25,Branch 11,2026-09-04 11:36,2026-09-04 14:26,Maintenance\nATM-18,Branch 8,2026-09-04 16:09,2026-09-04 20:56,Cash out\nATM-34,Hospital B,2026-09-04 16:25,2026-09-04 22:22,Comms down\nATM-17,Branch 7,2026-09-04 17:17,2026-09-05 00:09,Dispenser fault\nATM-37,Campus C,2026-09-04 23:24,2026-09-05 00:19,Comms down\nATM-13,Branch 5,2026-09-05 03:00,2026-09-05 04:10,Comms down\nATM-17,Branch 7,2026-09-05 03:01,2026-09-05 08:52,Comms down\nATM-31,Mall A,2026-09-05 12:00,2026-09-05 18:56,Cash out\nATM-11,Branch 5,2026-09-05 15:31,2026-09-05 22:16,Cash out\nATM-29,Mall A,2026-09-05 16:38,2026-09-06 02:52,Cash out\nATM-32,Mall A,2026-09-05 17:21,2026-09-05 22:44,Cash out\nATM-03,Branch 1,2026-09-05 17:51,2026-09-06 01:00,Cash out\nATM-23,Branch 10,2026-09-06 09:29,2026-09-06 10:10,Comms down\nATM-22,Branch 9,2026-09-06 12:42,2026-09-06 13:59,Comms down\nATM-01,Branch 1,2026-09-06 14:11,2026-09-06 20:12,Cash out\nATM-17,Branch 7,2026-09-06 18:20,2026-09-06 19:18,Comms down\nATM-17,Branch 7,2026-09-06 19:01,2026-09-07 01:45,Dispenser fault\nATM-13,Branch 5,2026-09-07 03:12,2026-09-07 05:26,Comms down\nATM-12,Branch 5,2026-09-07 07:29,2026-09-07 08:01,Comms down\nATM-17,Branch 7,2026-09-07 10:31,2026-09-07 12:14,Maintenance\nATM-33,Hospital B,2026-09-07 11:43,2026-09-07 14:09,Maintenance\nATM-10,Branch 4,2026-09-07 12:17,2026-09-07 12:41,Comms down\nATM-34,Hospital B,2026-09-07 12:45,2026-09-07 16:38,Card reader fault\nATM-32,Mall A,2026-09-07 13:57,2026-09-07 15:41,Maintenance\nATM-09,Branch 4,2026-09-07 15:49,2026-09-07 16:05,Comms down\nATM-05,Branch 2,2026-09-07 16:56,2026-09-07 17:12,Comms down\nATM-05,Branch 2,2026-09-08 09:26,2026-09-08 11:19,Maintenance\nATM-08,Branch 3,2026-09-08 10:29,2026-09-08 13:16,Maintenance\nATM-09,Branch 4,2026-09-08 12:39,2026-09-08 14:39,Maintenance\nATM-34,Hospital B,2026-09-08 14:18,2026-09-08 14:44,Comms down\nATM-32,Mall A,2026-09-08 14:25,2026-09-08 14:39,Comms down\nATM-16,Branch 7,2026-09-09 01:34,2026-09-09 01:48,Comms down\nATM-35,Hospital B,2026-09-09 09:18,2026-09-09 11:55,Maintenance\nATM-27,Branch 12,2026-09-09 10:56,2026-09-09 13:34,Maintenance\nATM-33,Hospital B,2026-09-09 20:21,2026-09-09 22:26,Power\nATM-34,Hospital B,2026-09-09 20:21,2026-09-09 22:26,Power\nATM-35,Hospital B,2026-09-09 20:21,2026-09-09 22:26,Power\nATM-35,Hospital B,2026-09-09 20:29,2026-09-09 22:56,Comms down\nATM-33,Hospital B,2026-09-09 20:30,2026-09-09 23:02,Comms down\nATM-04,Branch 2,2026-09-10 00:22,2026-09-10 00:37,Comms down\nATM-34,Hospital B,2026-09-10 01:26,2026-09-10 06:47,Comms down\nATM-17,Branch 7,2026-09-10 05:44,2026-09-10 10:39,Comms down\nATM-34,Hospital B,2026-09-10 09:27,2026-09-10 10:34,Comms down\nATM-30,Mall A,2026-09-10 11:21,2026-09-10 11:55,Comms down\nATM-20,Branch 8,2026-09-10 12:43,2026-09-10 14:29,Maintenance\nATM-37,Campus C,2026-09-10 13:10,2026-09-10 15:33,Maintenance\nATM-22,Branch 9,2026-09-10 13:11,2026-09-10 15:40,Maintenance\nATM-31,Mall A,2026-09-10 13:52,2026-09-10 16:29,Maintenance\nATM-15,Branch 6,2026-09-10 14:37,2026-09-10 14:56,Comms down\nATM-06,Branch 3,2026-09-10 22:40,2026-09-10 23:31,Comms down\nATM-17,Branch 7,2026-09-11 08:32,2026-09-11 09:27,Comms down\nATM-04,Branch 2,2026-09-11 08:43,2026-09-11 09:18,Comms down\nATM-30,Mall A,2026-09-11 09:38,2026-09-11 11:36,Maintenance\nATM-18,Branch 8,2026-09-11 11:25,2026-09-11 13:44,Maintenance\nATM-01,Branch 1,2026-09-11 12:56,2026-09-11 14:52,Maintenance\nATM-03,Branch 1,2026-09-11 19:21,2026-09-12 04:47,Cash out\nATM-08,Branch 3,2026-09-11 19:35,2026-09-11 20:00,Comms down\nATM-22,Branch 9,2026-09-11 20:35,2026-09-11 21:36,Comms down\nATM-17,Branch 7,2026-09-11 23:13,2026-09-12 03:29,Comms down\nATM-04,Branch 2,2026-09-12 14:54,2026-09-12 15:36,Comms down\nATM-22,Branch 9,2026-09-12 15:09,2026-09-12 15:30,Comms down\nATM-17,Branch 7,2026-09-12 15:44,2026-09-13 01:46,Comms down\nATM-32,Mall A,2026-09-12 15:50,2026-09-14 08:49,Cash out\nATM-34,Hospital B,2026-09-12 15:54,2026-09-12 17:02,Comms down\nATM-38,Campus C,2026-09-12 18:39,2026-09-13 02:09,Cash out\nATM-10,Branch 4,2026-09-12 19:29,2026-09-13 05:21,Card reader fault\nATM-36,Campus C,2026-09-12 20:23,2026-09-13 01:01,Cash out\nATM-17,Branch 7,2026-09-13 01:42,2026-09-13 04:05,Comms down\nATM-36,Campus C,2026-09-13 03:52,2026-09-13 04:09,Comms down\nATM-24,Branch 10,2026-09-13 07:10,2026-09-13 17:07,Card reader fault\nATM-37,Campus C,2026-09-13 07:49,2026-09-13 13:59,Dispenser fault\nATM-37,Campus C,2026-09-13 14:12,2026-09-14 00:33,Cash out\nATM-40,Campus C,2026-09-13 18:07,2026-09-14 09:20,Cash out\nATM-15,Branch 6,2026-09-13 18:44,2026-09-14 01:53,Card reader fault\nATM-34,Hospital B,2026-09-14 03:49,2026-09-14 04:51,Comms down\nATM-39,Campus C,2026-09-14 12:28,2026-09-14 13:01,Comms down\nATM-09,Branch 4,2026-09-14 14:04,2026-09-14 23:51,Dispenser fault\nATM-25,Branch 11,2026-09-14 15:55,2026-09-14 16:04,Comms down\nATM-32,Mall A,2026-09-14 16:28,2026-09-14 20:29,Card reader fault\nATM-27,Branch 12,2026-09-14 16:40,2026-09-14 17:27,Comms down\nATM-06,Branch 3,2026-09-15 08:42,2026-09-15 09:19,Comms down\nATM-34,Hospital B,2026-09-15 10:15,2026-09-15 12:39,Maintenance\nATM-06,Branch 3,2026-09-15 14:34,2026-09-15 19:26,Dispenser fault\nATM-09,Branch 4,2026-09-15 15:04,2026-09-16 03:34,Dispenser fault\nATM-27,Branch 12,2026-09-15 15:41,2026-09-15 16:02,Comms down\nATM-06,Branch 3,2026-09-15 20:21,2026-09-15 21:22,Power\nATM-07,Branch 3,2026-09-15 20:21,2026-09-15 21:22,Power\nATM-08,Branch 3,2026-09-15 20:21,2026-09-15 21:22,Power\nATM-06,Branch 3,2026-09-15 20:30,2026-09-15 21:50,Comms down\nATM-07,Branch 3,2026-09-15 20:30,2026-09-15 21:56,Comms down\nATM-17,Branch 7,2026-09-16 01:47,2026-09-16 03:00,Comms down\nATM-11,Branch 5,2026-09-16 10:30,2026-09-16 13:28,Maintenance\nATM-17,Branch 7,2026-09-16 15:07,2026-09-16 20:03,Comms down\nATM-10,Branch 4,2026-09-16 17:31,2026-09-16 23:56,Dispenser fault\nATM-25,Branch 11,2026-09-16 19:27,2026-09-16 20:09,Power\nATM-26,Branch 11,2026-09-16 19:27,2026-09-16 20:09,Power\nATM-26,Branch 11,2026-09-16 19:35,2026-09-16 20:33,Comms down\nATM-34,Hospital B,2026-09-17 05:19,2026-09-17 06:54,Comms down\nATM-17,Branch 7,2026-09-17 08:33,2026-09-17 10:07,Comms down\nATM-19,Branch 8,2026-09-17 13:17,2026-09-17 15:19,Maintenance\nATM-07,Branch 3,2026-09-17 13:18,2026-09-18 02:21,Dispenser fault\nATM-17,Branch 7,2026-09-17 19:17,2026-09-17 20:14,Comms down\nATM-11,Branch 5,2026-09-17 19:37,2026-09-17 19:51,Comms down\nATM-27,Branch 12,2026-09-17 21:57,2026-09-17 22:40,Comms down\nATM-02,Branch 1,2026-09-18 02:31,2026-09-18 03:19,Comms down\nATM-34,Hospital B,2026-09-18 07:51,2026-09-18 11:57,Comms down\nATM-08,Branch 3,2026-09-18 09:03,2026-09-18 16:34,Dispenser fault\nATM-38,Campus C,2026-09-18 10:31,2026-09-18 13:22,Maintenance\nATM-17,Branch 7,2026-09-18 10:35,2026-09-18 17:03,Comms down\nATM-20,Branch 8,2026-09-18 18:49,2026-09-19 00:07,Cash out\nATM-18,Branch 8,2026-09-18 19:33,2026-09-19 07:22,Cash out\nATM-17,Branch 7,2026-09-19 00:45,2026-09-19 01:45,Comms down\nATM-20,Branch 8,2026-09-19 09:24,2026-09-19 12:38,Dispenser fault\nATM-07,Branch 3,2026-09-19 09:45,2026-09-19 12:56,Dispenser fault\nATM-38,Campus C,2026-09-19 15:39,2026-09-19 23:12,Cash out\nATM-02,Branch 1,2026-09-19 16:25,2026-09-21 10:27,Cash out\nATM-28,Branch 12,2026-09-19 22:33,2026-09-19 23:48,Comms down\nATM-33,Hospital B,2026-09-20 06:40,2026-09-20 06:49,Comms down\nATM-12,Branch 5,2026-09-20 12:26,2026-09-20 15:46,Dispenser fault\nATM-09,Branch 4,2026-09-20 18:21,2026-09-21 05:49,Dispenser fault\nATM-16,Branch 7,2026-09-21 03:05,2026-09-21 03:45,Comms down\nATM-02,Branch 1,2026-09-21 06:13,2026-09-21 06:36,Comms down\nATM-08,Branch 3,2026-09-21 08:42,2026-09-21 18:11,Dispenser fault\nATM-08,Branch 3,2026-09-21 17:59,2026-09-22 00:22,Dispenser fault\nATM-08,Branch 3,2026-09-21 18:11,2026-09-22 08:16,Dispenser fault\nATM-17,Branch 7,2026-09-21 23:38,2026-09-22 03:23,Comms down\nATM-34,Hospital B,2026-09-21 23:52,2026-09-22 02:16,Comms down\nATM-40,Campus C,2026-09-22 03:57,2026-09-22 04:54,Comms down\nATM-17,Branch 7,2026-09-22 04:46,2026-09-22 06:44,Comms down\nATM-17,Branch 7,2026-09-22 06:47,2026-09-22 11:40,Comms down\nATM-25,Branch 11,2026-09-22 08:43,2026-09-22 15:24,Dispenser fault\nATM-40,Campus C,2026-09-22 09:59,2026-09-22 11:45,Maintenance\nATM-12,Branch 5,2026-09-22 10:09,2026-09-22 11:49,Comms down\nATM-10,Branch 4,2026-09-22 11:44,2026-09-23 00:12,Dispenser fault\nATM-13,Branch 5,2026-09-22 13:57,2026-09-22 16:37,Maintenance\nATM-10,Branch 4,2026-09-22 15:55,2026-09-22 21:39,Dispenser fault\nATM-06,Branch 3,2026-09-22 17:13,2026-09-23 06:02,Dispenser fault\nATM-40,Campus C,2026-09-22 17:29,2026-09-22 22:16,Dispenser fault\nATM-17,Branch 7,2026-09-22 17:32,2026-09-22 19:10,Comms down\nATM-15,Branch 6,2026-09-22 18:12,2026-09-22 19:22,Comms down\nATM-36,Campus C,2026-09-22 20:22,2026-09-22 22:51,Power\nATM-37,Campus C,2026-09-22 20:22,2026-09-22 22:51,Power\nATM-38,Campus C,2026-09-22 20:22,2026-09-22 22:51,Power\nATM-39,Campus C,2026-09-22 20:22,2026-09-22 22:51,Power\nATM-40,Campus C,2026-09-22 20:22,2026-09-22 22:51,Power\nATM-36,Campus C,2026-09-22 20:26,2026-09-22 23:39,Comms down\nATM-38,Campus C,2026-09-22 20:26,2026-09-22 23:38,Comms down\nATM-40,Campus C,2026-09-22 20:26,2026-09-22 23:26,Comms down\nATM-02,Branch 1,2026-09-22 22:48,2026-09-22 23:20,Comms down\nATM-34,Hospital B,2026-09-23 02:26,2026-09-23 03:54,Comms down\nATM-28,Branch 12,2026-09-23 10:15,2026-09-23 13:09,Maintenance\nATM-07,Branch 3,2026-09-23 11:02,2026-09-23 13:41,Maintenance\nATM-36,Campus C,2026-09-23 13:13,2026-09-23 14:52,Maintenance\nATM-03,Branch 1,2026-09-23 15:00,2026-09-23 20:29,Card reader fault\nATM-34,Hospital B,2026-09-23 17:22,2026-09-23 19:45,Comms down\nATM-17,Branch 7,2026-09-23 19:22,2026-09-24 06:22,Comms down\nATM-30,Mall A,2026-09-23 19:27,2026-09-23 22:58,Other\nATM-30,Mall A,2026-09-23 20:24,2026-09-23 23:19,Card reader fault\nATM-23,Branch 10,2026-09-23 22:17,2026-09-23 23:09,Comms down\nATM-34,Hospital B,2026-09-24 03:25,2026-09-24 05:36,Comms down\nATM-06,Branch 3,2026-09-24 09:58,2026-09-24 10:07,Comms down\nATM-31,Mall A,2026-09-24 11:15,2026-09-24 13:11,Comms down\nATM-17,Branch 7,2026-09-24 12:20,2026-09-24 20:25,Comms down\nATM-17,Branch 7,2026-09-24 14:16,2026-09-24 16:40,Comms down\nATM-17,Branch 7,2026-09-24 16:56,2026-09-24 22:48,Comms down\nATM-33,Hospital B,2026-09-24 20:19,2026-09-24 21:31,Other\nATM-11,Branch 5,2026-09-24 20:41,2026-09-24 21:18,Power\nATM-12,Branch 5,2026-09-24 20:41,2026-09-24 21:18,Power\nATM-13,Branch 5,2026-09-24 20:41,2026-09-24 21:18,Power\nATM-12,Branch 5,2026-09-24 20:43,2026-09-24 21:35,Comms down\nATM-11,Branch 5,2026-09-24 20:44,2026-09-24 21:43,Comms down\nATM-06,Branch 3,2026-09-25 10:00,2026-09-25 12:30,Maintenance\nATM-21,Branch 9,2026-09-25 11:17,2026-09-25 11:46,Comms down\nATM-22,Branch 9,2026-09-25 12:34,2026-09-25 13:04,Comms down\nATM-15,Branch 6,2026-09-25 12:53,2026-09-25 15:48,Maintenance\nATM-26,Branch 11,2026-09-25 12:56,2026-09-25 15:02,Maintenance\nATM-39,Campus C,2026-09-25 18:55,2026-09-26 02:21,Cash out\nATM-18,Branch 8,2026-09-25 19:29,2026-09-26 01:40,Cash out\nATM-31,Mall A,2026-09-25 20:02,2026-09-28 10:18,Cash out\nATM-34,Hospital B,2026-09-26 00:57,2026-09-26 02:44,Comms down\nATM-17,Branch 7,2026-09-26 07:50,2026-09-26 11:01,Comms down\nATM-37,Campus C,2026-09-26 10:32,2026-09-26 11:15,Comms down\nATM-37,Campus C,2026-09-26 12:16,2026-09-26 19:13,Cash out\nATM-34,Hospital B,2026-09-26 17:39,2026-09-26 19:38,Comms down\nATM-36,Campus C,2026-09-26 18:19,2026-09-27 05:48,Cash out\nATM-17,Branch 7,2026-09-26 21:15,2026-09-28 10:03,Cash out\nATM-17,Branch 7,2026-09-27 05:50,2026-09-27 11:23,Comms down\nATM-23,Branch 10,2026-09-27 09:35,2026-09-27 10:24,Comms down\nATM-05,Branch 2,2026-09-27 10:17,2026-09-27 13:50,Dispenser fault\nATM-09,Branch 4,2026-09-27 12:43,2026-09-27 21:21,Cash out\nATM-40,Campus C,2026-09-27 13:48,2026-09-27 14:09,Comms down\nATM-01,Branch 1,2026-09-27 16:55,2026-09-28 03:10,Cash out\nATM-05,Branch 2,2026-09-27 20:27,2026-09-27 20:49,Comms down\nATM-24,Branch 10,2026-09-27 23:05,2026-09-27 23:22,Comms down\nATM-17,Branch 7,2026-09-27 23:08,2026-09-28 01:25,Comms down\nATM-14,Branch 6,2026-09-28 01:45,2026-09-28 02:11,Comms down\nATM-07,Branch 3,2026-09-28 08:35,2026-09-28 10:23,Comms down\nATM-23,Branch 10,2026-09-28 12:12,2026-09-28 13:45,Maintenance\nATM-24,Branch 10,2026-09-28 12:32,2026-09-28 14:32,Maintenance\nATM-21,Branch 9,2026-09-28 13:42,2026-09-28 15:17,Maintenance\nATM-36,Campus C,2026-09-28 17:33,2026-09-28 21:24,Cash out\nATM-03,Branch 1,2026-09-28 17:46,2026-09-28 23:06,Cash out\nATM-10,Branch 4,2026-09-29 07:21,2026-09-29 09:53,Comms down\nATM-04,Branch 2,2026-09-29 07:47,2026-09-29 08:06,Comms down\nATM-34,Hospital B,2026-09-29 08:01,2026-09-29 10:33,Comms down\nATM-19,Branch 8,2026-09-29 09:20,2026-09-29 11:12,Comms down\nATM-30,Mall A,2026-09-29 10:03,2026-09-29 10:32,Comms down\nATM-38,Campus C,2026-09-29 10:37,2026-09-29 11:29,Comms down\nATM-30,Mall A,2026-09-29 13:09,2026-09-29 18:58,Cash out\nATM-04,Branch 2,2026-09-29 13:12,2026-09-29 15:28,Maintenance\nATM-10,Branch 4,2026-09-29 13:45,2026-09-29 16:12,Maintenance\nATM-02,Branch 1,2026-09-29 15:50,2026-09-29 20:57,Cash out\nATM-01,Branch 1,2026-09-29 18:50,2026-09-29 22:09,Cash out\nATM-11,Branch 5,2026-09-29 18:53,2026-09-29 20:02,Comms down\nATM-17,Branch 7,2026-09-29 22:12,2026-09-29 22:53,Comms down\nATM-07,Branch 3,2026-09-30 03:09,2026-09-30 03:33,Comms down\nATM-03,Branch 1,2026-09-30 12:02,2026-09-30 13:59,Maintenance\nATM-01,Branch 1,2026-09-30 15:49,2026-09-30 21:26,Cash out\nATM-34,Hospital B,2026-09-30 21:40,2026-10-01 02:16,Comms down\n"];
+var $=function(id){return document.getElementById(id);};
+var inst=$("inst"), errEl=$("err"), isSample=false, lastParsed=null, texts=[null,null];
+var U={};
+U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
+U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
+U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.of=function(c,k,n){ return n>k ? c+" \u00b7 "+k+" of "+U.fmt(n)+" shown" : c; };
+U.MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+U.dd=function(t,noYear){ var d=new Date(t); return d.getDate()+" "+U.MON[d.getMonth()]+(noYear?"":" "+d.getFullYear()); };
+U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };
+U.pct=function(a,b){ return b? Math.round(a/b*1000)/10 : 0; };
+U.median=function(a){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; };
+U.pctl=function(a,p){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}); var i=Math.max(0,Math.ceil(p/100*s.length)-1); return s[i]; };
+U.parseCSV=function(text){
+  text=String(text).replace(/^﻿/,"");
+  var lines=text.replace(/\r\n?/g,"\n").split("\n").filter(function(l){ return l.trim().length; });
+  if(!lines.length) return null;
+  var h0=lines[0], cnt={",":0,";":0,"\t":0,"|":0}, qq=false, D=",";
+  for(var z=0;z<h0.length;z++){ var cz=h0[z]; if(cz==='"') qq=!qq; else if(!qq&&cnt.hasOwnProperty(cz)) cnt[cz]++; }
+  Object.keys(cnt).forEach(function(k){ if(cnt[k]>cnt[D]) D=k; });
+  function cells(line){ var o=[],c="",q=false; for(var i=0;i<line.length;i++){ var ch=line[i];
+    if(q){ if(ch==='"'){ if(line[i+1]==='"'){c+='"';i++;} else q=false; } else c+=ch; }
+    else { if(ch==='"') q=true; else if(ch===D){ o.push(c); c=""; } else c+=ch; } } o.push(c); return o; }
+  var H=cells(h0).map(function(h){ return h.trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,""); }), R=[];
+  for(var i=1;i<lines.length;i++){ var c=cells(lines[i]), o={}; for(var j=0;j<H.length;j++) o[H[j]]=(c[j]===undefined?"":String(c[j]).trim()); R.push(o); }
+  return {header:H, rows:R};
+};
+U.pick=function(H,al){ var a,h; for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h]===al[a]) return H[h];
+  for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h].indexOf(al[a])>=0) return H[h]; return null; };
+U.time=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim(); if(!s) return NaN;
+  if(/^\d{13}$/.test(s)) return parseInt(s,10); if(/^\d{10}$/.test(s)) return parseInt(s,10)*1000;
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?)?\s*(Z|[+-]\d{2}:?\d{2})?$/);
+  if(m){ var ms=m[7]?Math.round(parseFloat("0."+m[7])*1000):0;
+    var y=+m[1], mo=+m[2]-1, d=+m[3], hh=+(m[4]||0), mi=+(m[5]||0), se=+(m[6]||0);
+    if(m[8]){ var t=Date.UTC(y,mo,d,hh,mi,se,ms); if(m[8]!=="Z"){ var z=m[8].replace(":",""), sg=z[0]==="-"?-1:1; t-=sg*(parseInt(z.slice(1,3),10)*60+parseInt(z.slice(3,5),10))*60000; } return t; }
+    return new Date(y,mo,d,hh,mi,se,ms).getTime(); }
+  var d2=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:[T ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?)?$/);
+  if(d2){ var A1=+d2[1], A2=+d2[2], dd=A1, mm=A2; if(A2>12&&A1<=12){ dd=A2; mm=A1; } var H2=+(d2[4]||0);
+    if(d2[7]){ var pm=/p/i.test(d2[7]); if(pm&&H2<12) H2+=12; if(!pm&&H2===12) H2=0; }
+    return new Date(+d2[3],mm-1,dd,H2,+(d2[5]||0),+(d2[6]||0)).getTime(); }
+  return Date.parse(s); };
+U.hour=function(v){ if(!v) return null; var m=String(v).match(/(?:^|[T\s,])(\d{1,2}):\d{2}(?::\d{2})?(?:\.\d+)?\s*([AaPp][Mm])?/); if(m){ var h=parseInt(m[1],10);
+  if(m[2]){ var pm=/p/i.test(m[2]); if(pm&&h<12) h+=12; if(!pm&&h===12) h=0; } return (h>=0&&h<24)?h:null; } return null; };
+U.hh=function(h){ if(h===null||h===undefined) return "—"; var ap=h<12?"am":"pm", r=h%12; if(r===0) r=12; return r+ap; };
+U.mask=function(v){ var d=String(v||"").replace(/\D/g,""); if(d.length<4) return "•••"; return "••• "+d.slice(-3); };
+U.tile=function(k,v,s,cls){ var m=String(v).match(/^(.*?)\s(L|kWh|t|h|s|ms|min|days|agents|links|vehicles|km|L\/100 km|\u00d7)$/);
+  var vv=m?U.esc(m[1])+'<small class="u"> '+m[2]+'</small>':U.esc(v), m2=String(v).match(/^RWF\s(.+)$/);
+  if(m2) vv='<small class="u">RWF </small>'+U.esc(m2[1]);
+  return '<div class="tile"><div class="k">'+U.esc(k)+'</div><div class="v '+(cls||'')+'">'+vv+'</div><div class="s">'+U.esc(s||"")+'</div></div>'; };
+U.bars=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){ var w=Math.max(0,Math.min(100,r.w));
+  h+='<div class="brow"><div class="bl" title="'+U.esc(r.label)+'">'+U.esc(r.label)+'</div><div class="bb"><span class="'+(r.cls||'')+'" style="width:'+w+'%"></span></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.pairs=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){
+  h+='<div class="brow pair"><div class="bl">'+U.esc(r.label)+'</div><div class="bbs"><div class="bb"><span class="'+(r.cls1||'')+'" style="width:'+Math.min(100,r.w1)+'%"></span></div><div class="bb"><span class="'+(r.cls2||'dim')+'" style="width:'+Math.min(100,r.w2)+'%"></span></div></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.stack=function(parts){ var tot=0; parts.forEach(function(p){ tot+=p.v; }); var h='<div class="stack">';
+  parts.forEach(function(p){ if(p.v>0) h+='<span title="'+U.esc(p.label)+'" style="width:'+(tot?p.v/tot*100:0)+'%;background:'+p.color+'"></span>'; });
+  h+='</div><div class="legend">'; parts.forEach(function(p){ h+='<span><i style="background:'+p.color+'"></i>'+U.esc(p.label)+' '+U.esc(p.text)+'</span>'; }); return h+'</div>'; };
+U.heat=function(vals, mode, ref, labs){ // mode "count": raw counts, darker red = more; mode "level": ratios against a reference
+  var mx=0, i; if(mode==="count") vals.forEach(function(v){ if(v>mx) mx=v; });
+  var h='<div class="hours">';
+  for(i=0;i<24;i++){ var v=vals[i], col="var(--panel2)";
+    if(v!==null&&v!==undefined&&!isNaN(v)){
+      if(mode==="count"){ if(v>0&&mx>0) col="color-mix(in srgb, var(--bad) "+Math.round(22+78*v/mx)+"%, var(--panel2))"; }
+      else col = v>=ref-1e-9 ? "var(--accent)" : (v>=ref-0.10 ? "var(--warn)" : "var(--bad)"); }
+    h+='<div class="hcell" style="background:'+col+'"></div>'; }
+  h+='</div><div class="hlabels">'; ["12a","","","3","","","6","","","9","","","12p","","","3","","","6","","","9","",""].forEach(function(l){ h+='<span>'+l+'</span>'; });
+  h+='</div><div class="legend">';
+  if(mode==="count") h+='<span><i style="background:color-mix(in srgb, var(--bad) 22%, var(--panel2))"></i>Fewer</span><span><i style="background:var(--bad)"></i>Most</span><span><i style="background:var(--panel2)"></i>None</span>';
+  else { labs=labs||["At or above target","Up to 10 points below","More than 10 points below"];
+    h+='<span><i style="background:var(--accent)"></i>'+U.esc(labs[0])+'</span><span><i style="background:var(--warn)"></i>'+U.esc(labs[1])+'</span><span><i style="background:var(--bad)"></i>'+U.esc(labs[2])+'</span><span><i style="background:var(--panel2)"></i>No data</span>'; }
+  return h+'</div>'; };
+U.table=function(head, rows, numCols){ numCols=numCols||[]; var h='<div class="tblwrap"><table class="tbl"><thead><tr>';
+  head.forEach(function(c,i){ h+='<th class="'+(numCols.indexOf(i)>=0?'num':'')+'">'+U.esc(c)+'</th>'; }); h+='</tr></thead><tbody>';
+  rows.forEach(function(r){ h+='<tr>'; r.forEach(function(c,i){ var cls=(numCols.indexOf(i)>=0?'num':''), txt=c;
+    if(c&&typeof c==="object"){ cls+=' '+(c.cls||''); txt=c.t; } h+='<td class="'+cls+'">'+U.esc(txt)+'</td>'; }); h+='</tr>'; });
+  return h+'</tbody></table></div>'; };
+
+try{ var sv=localStorage.getItem(CFG.slug+"_theme"); if(sv) document.documentElement.setAttribute("data-theme",sv); }catch(e){}
+$("theme").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dk=window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var nx=cur?(cur==="dark"?"light":"dark"):(dk?"light":"dark");
+  document.documentElement.setAttribute("data-theme",nx);
+  try{ localStorage.setItem(CFG.slug+"_theme",nx); }catch(e){}
+});
+
+var G=(function(H){
+  var PUB={"kty": "EC", "crv": "P-256", "x": "dd_RAcn7vNcw2otkFdNpoI6U3_RyeEOu6SawgbThnho", "y": "zjKzBb8ADm1xZQ2tioXLYUyj-bstyz4fIcvI6VBocrA"}, KID="fk1-AqEPEA", LS="fk_codes", TITLE=CFG.plainTitle, mem=null, kp=null, pending=null, timer=null;
+  var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var esc=function(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+  var st={state:"locked", exp:0, org:"", code:""};
+  var hasCrypto=!!(window.crypto&&window.crypto.subtle&&window.TextEncoder&&window.TextDecoder&&window.Promise);
+  var MSG={bad:"That code isn't valid. Check it was copied in full, or ask Frutos for a new one.",
+    scope:"That code is for another tool. Ask Frutos for a code for the "+TITLE+".",
+    expired:"That code's trial has ended. Ask Frutos for a new one.",
+    early:"That code isn't active yet. Check the date and time on this device.",
+    nocrypto:"This browser cannot check trial codes; open the link in Chrome, Safari or Firefox.",
+    revoked:"That code has been withdrawn. Ask Frutos for a new one."};
+  function now(){ return Date.now()/1000; }
+  function b2u(s){ s=String(s).replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; var bin=atob(s), a=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a; }
+  function pick(raw){ var m=String(raw||"").match(/FK1\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{40,}/); return m?m[0]:null; }
+  function key(){ if(!kp) kp=crypto.subtle.importKey("jwk",PUB,{name:"ECDSA",namedCurve:"P-256"},false,["verify"]); return kp; }
+  function all(){ try{ var v=JSON.parse(localStorage.getItem(LS)||"null"); if(v&&v.c) v=[v]; return (v&&v.length)?v:(mem||[]); }catch(e){ return mem||[]; } }
+  function find(code){ var a=all(); for(var i=0;i<a.length;i++) if(a[i]&&a[i].c===code) return a[i]; return null; }
+  function put(list){ mem=list; try{ localStorage.setItem(LS,JSON.stringify(list)); }catch(e){} }
+  function save(o){ var a=all().filter(function(x){ return x&&x.c!==o.c; }); a.unshift(o); put(a.slice(0,6)); }
+  function forget(code){ put(all().filter(function(x){ return x&&x.c!==code; })); }
+  function check(code, first){
+    if(!hasCrypto) return Promise.resolve({ok:false, why:"nocrypto"});
+    var parts=String(code).split("."), p;
+    try{ p=JSON.parse(new TextDecoder().decode(b2u(parts[1]))); }catch(e){ return Promise.resolve({ok:false, why:"bad"}); }
+    return key().then(function(k){
+      return crypto.subtle.verify({name:"ECDSA",hash:{name:"SHA-256"}},k,b2u(parts[2]),new TextEncoder().encode(parts[0]+"."+parts[1]));
+    }).then(function(good){
+      if(!good||!p||p.v!==1||p.k!==KID) return {ok:false, why:"bad"};
+      var sc=p.s||[]; if(sc.indexOf("*")<0&&sc.indexOf(CFG.slug)<0) return {ok:false, why:"scope", p:p};
+      var t=now(), exp, f=first||null;
+      if(t<(p.i||0)-600) return {ok:false, why:"early", p:p};
+      if(typeof p.e==="number") exp=p.e;
+      else if(typeof p.d==="number"&&typeof p.h==="number"){ if(!f) f=Math.floor(t); exp=Math.min(f+p.d*86400,p.h); }
+      else return {ok:false, why:"bad"};
+      if(t>=exp) return {ok:false, why:"expired", p:p, exp:exp, first:f};
+      return {ok:true, p:p, exp:exp, first:f};
+    }, function(){ return {ok:false, why:"bad"}; });
+  }
+  function left(sec){ var d=Math.floor(sec/86400), h=Math.floor(sec%86400/3600), m=Math.floor(sec%3600/60);
+    if(d>0) return d+(d===1?" day ":" days ")+h+" h left"; if(h>0) return h+" h "+m+" min left"; return Math.max(1,m)+" min left"; }
+  function when(ts){ var d=new Date(ts*1000); return d.getDate()+" "+MON[d.getMonth()]+", "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2); }
+  function orgName(){ var v=inst.value.trim(); return (v&&v!==CFG.defaultFor)?v:"my organisation"; }
+  function paint(){
+    var el=$("runs"), h;
+    if(!hasCrypto) h='<span class="gdot end"></span><span>'+esc(MSG.nocrypto)+'</span>';
+    else if(st.state==="ok") h='<span class="gdot ok"></span><span>Trial unlocked for <b>'+esc(st.org||"you")+'</b> · '+left(st.exp-now())+'</span><button type="button" class="glink" id="gopen">Change code</button>';
+    else if(st.state==="expired") h='<span class="gdot end"></span><span>Your 3-day trial ended on '+when(st.exp)+'</span><button type="button" class="glink" id="gopen">Enter a new code</button>';
+    else h='<span class="gdot"></span><span>Sample: free · Your own file: trial code needed</span><button type="button" class="glink" id="gopen">Enter a code</button>';
+    el.innerHTML=h; var b=$("gopen"); if(b) b.addEventListener("click",function(){ open(""); });
+  }
+  function msgEl(m){ var e=$("uerr"); if(m){ e.textContent=m; e.hidden=false; } else e.hidden=true; }
+  function open(m){
+    var u=$("unlock"); u.hidden=false; msgEl(m);
+    $("uwa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent("Muraho Frutos. Please send a 3-day trial code for the "+TITLE+" for "+orgName()+".");
+    u.scrollIntoView({behavior:"smooth",block:"center"}); setTimeout(function(){ try{ $("ucode").focus({preventScroll:true}); }catch(e){ $("ucode").focus(); } },60);
+  }
+  function close(){ $("unlock").hidden=true; }
+  function closing(scroll){ H.closing(scroll); }
+  function sha(s){ return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){ var a=new Uint8Array(b), o="";
+    for(var i=0;i<a.length;i++) o+=("0"+a[i].toString(16)).slice(-2); return o; }); }
+  function api(ev){
+    if(!CFG.api||!st.code||!window.fetch) return;
+    try{ sha(st.code).then(function(hx){
+        return fetch(CFG.api.replace(/\/+$/,"")+"/v1/event",{method:"POST",keepalive:true,headers:{"content-type":"application/json"},
+          body:JSON.stringify({kid:KID,codeHash:hx,slug:CFG.slug,event:ev,ts:Math.floor(now())})});
+      }).then(function(r){ return (r&&r.ok)?r.json():null; }).then(function(j){
+        if(j&&j.revoked){ forget(st.code); st={state:"locked",exp:0,org:"",code:""}; paint(); open(MSG.revoked); }
+      })["catch"](function(){});
+    }catch(e){}
+  }
+  function tick(){ if(timer) clearInterval(timer); timer=setInterval(function(){
+    if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); closing(false); } else paint(); },60000); }
+  function activate(code, quiet){
+    var prev=find(code), first=prev?prev.f:null;
+    return check(code, first).then(function(r){
+      if(!r.ok){
+        if(r.why==="expired"){ st={state:"expired", exp:r.exp, org:(r.p&&r.p.o)||"", code:""}; paint(); }
+        if(!quiet) msgEl(MSG[r.why]||MSG.bad);
+        return r;
+      }
+      var fresh=!prev;
+      save({c:code, f:r.first||null});
+      st={state:"ok", exp:r.exp, org:r.p.o||"", code:code};
+      var cur=inst.value.trim();
+      if(r.p.o&&(cur===""||cur===CFG.defaultFor)){ inst.value=r.p.o; $("gate-inst").textContent=H.name(); }
+      paint(); close(); $("gate").hidden=true; tick();
+      if(fresh) api("activate");
+      if(pending!==null){ var a=pending; pending=null; H.run(a); }
+      return r;
+    });
+  }
+  function init(){
+    paint();
+    if(!hasCrypto) return;
+    var qs=null, qc=null; try{ qs=new URLSearchParams(location.search); qc=qs.get("code"); }catch(e){}
+    if(qc!==null&&qs){ try{ qs["delete"]("code"); var rest=qs.toString(); history.replaceState(null,"",location.pathname+(rest?"?"+rest:"")+location.hash); }catch(e){} }
+    var list=[], fromLink=pick(qc);
+    if(qc!==null&&!fromLink){ open(MSG.bad); }
+    [fromLink].concat(all().map(function(x){ return x&&x.c; }), [CFG.preset||null]).forEach(function(c){ if(c&&list.indexOf(c)<0) list.push(c); });
+    var i=0, last=null;
+    (function next(){
+      if(i>=list.length){
+        if(last&&last.why==="expired"&&st.state==="expired") closing(false);
+        if(fromLink&&last&&!last.ok) open(MSG[last.why]||MSG.bad);
+        return; }
+      var c=list[i++];
+      activate(c, true).then(function(r){ last=r; if(!r.ok) next(); });
+    })();
+  }
+  $("uform").addEventListener("submit",function(e){ e.preventDefault(); var c=pick($("ucode").value);
+    if(!hasCrypto){ msgEl(MSG.nocrypto); return; } if(!c){ msgEl(MSG.bad); return; } activate(c,false); });
+  $("ucode").addEventListener("keydown",function(e){ if(e.key==="Escape"||e.keyCode===27) close(); });
+  $("uclose").addEventListener("click",close);
+  return {
+    ok:function(){ if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); } return st.state==="ok"; },
+    ask:function(arr){ pending=arr;
+      if(st.state==="expired"){ open("Your 3-day trial ended on "+when(st.exp)+". Enter a new code, or ask Frutos for one."); closing(false); }
+      else open(""); },
+    ran:function(){ api("run"); },
+    init:init
+  };
+})({
+  name:function(){ return name(); },
+  run:function(a){ isSample=false; go(a); },
+  closing:function(scroll){ var v=name(); $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+    $("gate-inst").textContent=v; $("gate").hidden=false; if(scroll) $("gate").scrollIntoView({behavior:"smooth",block:"center"}); }
+});
+
+function name(){ return inst.value.trim()||CFG.defaultFor; }
+try{ var qf=new URLSearchParams(location.search).get("for"); if(qf){ inst.value=qf.slice(0,60); } }catch(e){}
+$("gate-inst").textContent=name();
+inst.addEventListener("input",function(){ $("gate-inst").textContent=name(); });
+function inputs(){ var o={}; document.querySelectorAll("[data-in]").forEach(function(el){ o[el.getAttribute("data-in")]=el.value; }); return o; }
+function showErr(m){ errEl.textContent=m; errEl.hidden=false; }
+
+function readInto(i,f){ var r=new FileReader();
+  r.onload=function(){ texts[i]=String(r.result); var fn=$("fn"+i); if(fn) fn.textContent=f.name;
+    if(CFG.files===1){ isSample=false; go([texts[0]]); } else { $("runbtn").disabled=!(texts[0]&&texts[1]); } };
+  r.onerror=function(){ showErr("Could not read that file."); }; r.readAsText(f); }
+for(var i=0;i<CFG.files;i++)(function(i){
+  var d=$("drop"+i), p=$("pick"+i), fi=$("file"+i);
+  p.addEventListener("click",function(){ fi.click(); });
+  fi.addEventListener("change",function(e){ var f=e.target.files&&e.target.files[0]; if(f) readInto(i,f); });
+  ["dragenter","dragover"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.add("over"); }); });
+  ["dragleave","drop"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.remove("over"); }); });
+  d.addEventListener("drop",function(e){ var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) readInto(i,f); });
+})(i);
+if(CFG.files===2){ $("runbtn").addEventListener("click",function(){ isSample=false; go([texts[0],texts[1]]); }); }
+$("sample").addEventListener("click",function(){ isSample=true; go(SAMPLES); });
+
+function go(arr){
+  errEl.hidden=true;
+  if(!isSample&&!G.ok()){ G.ask(arr); return; }
+  var ps=[], R;
+  try{ arr.forEach(function(t,ix){ var p=U.parseCSV(t); if(!p||!p.rows.length) throw (CFG.files===2?(CFG.fileLabels[ix]+": "):"")+"I couldn't find any rows in that file."; ps.push(p); });
+       R=TOOL.analyse(ps, inputs(), U); }
+  catch(e){ showErr(typeof e==="string"?e:"That file couldn't be read."); return; }
+  lastParsed=ps; draw(R); if(!isSample) G.ran();
+}
+document.querySelectorAll("[data-in]").forEach(function(el){ el.addEventListener("change",function(){
+  if(!lastParsed) return; try{ draw(TOOL.analyse(lastParsed, inputs(), U)); }catch(e){} }); });
+
+function draw(R){
+  var out=TOOL.render(R, inputs(), U, {name:name(), sample:isSample});
+  var H='<div class="verdict"><p class="vh">What the data shows'+(isSample?' · illustrative sample, not your data':'')+'</p><p>'+out.verdict+'</p></div>';
+  if(out.tiles&&out.tiles.length) H+='<div class="tiles">'+out.tiles.join("")+'</div>';
+  (out.sections||[]).forEach(function(s){ H+='<div class="card"><h3>'+U.esc(s.title)+'</h3>'+(s.cap?'<p class="cap">'+U.esc(s.cap)+'</p>':'')+s.html+'</div>'; });
+  H+='<div class="summary"><div class="summary-h"><h3>'+U.esc(CFG.summaryTitle)+'</h3><span class="acts"><button class="copy pdf" id="pdf" type="button">Save PDF</button><button class="copy" id="copy" type="button">Copy</button></span></div><pre id="smtext">'+U.esc(out.summary)+'</pre></div>';
+  var rep=$("report"); rep.innerHTML=H; rep.hidden=false;
+  var cp=$("copy"); cp.addEventListener("click",function(){ var t=$("smtext").textContent;
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ cp.textContent="Copied"; cp.classList.add("done"); }); } });
+  $("pdf").addEventListener("click",function(){ window.print(); });
+  rep.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function gate(){
+  var v=name();
+  $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+  $("gate-inst").textContent=v; $("gate").hidden=false;
+  $("gate").scrollIntoView({behavior:"smooth",block:"center"});
+}
+$("foot").textContent=CFG.foot;
+G.init();
+})();
+</script>
+</body>
+</html>

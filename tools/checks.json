@@ -1,6 +1,6 @@
 {
- "checked": "2026-10-14",
- "how": "Open each path, press #sample, read '.verdict p:last-child'; it must start with 'expect'. The trial gate (#gate) shows after the third run.",
+ "checked": "2026-10-17",
+ "how": "Open each path, press #sample, read '.verdict p:last-child'; it must start with 'expect'. The sample runs free; the visitor's own file needs a signed 3-day trial code (FK1...). Client copies carry a preset code (3 days from first use, hard limit 31 Dec 2026). Each 'why' is a dated fact: re-check its source and replace it once it is no longer true.",
  "tools": [
   {
    "slug": "payment-decoder",
@@ -42,6 +42,97 @@
    }
   },
   {
+   "slug": "sim-swap-window",
+   "name": "SIM-Swap Risk Window",
+   "paths": [
+    "sim-swap-window/index.html"
+   ],
+   "expect": "Of 907 SIM swaps, device changes and PIN resets, 295",
+   "why": {
+    "text": "On 18 June 2026, Kenya's High Court upheld an order for a mobile operator and a bank to cover KES 4.4M a customer lost after a SIM swap; a correct PIN was no defence for missing unusual transfers.",
+    "url": "https://tech-ish.com/2026/07/13/safaricom-dtb-sim-swap-ruling/",
+    "source": "tech-ish.com, 13 Jul 2026"
+   }
+  },
+  {
+   "slug": "agent-float",
+   "name": "Agent Float Lens",
+   "paths": [
+    "agent-float/index.html"
+   ],
+   "expect": "Of 150 agents, 38 ran short of e-float",
+   "why": {
+    "text": "By 5 August 2026, eKash had processed more than 10.5 million transactions worth over FRW 960 billion since its nationwide launch on 14 July, with a 98.6% average success rate.",
+    "url": "https://www.bnr.rw/documents/Press_Release-_Update_on_the_Performance_of_eKash_Aug_2026.pdf",
+    "source": "National Bank of Rwanda, 5 Aug 2026"
+   }
+  },
+  {
+   "slug": "atm-uptime",
+   "name": "ATM Uptime Lens",
+   "paths": [
+    "atm-uptime/index.html"
+   ],
+   "expect": "Across 40 ATMs in September 2026, the fleet was available 96.90%",
+   "why": {
+    "text": "Since 14 July 2026, eKash links every bank and e-money issuer for transfers and merchant payments (BNR Directive No. 45/2026): when an ATM is down, customers can move money to any wallet instead.",
+    "url": "https://techafricanews.com/2026/07/13/rwanda-launches-full-interoperability-on-ekash-national-payment-system/",
+    "source": "TechAfrica News, 13 Jul 2026"
+   }
+  },
+  {
+   "slug": "par-lens",
+   "name": "Portfolio at Risk Lens",
+   "paths": [
+    "par-lens/index.html"
+   ],
+   "expect": "Of RWF 2.97bn outstanding in 2,400 loans, 9.5%",
+   "why": {
+    "text": "New lending to agriculture rose 177% in the first half of 2026, to RWF 57 billion, central bank figures show: a book growing that fast needs its arrears watched loan by loan.",
+    "url": "https://www.ktpress.rw/2026/08/rwandas-financial-sector-grows-to-rwf17-5-trillion-agriculture-lending-jumps-177/",
+    "source": "KT Press, 27 Aug 2026"
+   }
+  },
+  {
+   "slug": "collection-rate",
+   "name": "Billing Collection Lens",
+   "paths": [
+    "collection-rate/index.html"
+   ],
+   "expect": "Of RWF 146.0M billed and due, 88.5% has been collected",
+   "why": {
+    "text": "The 2026/27 school year opened on 7 September 2026 and its first term closes on 17 December: see which classes and accounts are behind while there is still time to collect.",
+    "url": "https://allafrica.com/stories/202607290303.html",
+    "source": "The New Times via allAfrica, 29 Jul 2026"
+   }
+  },
+  {
+   "slug": "claims-flags",
+   "name": "Claims Red-Flag Scanner",
+   "paths": [
+    "claims-flags/index.html"
+   ],
+   "expect": "Of 1,504 claims worth RWF 1.27bn, 393 (26.1%)",
+   "why": {
+    "text": "On 12 October 2026 the Rwanda Insurers Association said a claim should be settled within five days of complete documents, and that insurers work with doctors and police on suspected fraud.",
+    "url": "https://www.newtimes.co.rw/article/39627/news/rwanda/rising-repair-claims-costs-push-insurers-to-review-motor-premiums/amp",
+    "source": "The New Times, 12 Oct 2026"
+   }
+  },
+  {
+   "slug": "loss-ratio",
+   "name": "Motor Loss Ratio Lens",
+   "paths": [
+    "loss-ratio/index.html"
+   ],
+   "expect": "Across 3,012 policies, claims took 72.6% of premium",
+   "why": {
+    "text": "On 12 October 2026 the insurers' association said motor third-party premiums could rise 20-30%: repair costs have more than doubled while tariffs stayed unchanged for five years.",
+    "url": "https://www.newtimes.co.rw/article/39627/news/rwanda/rising-repair-costs-claims-push-insurers-to-review-motor-premiums/amp",
+    "source": "The New Times, 12 Oct 2026"
+   }
+  },
+  {
    "slug": "turnaround",
    "name": "Turnaround & Backlog Lens",
    "paths": [
@@ -52,6 +143,19 @@
     "text": "BNR Regulation No. 56/2022 gives financial service providers 15 days to resolve a complaint and one working day to acknowledge it, with a report every quarter: the third-quarter report is due on 20 October 2026.",
     "url": "https://bnr.rw/laws-and-regulations/regulatory-digest-market-consultation/regulatory-digest/financial-complaints-handling-regulation",
     "source": "BNR, Regulation No. 56/2022"
+   }
+  },
+  {
+   "slug": "staffing-lens",
+   "name": "Contact Centre Staffing Lens",
+   "paths": [
+    "staffing-lens/index.html"
+   ],
+   "expect": "To answer 80% of calls within 20 seconds you need between 8 and 38",
+   "why": {
+    "text": "Rwanda switches off 3G on 30 June 2027, with pilot shutdowns in 2026: operators must reach every customer who needs a new phone or SIM.",
+    "url": "https://www.ktpress.rw/2026/07/rwanda-to-phase-out-2g-and-3g-networks-by-2027/",
+    "source": "KT Press, 28 Jul 2026"
    }
   },
   {
@@ -98,32 +202,6 @@
    }
   },
   {
-   "slug": "link-sla",
-   "name": "Link SLA Auditor",
-   "paths": [
-    "link-sla/index.html"
-   ],
-   "expect": "17 of 35 links with outages fell below",
-   "why": {
-    "text": "In April 2026 RURA ordered an internet provider to compensate customers for a week of disruption and to pay daily penalties until compliant.",
-    "url": "https://www.ecofinagency.com/news-digital/2904-55122-rwanda-canalbox-restores-services-under-regulator-pressure-offers-compensation",
-    "source": "Ecofin, 29 Apr 2026"
-   }
-  },
-  {
-   "slug": "staffing-lens",
-   "name": "Contact Centre Staffing Lens",
-   "paths": [
-    "staffing-lens/index.html"
-   ],
-   "expect": "To answer 80% of calls within 20 seconds you need between 8 and 38",
-   "why": {
-    "text": "Rwanda switches off 3G on 30 June 2027, with pilot shutdowns in 2026: operators must reach every customer who needs a new phone or SIM.",
-    "url": "https://www.ktpress.rw/2026/07/rwanda-to-phase-out-2g-and-3g-networks-by-2027/",
-    "source": "KT Press, 28 Jul 2026"
-   }
-  },
-  {
    "slug": "cause-decoder",
    "name": "Signalling Cause Decoder",
    "paths": [
@@ -137,6 +215,32 @@
    }
   },
   {
+   "slug": "sunset-readiness",
+   "name": "3G Switch-off Readiness",
+   "paths": [
+    "sunset-readiness/index.html"
+   ],
+   "expect": "Of 4,026,917 active subscribers, 58.5% use VoLTE-capable devices",
+   "why": {
+    "text": "In July 2026 the ICT ministry set the nationwide 3G switch-off for 30 June 2027, with pilot shutdowns during 2026; 2G is retired later, after a coverage assessment.",
+    "url": "https://www.ktpress.rw/2026/07/rwanda-to-phase-out-2g-and-3g-networks-by-2027/",
+    "source": "KT Press, 28 Jul 2026"
+   }
+  },
+  {
+   "slug": "link-sla",
+   "name": "Link SLA Auditor",
+   "paths": [
+    "link-sla/index.html"
+   ],
+   "expect": "17 of 35 links with outages fell below",
+   "why": {
+    "text": "In April 2026 RURA ordered an internet provider to compensate customers for a week of disruption and to pay daily penalties until compliant.",
+    "url": "https://www.ecofinagency.com/news-digital/2904-55122-rwanda-canalbox-restores-services-under-regulator-pressure-offers-compensation",
+    "source": "Ecofin, 29 Apr 2026"
+   }
+  },
+  {
    "slug": "power-reliability",
    "name": "Power Reliability Index",
    "paths": [
@@ -145,6 +249,19 @@
    "expect": "In September 2026, the average customer lost power 3.00 times",
    "why": {
     "text": "On 10 September 2026 senators raised frequent power interruptions with the national utility after visiting schools, health facilities and other users; it is adding alternative supply routes.",
+    "url": "https://www.newtimes.co.rw/article/38862/news/energy/mps-demand-answers-from-reg-over-power-outages/amp",
+    "source": "The New Times, 10 Sep 2026"
+   }
+  },
+  {
+   "slug": "backup-autonomy",
+   "name": "Backup Autonomy Lens",
+   "paths": [
+    "backup-autonomy/index.html"
+   ],
+   "expect": "Across 120 sites and 1,076 mains failures, 71 sites went down",
+   "why": {
+    "text": "On 10 September 2026 senators raised frequent power interruptions with the national utility after visiting schools, health facilities and other users.",
     "url": "https://www.newtimes.co.rw/article/38862/news/energy/mps-demand-answers-from-reg-over-power-outages/amp",
     "source": "The New Times, 10 Sep 2026"
    }
@@ -164,6 +281,45 @@
    }
   },
   {
+   "slug": "pue-lens",
+   "name": "Data Centre PUE Lens",
+   "paths": [
+    "pue-lens/index.html"
+   ],
+   "expect": "In September 2026, the facility used 263,772 kWh",
+   "why": {
+    "text": "A Rwandan internet provider and a Middle Eastern data-centre developer signed an MoU, reported on 3 June 2026, to co-invest in a new Tier III data centre in Rwanda.",
+    "url": "https://www.datacenterdynamics.com/en/news/omantels-otech-signs-mou-to-build-data-center-in-rwanda/",
+    "source": "DCD, 3 Jun 2026"
+   }
+  },
+  {
+   "slug": "meter-loss",
+   "name": "Meter Loss Finder",
+   "paths": [
+    "meter-loss/index.html"
+   ],
+   "expect": "Of 600 meters, 50 show a loss pattern",
+   "why": {
+    "text": "In April 2026 the national regulator put non-revenue water, which includes illegal connections and billing inefficiencies, at about 35%, with a national target of 25% by 2029.",
+    "url": "https://umunota.com/en/rura-addresses-water-pricing-concerns-losses-and-smart-metering-rollout/",
+    "source": "Umunota, 24 Apr 2026"
+   }
+  },
+  {
+   "slug": "water-balance",
+   "name": "Water Loss Balance",
+   "paths": [
+    "water-balance/index.html"
+   ],
+   "expect": "Across 18 zones, 6,901,076 m³ (28.9%) of the water",
+   "why": {
+    "text": "The Auditor General found that in the year to June 2025 the national water utility billed 53.33 of the 85.75 million m³ it produced: 37.8% earned no revenue.",
+    "url": "https://www.ktpress.rw/2026/06/heres-why-construction-of-kigalis-planned-central-sewer-system-has-been-put-on-hold/",
+    "source": "KT Press, 26 Jun 2026"
+   }
+  },
+  {
    "slug": "fleet-fuel",
    "name": "Fleet Fuel Leak Finder",
    "paths": [
@@ -174,6 +330,19 @@
     "text": "RURA's pump-price review of 6 June 2026 capped diesel at RWF 2,927 a litre, 33% above the early-April cap of RWF 2,205. Enter today's price and every excess litre is valued at it.",
     "url": "https://ynews.digital/top-stories/rwanda-fuel-prices-higher-than-kenya-2026/",
     "source": "ynews.digital, 7 Jun 2026"
+   }
+  },
+  {
+   "slug": "bus-ontime",
+   "name": "Bus On-Time & Headway Lens",
+   "paths": [
+    "bus-ontime/index.html"
+   ],
+   "expect": "Of 13,048 scheduled departures on 14 routes, 82% left on time",
+   "why": {
+    "text": "Kigali's weekday bus riders rose from about 200,000 to nearly 230,000 after bus lanes opened in late April 2026, and more buses are being deployed to cut waiting times.",
+    "url": "https://www.newtimes.co.rw/article/35921/news/infrastructure/public-transport-users-up-by-30000-in-less-than-a-month/amp",
+    "source": "The New Times, 22 May 2026"
    }
   }
  ]

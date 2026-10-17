@@ -172,6 +172,32 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
 .why a{color:var(--dim); white-space:nowrap}
 .chip{display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; padding:2px 7px; border:1px solid var(--line); border-radius:999px; color:var(--dim); white-space:nowrap}
 @media (max-width:560px){ .drops.two{grid-template-columns:1fr} .brow{grid-template-columns:minmax(60px,30%) 1fr auto} }
+
+.runs{display:block; line-height:1.65}
+.runs b{color:var(--ink); font-weight:700}
+.gdot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--warn); margin-right:8px; vertical-align:0}
+.gdot.ok{background:var(--good)} .gdot.end{background:var(--bad)}
+.glink{border:0; background:none; color:var(--accent); font:inherit; font-family:var(--mono); font-size:12px; text-decoration:underline; text-underline-offset:2px; cursor:pointer; padding:0 2px; margin-left:8px; white-space:nowrap}
+.unlock{position:relative; margin-top:14px; border:1.5px solid var(--accent); background:var(--panel); padding:16px 16px 14px; text-align:left}
+.unlock h3{margin:0 30px 4px 0; font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; line-height:1.2}
+.unlock p{margin:0; font-size:14px; color:var(--dim); line-height:1.5}
+.unlock label{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin:12px 0 5px}
+.urow{display:flex; gap:8px; flex-wrap:wrap}
+.urow input{flex:1 1 220px; min-width:0; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font-family:var(--mono); font-size:13px; padding:10px; border-radius:9px}
+.urow input:focus{outline:0; border-color:var(--accent)}
+.urow .btn{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+.unlock .uerr{margin-top:9px; color:var(--bad); font-family:var(--mono); font-size:12.5px}
+.unlock .uask{margin-top:12px; font-size:13.5px}
+.unlock .uask a{color:var(--accent); font-weight:700}
+.uclose{position:absolute; top:6px; right:6px; border:0; background:none; color:var(--dim); font-size:24px; line-height:1; cursor:pointer; padding:4px 9px}
+.gate .btn{color:var(--bg)}
+.summary-h .acts{display:flex; gap:8px}
+@media print{
+  :root,:root[data-theme]{--bg:#fff; --panel:#fff; --panel2:#f4f4f4; --ink:#111; --dim:#555; --line:#ccc; color-scheme:light}
+  body{background:#fff!important}
+  .intake,.gate,.unlock,#theme,.copy,.pdf,.foot{display:none!important}
+  .card,.tiles,.verdict,.summary{break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -197,12 +223,23 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
       <p class="hint">Expected columns in both files, matched loosely: <b>date</b>, <b>route</b> (or partner, counterparty, participant), and <b>minutes</b>, <b>transactions</b> or another count, with an optional <b>amount</b>. Rows are summed per date and route, then matched; a difference counts when it is above your threshold or one side has no figure. Both files are read in your browser and never leave this page.</p>
       <div class="assume"><label>Dispute threshold, %<input data-in="tol" type="number" step="any" value="1"></label><label>Value per unit, RWF, if no amount<input data-in="rate" type="number" step="any" value=""></label></div>
       <div class="runs" id="runs" aria-live="polite"></div>
+      <div class="unlock" id="unlock" hidden>
+        <button class="uclose" id="uclose" type="button" aria-label="Close">×</button>
+        <h3>Your own file needs a 3-day trial code</h3>
+        <p>The illustrative sample is free. To read your own export, enter the code Frutos sent you. Your file still never leaves this page.</p>
+        <form id="uform" autocomplete="off">
+          <label for="ucode">Trial code</label>
+          <div class="urow"><input id="ucode" name="code" spellcheck="false" autocapitalize="off" placeholder="FK1… or the full link"><button class="btn" type="submit">Unlock</button></div>
+        </form>
+        <p class="uerr" id="uerr" role="alert" hidden></p>
+        <p class="uask">No code yet? <a id="uwa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a> · or call +250 731 000 163</p>
+      </div>
       <p class="err" id="err" hidden></p>
     </div>
   </section>
   <section id="report" class="report" hidden aria-live="polite"></section>
   <section id="gate" class="gate" hidden>
-    <h2>That's your three trial runs</h2>
+    <h2>Your 3-day trial has ended</h2>
     <p>The full version reconciles every partner and the switch each morning and prepares the dispute file, with every record behind each difference. Let's set it up for <b id="gate-inst">your organisation</b>.</p>
     <a class="btn" id="gate-wa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a>
     <p class="hint" style="margin-top:12px">Or call +250 731 000 163</p>
@@ -279,7 +316,7 @@ var TOOL={
 <script>
 (function(){
 "use strict";
-var CFG={"slug": "settlement", "maxRuns": 3, "wa": "250788312423", "defaultFor": "your organisation", "files": 2, "fileLabels": ["Your records", "Their records"], "summaryTitle": "Dispute-ready summary", "waMsg": "Muraho Frutos. I tried the Settlement Checker for {name} and I'd like the full version.", "foot": "Read entirely in your browser \u00b7 nothing is uploaded \u00b7 personal numbers are masked on sight. A trial limited to {n} runs. \u00a9 2026 Frutos."}, SAMPLES=["date,route,minutes,amount\n2026-09-01,Route A,51734,517340\n2026-09-01,Route B,39354,393540\n2026-09-01,Route C,22224,222240\n2026-09-01,Route D,9334,93340\n2026-09-01,Route E,6410,64100\n2026-09-01,Route F,3124,31240\n2026-09-02,Route A,52896,528960\n2026-09-02,Route B,40059,400590\n2026-09-02,Route C,20944,209440\n2026-09-02,Route D,9951,99510\n2026-09-02,Route E,6560,65600\n2026-09-02,Route F,3290,32900\n2026-09-03,Route A,50684,506840\n2026-09-03,Route B,37776,377760\n2026-09-03,Route C,21585,215850\n2026-09-03,Route D,8948,89480\n2026-09-03,Route E,6559,65590\n2026-09-03,Route F,3248,32480\n2026-09-04,Route A,49389,493890\n2026-09-04,Route B,37210,372100\n2026-09-04,Route C,21076,210760\n2026-09-04,Route D,9916,99160\n2026-09-04,Route E,6703,67030\n2026-09-04,Route F,3076,30760\n2026-09-05,Route A,43527,435270\n2026-09-05,Route B,32171,321710\n2026-09-05,Route C,17662,176620\n2026-09-05,Route D,8131,81310\n2026-09-05,Route E,5566,55660\n2026-09-05,Route F,2679,26790\n2026-09-06,Route A,42740,427400\n2026-09-06,Route B,31522,315220\n2026-09-06,Route C,17796,177960\n2026-09-06,Route D,8109,81090\n2026-09-06,Route E,6071,60710\n2026-09-06,Route F,2707,27070\n2026-09-07,Route A,50923,509230\n2026-09-07,Route B,39052,390520\n2026-09-07,Route C,22015,220150\n2026-09-07,Route D,9097,90970\n2026-09-07,Route E,6683,66830\n2026-09-07,Route F,3241,32410\n2026-09-08,Route A,50396,503960\n2026-09-08,Route B,38271,382710\n2026-09-08,Route C,20759,207590\n2026-09-08,Route D,9427,94270\n2026-09-08,Route E,6968,69680\n2026-09-08,Route F,3322,33220\n2026-09-09,Route A,51718,517180\n2026-09-09,Route B,38683,386830\n2026-09-09,Route C,21816,218160\n2026-09-09,Route D,9646,96460\n2026-09-09,Route E,6629,66290\n2026-09-09,Route F,3286,32860\n2026-09-10,Route A,51474,514740\n2026-09-10,Route B,37169,371690\n2026-09-10,Route C,21154,211540\n2026-09-10,Route D,9256,92560\n2026-09-10,Route E,6678,66780\n2026-09-10,Route F,3103,31030\n2026-09-11,Route A,49670,496700\n2026-09-11,Route B,37503,375030\n2026-09-11,Route C,20150,201500\n2026-09-11,Route D,9486,94860\n2026-09-11,Route E,6932,69320\n2026-09-11,Route F,3067,30670\n2026-09-12,Route A,41712,417120\n2026-09-12,Route B,33403,334030\n2026-09-12,Route C,17664,176640\n2026-09-12,Route D,7878,78780\n2026-09-12,Route E,5623,56230\n2026-09-12,Route F,2857,28570\n2026-09-13,Route A,43718,437180\n2026-09-13,Route B,33100,331000\n2026-09-13,Route C,18195,181950\n2026-09-13,Route D,7794,77940\n2026-09-13,Route E,5679,56790\n2026-09-13,Route F,2645,26450\n2026-09-14,Route A,53259,532590\n2026-09-14,Route B,35830,358300\n2026-09-14,Route C,20771,207710\n2026-09-14,Route D,9821,98210\n2026-09-14,Route E,6544,65440\n2026-09-14,Route F,3377,33770\n2026-09-15,Route A,51495,514950\n2026-09-15,Route B,36788,367880\n2026-09-15,Route C,21289,212890\n2026-09-15,Route D,9918,99180\n2026-09-15,Route E,6446,64460\n2026-09-15,Route F,3289,32890\n2026-09-16,Route A,54614,546140\n2026-09-16,Route B,39672,396720\n2026-09-16,Route C,20305,203050\n2026-09-16,Route D,9136,91360\n2026-09-16,Route E,7150,71500\n2026-09-16,Route F,3375,33750\n2026-09-17,Route A,50716,507160\n2026-09-17,Route B,36916,369160\n2026-09-17,Route C,20016,200160\n2026-09-17,Route D,9651,96510\n2026-09-17,Route E,6756,67560\n2026-09-17,Route F,3028,30280\n2026-09-18,Route A,50659,506590\n2026-09-18,Route B,35767,357670\n2026-09-18,Route C,20478,204780\n2026-09-18,Route D,9878,98780\n2026-09-18,Route E,6820,68200\n2026-09-18,Route F,3165,31650\n2026-09-19,Route A,44382,443820\n2026-09-19,Route B,33608,336080\n2026-09-19,Route C,18344,183440\n2026-09-19,Route D,7735,77350\n2026-09-19,Route E,5654,56540\n2026-09-19,Route F,2793,27930\n2026-09-20,Route A,44359,443590\n2026-09-20,Route B,30864,308640\n2026-09-20,Route C,18041,180410\n2026-09-20,Route D,8101,81010\n2026-09-20,Route E,5518,55180\n2026-09-20,Route F,2841,28410\n2026-09-21,Route A,54154,541540\n2026-09-21,Route B,39855,398550\n2026-09-21,Route C,19784,197840\n2026-09-21,Route D,9426,94260\n2026-09-21,Route E,7195,71950\n2026-09-21,Route F,3167,31670\n2026-09-22,Route A,53649,536490\n2026-09-22,Route B,37644,376440\n2026-09-22,Route C,21771,217710\n2026-09-22,Route D,9985,99850\n2026-09-22,Route E,6783,67830\n2026-09-22,Route F,3070,30700\n2026-09-23,Route A,51041,510410\n2026-09-23,Route B,39218,392180\n2026-09-23,Route C,21302,213020\n2026-09-23,Route D,9092,90920\n2026-09-23,Route E,7135,71350\n2026-09-23,Route F,3246,32460\n2026-09-24,Route A,54537,545370\n2026-09-24,Route B,38571,385710\n2026-09-24,Route C,21029,210290\n2026-09-24,Route D,9866,98660\n2026-09-24,Route E,6729,67290\n2026-09-24,Route F,3325,33250\n2026-09-25,Route A,55077,550770\n2026-09-25,Route B,38596,385960\n2026-09-25,Route C,20230,202300\n2026-09-25,Route D,9366,93660\n2026-09-25,Route E,6979,69790\n2026-09-25,Route F,3283,32830\n2026-09-26,Route A,43221,432210\n2026-09-26,Route B,31557,315570\n2026-09-26,Route C,17243,172430\n2026-09-26,Route D,7688,76880\n2026-09-26,Route E,5436,54360\n2026-09-26,Route F,2704,27040\n2026-09-27,Route A,42626,426260\n2026-09-27,Route B,31418,314180\n2026-09-27,Route C,17730,177300\n2026-09-27,Route D,8162,81620\n2026-09-27,Route E,5909,59090\n2026-09-27,Route F,2701,27010\n2026-09-28,Route B,38556,385560\n2026-09-28,Route C,21911,219110\n2026-09-28,Route D,10035,100350\n2026-09-28,Route E,6934,69340\n2026-09-28,Route F,3085,30850\n2026-09-29,Route A,53331,533310\n2026-09-29,Route B,40244,402440\n2026-09-29,Route C,19857,198570\n2026-09-29,Route D,9065,90650\n2026-09-29,Route E,7100,71000\n2026-09-29,Route F,3344,33440\n2026-09-30,Route A,50510,505100\n2026-09-30,Route B,37702,377020\n2026-09-30,Route C,21039,210390\n2026-09-30,Route D,9532,95320\n2026-09-30,Route E,6920,69200\n2026-09-30,Route F,3195,31950\n", "traffic_date,partner,minutes,amount\n01/09/2026,Route A,51703,517030\n01/09/2026,Route B,39291,392910\n01/09/2026,Route C,21292,212920\n01/09/2026,Route D,9302,93020\n01/09/2026,Route E,6420,64200\n01/09/2026,Route F,3127,31270\n02/09/2026,Route A,52827,528270\n02/09/2026,Route B,40022,400220\n02/09/2026,Route C,20159,201590\n02/09/2026,Route D,9942,99420\n02/09/2026,Route E,6551,65510\n02/09/2026,Route F,3288,32880\n03/09/2026,Route A,50582,505820\n03/09/2026,Route B,37898,378980\n03/09/2026,Route C,20957,209570\n03/09/2026,Route D,8944,89440\n03/09/2026,Route E,6564,65640\n03/09/2026,Route F,3236,32360\n04/09/2026,Route A,49401,494010\n04/09/2026,Route B,37256,372560\n04/09/2026,Route C,20415,204150\n04/09/2026,Route D,9920,99200\n04/09/2026,Route E,6701,67010\n04/09/2026,Route F,3075,30750\n05/09/2026,Route A,43740,437400\n05/09/2026,Route B,32161,321610\n05/09/2026,Route C,17162,171620\n05/09/2026,Route D,8124,81240\n05/09/2026,Route E,5545,55450\n05/09/2026,Route F,2681,26810\n06/09/2026,Route A,42786,427860\n06/09/2026,Route B,31514,315140\n06/09/2026,Route C,17158,171580\n06/09/2026,Route D,8081,80810\n06/09/2026,Route E,6086,60860\n06/09/2026,Route F,2706,27060\n07/09/2026,Route A,50997,509970\n07/09/2026,Route B,38966,389660\n07/09/2026,Route C,21229,212290\n07/09/2026,Route D,9070,90700\n07/09/2026,Route E,6675,66750\n07/09/2026,Route F,3231,32310\n08/09/2026,Route A,50380,503800\n08/09/2026,Route B,38244,382440\n08/09/2026,Route C,20091,200910\n08/09/2026,Route D,9447,94470\n08/09/2026,Route E,6977,69770\n08/09/2026,Route F,3323,33230\n09/09/2026,Route A,51726,517260\n09/09/2026,Route B,38682,386820\n09/09/2026,Route C,21253,212530\n09/09/2026,Route D,9632,96320\n09/09/2026,Route F,3294,32940\n10/09/2026,Route A,51582,515820\n10/09/2026,Route B,37262,372620\n10/09/2026,Route C,20403,204030\n10/09/2026,Route D,9237,92370\n10/09/2026,Route E,6690,66900\n10/09/2026,Route F,3108,31080\n11/09/2026,Route A,49604,496040\n11/09/2026,Route B,37452,374520\n11/09/2026,Route C,19524,195240\n11/09/2026,Route D,9488,94880\n11/09/2026,Route E,6924,69240\n11/09/2026,Route F,3067,30670\n12/09/2026,Route A,41818,418180\n12/09/2026,Route B,33483,334830\n12/09/2026,Route C,17072,170720\n12/09/2026,Route D,7889,78890\n12/09/2026,Route E,5610,56100\n12/09/2026,Route F,2859,28590\n13/09/2026,Route A,43810,438100\n13/09/2026,Route B,33185,331850\n13/09/2026,Route C,17530,175300\n13/09/2026,Route D,7778,77780\n13/09/2026,Route E,5688,56880\n13/09/2026,Route F,2647,26470\n14/09/2026,Route A,53213,532130\n14/09/2026,Route B,35826,358260\n14/09/2026,Route C,20011,200110\n14/09/2026,Route D,9820,98200\n14/09/2026,Route E,6541,65410\n14/09/2026,Route F,3380,33800\n15/09/2026,Route A,51659,516590\n15/09/2026,Route B,36762,367620\n15/09/2026,Route C,20517,205170\n15/09/2026,Route D,9946,99460\n15/09/2026,Route E,6450,64500\n15/09/2026,Route F,3289,32890\n16/09/2026,Route A,54763,547630\n16/09/2026,Route B,39836,398360\n16/09/2026,Route C,19687,196870\n16/09/2026,Route D,9139,91390\n16/09/2026,Route E,7147,71470\n16/09/2026,Route F,3372,33720\n17/09/2026,Route A,50463,504630\n17/09/2026,Route B,38393,383930\n17/09/2026,Route C,19341,193410\n17/09/2026,Route D,9658,96580\n17/09/2026,Route E,6747,67470\n17/09/2026,Route F,3028,30280\n18/09/2026,Route A,50736,507360\n18/09/2026,Route B,35982,359820\n18/09/2026,Route C,19499,194990\n18/09/2026,Route D,9878,98780\n18/09/2026,Route E,6826,68260\n18/09/2026,Route F,3167,31670\n19/09/2026,Route A,44467,444670\n19/09/2026,Route B,33637,336370\n19/09/2026,Route C,17758,177580\n19/09/2026,Route D,7740,77400\n19/09/2026,Route E,5660,56600\n19/09/2026,Route F,2801,28010\n20/09/2026,Route A,44362,443620\n20/09/2026,Route B,30870,308700\n20/09/2026,Route C,17301,173010\n20/09/2026,Route D,8100,81000\n20/09/2026,Route E,5503,55030\n20/09/2026,Route F,2832,28320\n21/09/2026,Route A,54077,540770\n21/09/2026,Route B,39976,399760\n21/09/2026,Route C,19049,190490\n21/09/2026,Route D,9420,94200\n21/09/2026,Route E,7210,72100\n21/09/2026,Route F,3178,31780\n22/09/2026,Route A,53756,537560\n22/09/2026,Route B,37534,375340\n22/09/2026,Route C,21067,210670\n22/09/2026,Route D,9997,99970\n22/09/2026,Route F,3064,30640\n23/09/2026,Route A,51013,510130\n23/09/2026,Route B,39284,392840\n23/09/2026,Route C,20767,207670\n23/09/2026,Route D,9120,91200\n23/09/2026,Route E,7136,71360\n23/09/2026,Route F,3250,32500\n24/09/2026,Route A,54595,545950\n24/09/2026,Route B,38509,385090\n24/09/2026,Route C,20236,202360\n24/09/2026,Route D,9856,98560\n24/09/2026,Route E,6728,67280\n24/09/2026,Route F,3323,33230\n25/09/2026,Route A,55238,552380\n25/09/2026,Route B,38384,383840\n25/09/2026,Route C,19504,195040\n25/09/2026,Route D,9340,93400\n25/09/2026,Route E,6963,69630\n25/09/2026,Route F,3287,32870\n26/09/2026,Route A,43058,430580\n26/09/2026,Route B,31550,315500\n26/09/2026,Route C,16626,166260\n26/09/2026,Route D,7680,76800\n26/09/2026,Route E,5434,54340\n26/09/2026,Route F,2708,27080\n27/09/2026,Route A,42760,427600\n27/09/2026,Route B,31353,313530\n27/09/2026,Route C,16959,169590\n27/09/2026,Route D,8158,81580\n27/09/2026,Route E,5887,58870\n27/09/2026,Route F,2694,26940\n28/09/2026,Route A,49799,497990\n28/09/2026,Route B,38470,384700\n28/09/2026,Route C,21240,212400\n28/09/2026,Route D,10058,100580\n28/09/2026,Route E,6915,69150\n28/09/2026,Route F,3086,30860\n29/09/2026,Route A,53340,533400\n29/09/2026,Route B,40288,402880\n29/09/2026,Route C,19274,192740\n29/09/2026,Route D,9058,90580\n29/09/2026,Route E,7107,71070\n29/09/2026,Route F,3341,33410\n30/09/2026,Route A,50430,504300\n30/09/2026,Route B,37821,378210\n30/09/2026,Route C,20376,203760\n30/09/2026,Route D,9524,95240\n30/09/2026,Route E,6917,69170\n30/09/2026,Route F,3199,31990\n"];
+var CFG={"slug": "settlement", "wa": "250788312423", "defaultFor": "your organisation", "files": 2, "fileLabels": ["Your records", "Their records"], "summaryTitle": "Dispute-ready summary", "waMsg": "Muraho Frutos. I tried the Settlement Checker for {name} and I'd like the full version.", "foot": "Read entirely in your browser \u00b7 nothing is uploaded \u00b7 personal numbers are masked on sight. 3-day trial with a code. \u00a9 2026 Frutos.", "plainTitle": "Settlement Checker", "preset": "", "api": ""}, SAMPLES=["date,route,minutes,amount\n2026-09-01,Route A,51734,517340\n2026-09-01,Route B,39354,393540\n2026-09-01,Route C,22224,222240\n2026-09-01,Route D,9334,93340\n2026-09-01,Route E,6410,64100\n2026-09-01,Route F,3124,31240\n2026-09-02,Route A,52896,528960\n2026-09-02,Route B,40059,400590\n2026-09-02,Route C,20944,209440\n2026-09-02,Route D,9951,99510\n2026-09-02,Route E,6560,65600\n2026-09-02,Route F,3290,32900\n2026-09-03,Route A,50684,506840\n2026-09-03,Route B,37776,377760\n2026-09-03,Route C,21585,215850\n2026-09-03,Route D,8948,89480\n2026-09-03,Route E,6559,65590\n2026-09-03,Route F,3248,32480\n2026-09-04,Route A,49389,493890\n2026-09-04,Route B,37210,372100\n2026-09-04,Route C,21076,210760\n2026-09-04,Route D,9916,99160\n2026-09-04,Route E,6703,67030\n2026-09-04,Route F,3076,30760\n2026-09-05,Route A,43527,435270\n2026-09-05,Route B,32171,321710\n2026-09-05,Route C,17662,176620\n2026-09-05,Route D,8131,81310\n2026-09-05,Route E,5566,55660\n2026-09-05,Route F,2679,26790\n2026-09-06,Route A,42740,427400\n2026-09-06,Route B,31522,315220\n2026-09-06,Route C,17796,177960\n2026-09-06,Route D,8109,81090\n2026-09-06,Route E,6071,60710\n2026-09-06,Route F,2707,27070\n2026-09-07,Route A,50923,509230\n2026-09-07,Route B,39052,390520\n2026-09-07,Route C,22015,220150\n2026-09-07,Route D,9097,90970\n2026-09-07,Route E,6683,66830\n2026-09-07,Route F,3241,32410\n2026-09-08,Route A,50396,503960\n2026-09-08,Route B,38271,382710\n2026-09-08,Route C,20759,207590\n2026-09-08,Route D,9427,94270\n2026-09-08,Route E,6968,69680\n2026-09-08,Route F,3322,33220\n2026-09-09,Route A,51718,517180\n2026-09-09,Route B,38683,386830\n2026-09-09,Route C,21816,218160\n2026-09-09,Route D,9646,96460\n2026-09-09,Route E,6629,66290\n2026-09-09,Route F,3286,32860\n2026-09-10,Route A,51474,514740\n2026-09-10,Route B,37169,371690\n2026-09-10,Route C,21154,211540\n2026-09-10,Route D,9256,92560\n2026-09-10,Route E,6678,66780\n2026-09-10,Route F,3103,31030\n2026-09-11,Route A,49670,496700\n2026-09-11,Route B,37503,375030\n2026-09-11,Route C,20150,201500\n2026-09-11,Route D,9486,94860\n2026-09-11,Route E,6932,69320\n2026-09-11,Route F,3067,30670\n2026-09-12,Route A,41712,417120\n2026-09-12,Route B,33403,334030\n2026-09-12,Route C,17664,176640\n2026-09-12,Route D,7878,78780\n2026-09-12,Route E,5623,56230\n2026-09-12,Route F,2857,28570\n2026-09-13,Route A,43718,437180\n2026-09-13,Route B,33100,331000\n2026-09-13,Route C,18195,181950\n2026-09-13,Route D,7794,77940\n2026-09-13,Route E,5679,56790\n2026-09-13,Route F,2645,26450\n2026-09-14,Route A,53259,532590\n2026-09-14,Route B,35830,358300\n2026-09-14,Route C,20771,207710\n2026-09-14,Route D,9821,98210\n2026-09-14,Route E,6544,65440\n2026-09-14,Route F,3377,33770\n2026-09-15,Route A,51495,514950\n2026-09-15,Route B,36788,367880\n2026-09-15,Route C,21289,212890\n2026-09-15,Route D,9918,99180\n2026-09-15,Route E,6446,64460\n2026-09-15,Route F,3289,32890\n2026-09-16,Route A,54614,546140\n2026-09-16,Route B,39672,396720\n2026-09-16,Route C,20305,203050\n2026-09-16,Route D,9136,91360\n2026-09-16,Route E,7150,71500\n2026-09-16,Route F,3375,33750\n2026-09-17,Route A,50716,507160\n2026-09-17,Route B,36916,369160\n2026-09-17,Route C,20016,200160\n2026-09-17,Route D,9651,96510\n2026-09-17,Route E,6756,67560\n2026-09-17,Route F,3028,30280\n2026-09-18,Route A,50659,506590\n2026-09-18,Route B,35767,357670\n2026-09-18,Route C,20478,204780\n2026-09-18,Route D,9878,98780\n2026-09-18,Route E,6820,68200\n2026-09-18,Route F,3165,31650\n2026-09-19,Route A,44382,443820\n2026-09-19,Route B,33608,336080\n2026-09-19,Route C,18344,183440\n2026-09-19,Route D,7735,77350\n2026-09-19,Route E,5654,56540\n2026-09-19,Route F,2793,27930\n2026-09-20,Route A,44359,443590\n2026-09-20,Route B,30864,308640\n2026-09-20,Route C,18041,180410\n2026-09-20,Route D,8101,81010\n2026-09-20,Route E,5518,55180\n2026-09-20,Route F,2841,28410\n2026-09-21,Route A,54154,541540\n2026-09-21,Route B,39855,398550\n2026-09-21,Route C,19784,197840\n2026-09-21,Route D,9426,94260\n2026-09-21,Route E,7195,71950\n2026-09-21,Route F,3167,31670\n2026-09-22,Route A,53649,536490\n2026-09-22,Route B,37644,376440\n2026-09-22,Route C,21771,217710\n2026-09-22,Route D,9985,99850\n2026-09-22,Route E,6783,67830\n2026-09-22,Route F,3070,30700\n2026-09-23,Route A,51041,510410\n2026-09-23,Route B,39218,392180\n2026-09-23,Route C,21302,213020\n2026-09-23,Route D,9092,90920\n2026-09-23,Route E,7135,71350\n2026-09-23,Route F,3246,32460\n2026-09-24,Route A,54537,545370\n2026-09-24,Route B,38571,385710\n2026-09-24,Route C,21029,210290\n2026-09-24,Route D,9866,98660\n2026-09-24,Route E,6729,67290\n2026-09-24,Route F,3325,33250\n2026-09-25,Route A,55077,550770\n2026-09-25,Route B,38596,385960\n2026-09-25,Route C,20230,202300\n2026-09-25,Route D,9366,93660\n2026-09-25,Route E,6979,69790\n2026-09-25,Route F,3283,32830\n2026-09-26,Route A,43221,432210\n2026-09-26,Route B,31557,315570\n2026-09-26,Route C,17243,172430\n2026-09-26,Route D,7688,76880\n2026-09-26,Route E,5436,54360\n2026-09-26,Route F,2704,27040\n2026-09-27,Route A,42626,426260\n2026-09-27,Route B,31418,314180\n2026-09-27,Route C,17730,177300\n2026-09-27,Route D,8162,81620\n2026-09-27,Route E,5909,59090\n2026-09-27,Route F,2701,27010\n2026-09-28,Route B,38556,385560\n2026-09-28,Route C,21911,219110\n2026-09-28,Route D,10035,100350\n2026-09-28,Route E,6934,69340\n2026-09-28,Route F,3085,30850\n2026-09-29,Route A,53331,533310\n2026-09-29,Route B,40244,402440\n2026-09-29,Route C,19857,198570\n2026-09-29,Route D,9065,90650\n2026-09-29,Route E,7100,71000\n2026-09-29,Route F,3344,33440\n2026-09-30,Route A,50510,505100\n2026-09-30,Route B,37702,377020\n2026-09-30,Route C,21039,210390\n2026-09-30,Route D,9532,95320\n2026-09-30,Route E,6920,69200\n2026-09-30,Route F,3195,31950\n", "traffic_date,partner,minutes,amount\n01/09/2026,Route A,51703,517030\n01/09/2026,Route B,39291,392910\n01/09/2026,Route C,21292,212920\n01/09/2026,Route D,9302,93020\n01/09/2026,Route E,6420,64200\n01/09/2026,Route F,3127,31270\n02/09/2026,Route A,52827,528270\n02/09/2026,Route B,40022,400220\n02/09/2026,Route C,20159,201590\n02/09/2026,Route D,9942,99420\n02/09/2026,Route E,6551,65510\n02/09/2026,Route F,3288,32880\n03/09/2026,Route A,50582,505820\n03/09/2026,Route B,37898,378980\n03/09/2026,Route C,20957,209570\n03/09/2026,Route D,8944,89440\n03/09/2026,Route E,6564,65640\n03/09/2026,Route F,3236,32360\n04/09/2026,Route A,49401,494010\n04/09/2026,Route B,37256,372560\n04/09/2026,Route C,20415,204150\n04/09/2026,Route D,9920,99200\n04/09/2026,Route E,6701,67010\n04/09/2026,Route F,3075,30750\n05/09/2026,Route A,43740,437400\n05/09/2026,Route B,32161,321610\n05/09/2026,Route C,17162,171620\n05/09/2026,Route D,8124,81240\n05/09/2026,Route E,5545,55450\n05/09/2026,Route F,2681,26810\n06/09/2026,Route A,42786,427860\n06/09/2026,Route B,31514,315140\n06/09/2026,Route C,17158,171580\n06/09/2026,Route D,8081,80810\n06/09/2026,Route E,6086,60860\n06/09/2026,Route F,2706,27060\n07/09/2026,Route A,50997,509970\n07/09/2026,Route B,38966,389660\n07/09/2026,Route C,21229,212290\n07/09/2026,Route D,9070,90700\n07/09/2026,Route E,6675,66750\n07/09/2026,Route F,3231,32310\n08/09/2026,Route A,50380,503800\n08/09/2026,Route B,38244,382440\n08/09/2026,Route C,20091,200910\n08/09/2026,Route D,9447,94470\n08/09/2026,Route E,6977,69770\n08/09/2026,Route F,3323,33230\n09/09/2026,Route A,51726,517260\n09/09/2026,Route B,38682,386820\n09/09/2026,Route C,21253,212530\n09/09/2026,Route D,9632,96320\n09/09/2026,Route F,3294,32940\n10/09/2026,Route A,51582,515820\n10/09/2026,Route B,37262,372620\n10/09/2026,Route C,20403,204030\n10/09/2026,Route D,9237,92370\n10/09/2026,Route E,6690,66900\n10/09/2026,Route F,3108,31080\n11/09/2026,Route A,49604,496040\n11/09/2026,Route B,37452,374520\n11/09/2026,Route C,19524,195240\n11/09/2026,Route D,9488,94880\n11/09/2026,Route E,6924,69240\n11/09/2026,Route F,3067,30670\n12/09/2026,Route A,41818,418180\n12/09/2026,Route B,33483,334830\n12/09/2026,Route C,17072,170720\n12/09/2026,Route D,7889,78890\n12/09/2026,Route E,5610,56100\n12/09/2026,Route F,2859,28590\n13/09/2026,Route A,43810,438100\n13/09/2026,Route B,33185,331850\n13/09/2026,Route C,17530,175300\n13/09/2026,Route D,7778,77780\n13/09/2026,Route E,5688,56880\n13/09/2026,Route F,2647,26470\n14/09/2026,Route A,53213,532130\n14/09/2026,Route B,35826,358260\n14/09/2026,Route C,20011,200110\n14/09/2026,Route D,9820,98200\n14/09/2026,Route E,6541,65410\n14/09/2026,Route F,3380,33800\n15/09/2026,Route A,51659,516590\n15/09/2026,Route B,36762,367620\n15/09/2026,Route C,20517,205170\n15/09/2026,Route D,9946,99460\n15/09/2026,Route E,6450,64500\n15/09/2026,Route F,3289,32890\n16/09/2026,Route A,54763,547630\n16/09/2026,Route B,39836,398360\n16/09/2026,Route C,19687,196870\n16/09/2026,Route D,9139,91390\n16/09/2026,Route E,7147,71470\n16/09/2026,Route F,3372,33720\n17/09/2026,Route A,50463,504630\n17/09/2026,Route B,38393,383930\n17/09/2026,Route C,19341,193410\n17/09/2026,Route D,9658,96580\n17/09/2026,Route E,6747,67470\n17/09/2026,Route F,3028,30280\n18/09/2026,Route A,50736,507360\n18/09/2026,Route B,35982,359820\n18/09/2026,Route C,19499,194990\n18/09/2026,Route D,9878,98780\n18/09/2026,Route E,6826,68260\n18/09/2026,Route F,3167,31670\n19/09/2026,Route A,44467,444670\n19/09/2026,Route B,33637,336370\n19/09/2026,Route C,17758,177580\n19/09/2026,Route D,7740,77400\n19/09/2026,Route E,5660,56600\n19/09/2026,Route F,2801,28010\n20/09/2026,Route A,44362,443620\n20/09/2026,Route B,30870,308700\n20/09/2026,Route C,17301,173010\n20/09/2026,Route D,8100,81000\n20/09/2026,Route E,5503,55030\n20/09/2026,Route F,2832,28320\n21/09/2026,Route A,54077,540770\n21/09/2026,Route B,39976,399760\n21/09/2026,Route C,19049,190490\n21/09/2026,Route D,9420,94200\n21/09/2026,Route E,7210,72100\n21/09/2026,Route F,3178,31780\n22/09/2026,Route A,53756,537560\n22/09/2026,Route B,37534,375340\n22/09/2026,Route C,21067,210670\n22/09/2026,Route D,9997,99970\n22/09/2026,Route F,3064,30640\n23/09/2026,Route A,51013,510130\n23/09/2026,Route B,39284,392840\n23/09/2026,Route C,20767,207670\n23/09/2026,Route D,9120,91200\n23/09/2026,Route E,7136,71360\n23/09/2026,Route F,3250,32500\n24/09/2026,Route A,54595,545950\n24/09/2026,Route B,38509,385090\n24/09/2026,Route C,20236,202360\n24/09/2026,Route D,9856,98560\n24/09/2026,Route E,6728,67280\n24/09/2026,Route F,3323,33230\n25/09/2026,Route A,55238,552380\n25/09/2026,Route B,38384,383840\n25/09/2026,Route C,19504,195040\n25/09/2026,Route D,9340,93400\n25/09/2026,Route E,6963,69630\n25/09/2026,Route F,3287,32870\n26/09/2026,Route A,43058,430580\n26/09/2026,Route B,31550,315500\n26/09/2026,Route C,16626,166260\n26/09/2026,Route D,7680,76800\n26/09/2026,Route E,5434,54340\n26/09/2026,Route F,2708,27080\n27/09/2026,Route A,42760,427600\n27/09/2026,Route B,31353,313530\n27/09/2026,Route C,16959,169590\n27/09/2026,Route D,8158,81580\n27/09/2026,Route E,5887,58870\n27/09/2026,Route F,2694,26940\n28/09/2026,Route A,49799,497990\n28/09/2026,Route B,38470,384700\n28/09/2026,Route C,21240,212400\n28/09/2026,Route D,10058,100580\n28/09/2026,Route E,6915,69150\n28/09/2026,Route F,3086,30860\n29/09/2026,Route A,53340,533400\n29/09/2026,Route B,40288,402880\n29/09/2026,Route C,19274,192740\n29/09/2026,Route D,9058,90580\n29/09/2026,Route E,7107,71070\n29/09/2026,Route F,3341,33410\n30/09/2026,Route A,50430,504300\n30/09/2026,Route B,37821,378210\n30/09/2026,Route C,20376,203760\n30/09/2026,Route D,9524,95240\n30/09/2026,Route E,6917,69170\n30/09/2026,Route F,3199,31990\n"];
 var $=function(id){return document.getElementById(id);};
 var inst=$("inst"), errEl=$("err"), isSample=false, lastParsed=null, texts=[null,null];
 var U={};
@@ -366,13 +403,137 @@ $("theme").addEventListener("click",function(){
   document.documentElement.setAttribute("data-theme",nx);
   try{ localStorage.setItem(CFG.slug+"_theme",nx); }catch(e){}
 });
-var mem=null, KEY=CFG.slug+"_runs_v1";
-function getRuns(){ try{ var v=parseInt(localStorage.getItem(KEY)||"0",10); return isNaN(v)?0:v; }catch(e){ return mem===null?0:mem; } }
-function setRuns(v){ mem=v; try{ localStorage.setItem(KEY,String(v)); }catch(e){} }
-function paintRuns(){ var u=getRuns(), h="Trial runs used&nbsp;&nbsp;";
-  for(var i=0;i<CFG.maxRuns;i++) h+='<span class="pip'+(i<u?' used':'')+'"></span>';
-  $("runs").innerHTML=h+'&nbsp;&nbsp;'+Math.max(0,CFG.maxRuns-u)+' of '+CFG.maxRuns+' left'; }
-paintRuns();
+
+var G=(function(H){
+  var PUB={"kty": "EC", "crv": "P-256", "x": "dd_RAcn7vNcw2otkFdNpoI6U3_RyeEOu6SawgbThnho", "y": "zjKzBb8ADm1xZQ2tioXLYUyj-bstyz4fIcvI6VBocrA"}, KID="fk1-AqEPEA", LS="fk_codes", TITLE=CFG.plainTitle, mem=null, kp=null, pending=null, timer=null;
+  var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var esc=function(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+  var st={state:"locked", exp:0, org:"", code:""};
+  var hasCrypto=!!(window.crypto&&window.crypto.subtle&&window.TextEncoder&&window.TextDecoder&&window.Promise);
+  var MSG={bad:"That code isn't valid. Check it was copied in full, or ask Frutos for a new one.",
+    scope:"That code is for another tool. Ask Frutos for a code for the "+TITLE+".",
+    expired:"That code's trial has ended. Ask Frutos for a new one.",
+    early:"That code isn't active yet. Check the date and time on this device.",
+    nocrypto:"This browser cannot check trial codes; open the link in Chrome, Safari or Firefox.",
+    revoked:"That code has been withdrawn. Ask Frutos for a new one."};
+  function now(){ return Date.now()/1000; }
+  function b2u(s){ s=String(s).replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; var bin=atob(s), a=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a; }
+  function pick(raw){ var m=String(raw||"").match(/FK1\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{40,}/); return m?m[0]:null; }
+  function key(){ if(!kp) kp=crypto.subtle.importKey("jwk",PUB,{name:"ECDSA",namedCurve:"P-256"},false,["verify"]); return kp; }
+  function all(){ try{ var v=JSON.parse(localStorage.getItem(LS)||"null"); if(v&&v.c) v=[v]; return (v&&v.length)?v:(mem||[]); }catch(e){ return mem||[]; } }
+  function find(code){ var a=all(); for(var i=0;i<a.length;i++) if(a[i]&&a[i].c===code) return a[i]; return null; }
+  function put(list){ mem=list; try{ localStorage.setItem(LS,JSON.stringify(list)); }catch(e){} }
+  function save(o){ var a=all().filter(function(x){ return x&&x.c!==o.c; }); a.unshift(o); put(a.slice(0,6)); }
+  function forget(code){ put(all().filter(function(x){ return x&&x.c!==code; })); }
+  function check(code, first){
+    if(!hasCrypto) return Promise.resolve({ok:false, why:"nocrypto"});
+    var parts=String(code).split("."), p;
+    try{ p=JSON.parse(new TextDecoder().decode(b2u(parts[1]))); }catch(e){ return Promise.resolve({ok:false, why:"bad"}); }
+    return key().then(function(k){
+      return crypto.subtle.verify({name:"ECDSA",hash:{name:"SHA-256"}},k,b2u(parts[2]),new TextEncoder().encode(parts[0]+"."+parts[1]));
+    }).then(function(good){
+      if(!good||!p||p.v!==1||p.k!==KID) return {ok:false, why:"bad"};
+      var sc=p.s||[]; if(sc.indexOf("*")<0&&sc.indexOf(CFG.slug)<0) return {ok:false, why:"scope", p:p};
+      var t=now(), exp, f=first||null;
+      if(t<(p.i||0)-600) return {ok:false, why:"early", p:p};
+      if(typeof p.e==="number") exp=p.e;
+      else if(typeof p.d==="number"&&typeof p.h==="number"){ if(!f) f=Math.floor(t); exp=Math.min(f+p.d*86400,p.h); }
+      else return {ok:false, why:"bad"};
+      if(t>=exp) return {ok:false, why:"expired", p:p, exp:exp, first:f};
+      return {ok:true, p:p, exp:exp, first:f};
+    }, function(){ return {ok:false, why:"bad"}; });
+  }
+  function left(sec){ var d=Math.floor(sec/86400), h=Math.floor(sec%86400/3600), m=Math.floor(sec%3600/60);
+    if(d>0) return d+(d===1?" day ":" days ")+h+" h left"; if(h>0) return h+" h "+m+" min left"; return Math.max(1,m)+" min left"; }
+  function when(ts){ var d=new Date(ts*1000); return d.getDate()+" "+MON[d.getMonth()]+", "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2); }
+  function orgName(){ var v=inst.value.trim(); return (v&&v!==CFG.defaultFor)?v:"my organisation"; }
+  function paint(){
+    var el=$("runs"), h;
+    if(!hasCrypto) h='<span class="gdot end"></span><span>'+esc(MSG.nocrypto)+'</span>';
+    else if(st.state==="ok") h='<span class="gdot ok"></span><span>Trial unlocked for <b>'+esc(st.org||"you")+'</b> · '+left(st.exp-now())+'</span><button type="button" class="glink" id="gopen">Change code</button>';
+    else if(st.state==="expired") h='<span class="gdot end"></span><span>Your 3-day trial ended on '+when(st.exp)+'</span><button type="button" class="glink" id="gopen">Enter a new code</button>';
+    else h='<span class="gdot"></span><span>Sample: free · Your own file: trial code needed</span><button type="button" class="glink" id="gopen">Enter a code</button>';
+    el.innerHTML=h; var b=$("gopen"); if(b) b.addEventListener("click",function(){ open(""); });
+  }
+  function msgEl(m){ var e=$("uerr"); if(m){ e.textContent=m; e.hidden=false; } else e.hidden=true; }
+  function open(m){
+    var u=$("unlock"); u.hidden=false; msgEl(m);
+    $("uwa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent("Muraho Frutos. Please send a 3-day trial code for the "+TITLE+" for "+orgName()+".");
+    u.scrollIntoView({behavior:"smooth",block:"center"}); setTimeout(function(){ try{ $("ucode").focus({preventScroll:true}); }catch(e){ $("ucode").focus(); } },60);
+  }
+  function close(){ $("unlock").hidden=true; }
+  function closing(scroll){ H.closing(scroll); }
+  function sha(s){ return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){ var a=new Uint8Array(b), o="";
+    for(var i=0;i<a.length;i++) o+=("0"+a[i].toString(16)).slice(-2); return o; }); }
+  function api(ev){
+    if(!CFG.api||!st.code||!window.fetch) return;
+    try{ sha(st.code).then(function(hx){
+        return fetch(CFG.api.replace(/\/+$/,"")+"/v1/event",{method:"POST",keepalive:true,headers:{"content-type":"application/json"},
+          body:JSON.stringify({kid:KID,codeHash:hx,slug:CFG.slug,event:ev,ts:Math.floor(now())})});
+      }).then(function(r){ return (r&&r.ok)?r.json():null; }).then(function(j){
+        if(j&&j.revoked){ forget(st.code); st={state:"locked",exp:0,org:"",code:""}; paint(); open(MSG.revoked); }
+      })["catch"](function(){});
+    }catch(e){}
+  }
+  function tick(){ if(timer) clearInterval(timer); timer=setInterval(function(){
+    if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); closing(false); } else paint(); },60000); }
+  function activate(code, quiet){
+    var prev=find(code), first=prev?prev.f:null;
+    return check(code, first).then(function(r){
+      if(!r.ok){
+        if(r.why==="expired"){ st={state:"expired", exp:r.exp, org:(r.p&&r.p.o)||"", code:""}; paint(); }
+        if(!quiet) msgEl(MSG[r.why]||MSG.bad);
+        return r;
+      }
+      var fresh=!prev;
+      save({c:code, f:r.first||null});
+      st={state:"ok", exp:r.exp, org:r.p.o||"", code:code};
+      var cur=inst.value.trim();
+      if(r.p.o&&(cur===""||cur===CFG.defaultFor)){ inst.value=r.p.o; $("gate-inst").textContent=H.name(); }
+      paint(); close(); $("gate").hidden=true; tick();
+      if(fresh) api("activate");
+      if(pending!==null){ var a=pending; pending=null; H.run(a); }
+      return r;
+    });
+  }
+  function init(){
+    paint();
+    if(!hasCrypto) return;
+    var qs=null, qc=null; try{ qs=new URLSearchParams(location.search); qc=qs.get("code"); }catch(e){}
+    if(qc!==null&&qs){ try{ qs["delete"]("code"); var rest=qs.toString(); history.replaceState(null,"",location.pathname+(rest?"?"+rest:"")+location.hash); }catch(e){} }
+    var list=[], fromLink=pick(qc);
+    if(qc!==null&&!fromLink){ open(MSG.bad); }
+    [fromLink].concat(all().map(function(x){ return x&&x.c; }), [CFG.preset||null]).forEach(function(c){ if(c&&list.indexOf(c)<0) list.push(c); });
+    var i=0, last=null;
+    (function next(){
+      if(i>=list.length){
+        if(last&&last.why==="expired"&&st.state==="expired") closing(false);
+        if(fromLink&&last&&!last.ok) open(MSG[last.why]||MSG.bad);
+        return; }
+      var c=list[i++];
+      activate(c, true).then(function(r){ last=r; if(!r.ok) next(); });
+    })();
+  }
+  $("uform").addEventListener("submit",function(e){ e.preventDefault(); var c=pick($("ucode").value);
+    if(!hasCrypto){ msgEl(MSG.nocrypto); return; } if(!c){ msgEl(MSG.bad); return; } activate(c,false); });
+  $("ucode").addEventListener("keydown",function(e){ if(e.key==="Escape"||e.keyCode===27) close(); });
+  $("uclose").addEventListener("click",close);
+  return {
+    ok:function(){ if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); } return st.state==="ok"; },
+    ask:function(arr){ pending=arr;
+      if(st.state==="expired"){ open("Your 3-day trial ended on "+when(st.exp)+". Enter a new code, or ask Frutos for one."); closing(false); }
+      else open(""); },
+    ran:function(){ api("run"); },
+    init:init
+  };
+})({
+  name:function(){ return name(); },
+  run:function(a){ isSample=false; go(a); },
+  closing:function(scroll){ var v=name(); $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+    $("gate-inst").textContent=v; $("gate").hidden=false; if(scroll) $("gate").scrollIntoView({behavior:"smooth",block:"center"}); }
+});
+
 function name(){ return inst.value.trim()||CFG.defaultFor; }
 try{ var qf=new URLSearchParams(location.search).get("for"); if(qf){ inst.value=qf.slice(0,60); } }catch(e){}
 $("gate-inst").textContent=name();
@@ -397,13 +558,12 @@ $("sample").addEventListener("click",function(){ isSample=true; go(SAMPLES); });
 
 function go(arr){
   errEl.hidden=true;
-  var u=getRuns(); if(u>=CFG.maxRuns){ gate(); return; }
+  if(!isSample&&!G.ok()){ G.ask(arr); return; }
   var ps=[], R;
   try{ arr.forEach(function(t,ix){ var p=U.parseCSV(t); if(!p||!p.rows.length) throw (CFG.files===2?(CFG.fileLabels[ix]+": "):"")+"I couldn't find any rows in that file."; ps.push(p); });
        R=TOOL.analyse(ps, inputs(), U); }
   catch(e){ showErr(typeof e==="string"?e:"That file couldn't be read."); return; }
-  setRuns(u+1); paintRuns(); lastParsed=ps; draw(R);
-  if(getRuns()>=CFG.maxRuns) setTimeout(gate,400);
+  lastParsed=ps; draw(R); if(!isSample) G.ran();
 }
 document.querySelectorAll("[data-in]").forEach(function(el){ el.addEventListener("change",function(){
   if(!lastParsed) return; try{ draw(TOOL.analyse(lastParsed, inputs(), U)); }catch(e){} }); });
@@ -413,10 +573,11 @@ function draw(R){
   var H='<div class="verdict"><p class="vh">What the data shows'+(isSample?' · illustrative sample, not your data':'')+'</p><p>'+out.verdict+'</p></div>';
   if(out.tiles&&out.tiles.length) H+='<div class="tiles">'+out.tiles.join("")+'</div>';
   (out.sections||[]).forEach(function(s){ H+='<div class="card"><h3>'+U.esc(s.title)+'</h3>'+(s.cap?'<p class="cap">'+U.esc(s.cap)+'</p>':'')+s.html+'</div>'; });
-  H+='<div class="summary"><div class="summary-h"><h3>'+U.esc(CFG.summaryTitle)+'</h3><button class="copy" id="copy" type="button">Copy</button></div><pre id="smtext">'+U.esc(out.summary)+'</pre></div>';
+  H+='<div class="summary"><div class="summary-h"><h3>'+U.esc(CFG.summaryTitle)+'</h3><span class="acts"><button class="copy pdf" id="pdf" type="button">Save PDF</button><button class="copy" id="copy" type="button">Copy</button></span></div><pre id="smtext">'+U.esc(out.summary)+'</pre></div>';
   var rep=$("report"); rep.innerHTML=H; rep.hidden=false;
   var cp=$("copy"); cp.addEventListener("click",function(){ var t=$("smtext").textContent;
     if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ cp.textContent="Copied"; cp.classList.add("done"); }); } });
+  $("pdf").addEventListener("click",function(){ window.print(); });
   rep.scrollIntoView({behavior:"smooth",block:"start"});
 }
 function gate(){
@@ -425,7 +586,8 @@ function gate(){
   $("gate-inst").textContent=v; $("gate").hidden=false;
   $("gate").scrollIntoView({behavior:"smooth",block:"center"});
 }
-$("foot").textContent=CFG.foot.replace("{n}",CFG.maxRuns);
+$("foot").textContent=CFG.foot;
+G.init();
 })();
 </script>
 </body>

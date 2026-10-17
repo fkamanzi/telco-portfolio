@@ -172,6 +172,32 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
 .why a{color:var(--dim); white-space:nowrap}
 .chip{display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; padding:2px 7px; border:1px solid var(--line); border-radius:999px; color:var(--dim); white-space:nowrap}
 @media (max-width:560px){ .drops.two{grid-template-columns:1fr} .brow{grid-template-columns:minmax(60px,30%) 1fr auto} }
+
+.runs{display:block; line-height:1.65}
+.runs b{color:var(--ink); font-weight:700}
+.gdot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--warn); margin-right:8px; vertical-align:0}
+.gdot.ok{background:var(--good)} .gdot.end{background:var(--bad)}
+.glink{border:0; background:none; color:var(--accent); font:inherit; font-family:var(--mono); font-size:12px; text-decoration:underline; text-underline-offset:2px; cursor:pointer; padding:0 2px; margin-left:8px; white-space:nowrap}
+.unlock{position:relative; margin-top:14px; border:1.5px solid var(--accent); background:var(--panel); padding:16px 16px 14px; text-align:left}
+.unlock h3{margin:0 30px 4px 0; font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; line-height:1.2}
+.unlock p{margin:0; font-size:14px; color:var(--dim); line-height:1.5}
+.unlock label{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin:12px 0 5px}
+.urow{display:flex; gap:8px; flex-wrap:wrap}
+.urow input{flex:1 1 220px; min-width:0; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font-family:var(--mono); font-size:13px; padding:10px; border-radius:9px}
+.urow input:focus{outline:0; border-color:var(--accent)}
+.urow .btn{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+.unlock .uerr{margin-top:9px; color:var(--bad); font-family:var(--mono); font-size:12.5px}
+.unlock .uask{margin-top:12px; font-size:13.5px}
+.unlock .uask a{color:var(--accent); font-weight:700}
+.uclose{position:absolute; top:6px; right:6px; border:0; background:none; color:var(--dim); font-size:24px; line-height:1; cursor:pointer; padding:4px 9px}
+.gate .btn{color:var(--bg)}
+.summary-h .acts{display:flex; gap:8px}
+@media print{
+  :root,:root[data-theme]{--bg:#fff; --panel:#fff; --panel2:#f4f4f4; --ink:#111; --dim:#555; --line:#ccc; color-scheme:light}
+  body{background:#fff!important}
+  .intake,.gate,.unlock,#theme,.copy,.pdf,.foot{display:none!important}
+  .card,.tiles,.verdict,.summary{break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -197,12 +223,23 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
       <p class="hint">Expected columns (any order, matched loosely): <b>feeder</b>, <b>start</b>, <b>end</b>, <b>customers_affected</b>, <b>customers_served</b> (per feeder), optional <b>cause</b>. Indices follow IEEE 1366: interruptions longer than the momentary limit count in SAIFI and SAIDI, shorter ones in MAIFI. Without customer columns, each feeder or site counts as one customer.</p>
       <div class="assume"><label>Customers served, if not in the file<input data-in="served" type="number" step="any" value=""></label><label>Momentary if up to, minutes<input data-in="mom" type="number" step="any" value="5"></label></div>
       <div class="runs" id="runs" aria-live="polite"></div>
+      <div class="unlock" id="unlock" hidden>
+        <button class="uclose" id="uclose" type="button" aria-label="Close">×</button>
+        <h3>Your own file needs a 3-day trial code</h3>
+        <p>The illustrative sample is free. To read your own export, enter the code Frutos sent you. Your file still never leaves this page.</p>
+        <form id="uform" autocomplete="off">
+          <label for="ucode">Trial code</label>
+          <div class="urow"><input id="ucode" name="code" spellcheck="false" autocapitalize="off" placeholder="FK1… or the full link"><button class="btn" type="submit">Unlock</button></div>
+        </form>
+        <p class="uerr" id="uerr" role="alert" hidden></p>
+        <p class="uask">No code yet? <a id="uwa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a> · or call +250 731 000 163</p>
+      </div>
       <p class="err" id="err" hidden></p>
     </div>
   </section>
   <section id="report" class="report" hidden aria-live="polite"></section>
   <section id="gate" class="gate" hidden>
-    <h2>That's your three trial runs</h2>
+    <h2>Your 3-day trial has ended</h2>
     <p>The full version computes the indices every month for every feeder, separates major event days, and shows where reinforcement buys the most minutes back. Let's set it up for <b id="gate-inst">your network</b>.</p>
     <a class="btn" id="gate-wa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a>
     <p class="hint" style="margin-top:12px">Or call +250 731 000 163</p>
@@ -277,7 +314,7 @@ var TOOL={
 <script>
 (function(){
 "use strict";
-var CFG={"slug": "power-reliability", "maxRuns": 3, "wa": "250788312423", "defaultFor": "your network", "files": 1, "fileLabels": [], "summaryTitle": "Regulator-ready summary", "waMsg": "Muraho Frutos. I tried the Power Reliability Index for {name} and I'd like the full version.", "foot": "Read entirely in your browser \u00b7 nothing is uploaded \u00b7 personal numbers are masked on sight. A trial limited to {n} runs. \u00a9 2026 Frutos."}, SAMPLES=["feeder,start,end,customers_affected,customers_served,cause\nF-06,2026-09-01 09:22:00,2026-09-01 14:24:39,4133,5400,Planned works\nF-07,2026-09-01 16:39:00,2026-09-01 16:49:21,5699,9600,Fault\nF-01,2026-09-01 19:30:00,2026-09-01 19:33:45,4200,4200,Fault\nF-07,2026-09-01 20:33:00,2026-09-01 20:36:29,9600,9600,Storm or vegetation\nF-14,2026-09-02 06:08:00,2026-09-02 06:12:49,8200,8200,Fault\nF-09,2026-09-02 18:35:00,2026-09-02 19:38:54,5337,7300,Overload\nF-05,2026-09-02 21:07:00,2026-09-03 01:42:53,9639,12000,Unknown\nF-08,2026-09-02 22:28:00,2026-09-02 22:32:59,2800,2800,Fault\nF-14,2026-09-03 20:35:00,2026-09-03 20:54:29,5038,8200,Overload\nF-07,2026-09-04 00:05:00,2026-09-04 00:38:31,7520,9600,Fault\nF-13,2026-09-04 13:35:00,2026-09-04 13:59:15,3487,3900,Fault\nF-05,2026-09-05 04:42:00,2026-09-05 04:44:34,12000,12000,Fault\nF-11,2026-09-05 09:01:00,2026-09-05 09:42:59,2086,4900,Storm or vegetation\nF-11,2026-09-05 09:40:00,2026-09-05 19:57:38,4309,4900,Fault\nF-07,2026-09-05 18:48:00,2026-09-05 19:31:29,4682,9600,Overload\nF-11,2026-09-06 02:47:00,2026-09-06 02:49:56,4900,4900,Fault\nF-03,2026-09-07 17:55:00,2026-09-07 18:47:29,1841,8800,Fault\nF-02,2026-09-07 19:05:00,2026-09-07 21:00:45,5338,6100,Storm or vegetation\nF-14,2026-09-07 21:55:00,2026-09-07 22:10:44,5048,8200,Fault\nF-11,2026-09-08 01:43:00,2026-09-08 01:50:59,3113,4900,Unknown\nF-09,2026-09-08 11:22:00,2026-09-08 17:09:00,2258,7300,Planned works\nF-05,2026-09-08 21:43:00,2026-09-08 22:13:19,2789,12000,Overload\nF-03,2026-09-09 11:34:00,2026-09-09 14:34:15,4397,8800,Planned works\nF-11,2026-09-09 19:58:00,2026-09-09 19:58:39,4900,4900,Storm or vegetation\nF-02,2026-09-10 19:17:00,2026-09-10 20:22:14,4051,6100,Fault\nF-07,2026-09-10 20:54:00,2026-09-10 21:08:03,3497,9600,Overload\nF-05,2026-09-10 22:10:00,2026-09-10 22:42:15,9036,12000,Storm or vegetation\nF-09,2026-09-11 10:03:00,2026-09-11 10:15:09,6907,7300,Fault\nF-02,2026-09-11 11:15:00,2026-09-11 16:09:51,5785,6100,Planned works\nF-11,2026-09-13 05:43:00,2026-09-13 06:18:00,1972,4900,Storm or vegetation\nF-05,2026-09-13 10:17:00,2026-09-13 14:23:26,6087,12000,Planned works\nF-11,2026-09-13 10:18:00,2026-09-13 12:46:34,3367,4900,Fault\nF-11,2026-09-13 12:42:00,2026-09-13 13:22:00,3530,4900,Unknown\nF-14,2026-09-13 20:44:00,2026-09-13 21:10:57,2708,8200,Overload\nF-07,2026-09-13 23:58:00,2026-09-14 01:48:36,2637,9600,Fault\nF-07,2026-09-14 09:16:00,2026-09-14 09:20:46,9600,9600,Fault\nF-11,2026-09-14 10:24:00,2026-09-14 13:30:04,1787,4900,Planned works\nF-07,2026-09-14 16:00:00,2026-09-14 22:54:35,8198,9600,Storm or vegetation\nF-11,2026-09-14 16:10:00,2026-09-14 20:29:05,3996,4900,Storm or vegetation\nF-02,2026-09-14 16:37:00,2026-09-14 21:09:55,3937,6100,Storm or vegetation\nF-11,2026-09-16 04:34:00,2026-09-16 04:36:47,4900,4900,Fault\nF-09,2026-09-16 05:10:00,2026-09-16 06:29:16,5404,7300,Fault\nF-11,2026-09-16 09:23:00,2026-09-16 14:06:31,2857,4900,Planned works\nF-14,2026-09-16 13:12:00,2026-09-16 13:59:15,1739,8200,Unknown\nF-07,2026-09-16 18:23:00,2026-09-16 20:11:46,6994,9600,Overload\nF-06,2026-09-16 21:01:00,2026-09-16 21:11:47,4454,5400,Storm or vegetation\nF-09,2026-09-17 03:19:00,2026-09-17 07:45:53,4550,7300,Unknown\nF-07,2026-09-17 05:49:00,2026-09-17 06:54:20,9099,9600,Storm or vegetation\nF-07,2026-09-17 08:18:00,2026-09-17 13:36:20,4440,9600,Planned works\nF-14,2026-09-17 15:40:00,2026-09-17 15:42:30,8200,8200,Unknown\nF-03,2026-09-17 15:55:00,2026-09-17 17:10:42,4343,8800,Fault\nF-11,2026-09-19 01:19:00,2026-09-19 02:15:08,1048,4900,Storm or vegetation\nF-07,2026-09-20 02:43:00,2026-09-20 02:44:49,9600,9600,Fault\nF-09,2026-09-20 03:08:00,2026-09-20 03:12:28,7300,7300,Fault\nF-11,2026-09-21 19:35:00,2026-09-21 21:32:28,1143,4900,Overload\nF-07,2026-09-22 13:00:00,2026-09-22 15:13:11,6205,9600,Storm or vegetation\nF-10,2026-09-23 01:40:00,2026-09-23 02:55:26,7870,10500,Fault\nF-09,2026-09-23 16:00:00,2026-09-23 20:37:02,5965,7300,Storm or vegetation\nF-07,2026-09-23 16:37:00,2026-09-23 21:11:16,9496,9600,Storm or vegetation\nF-13,2026-09-23 16:49:00,2026-09-23 21:03:01,2767,3900,Storm or vegetation\nF-07,2026-09-25 07:58:00,2026-09-25 09:18:07,5278,9600,Fault\nF-01,2026-09-25 21:48:00,2026-09-25 21:48:52,4200,4200,Fault\nF-01,2026-09-26 14:22:00,2026-09-26 14:26:29,4200,4200,Fault\nF-05,2026-09-26 21:17:00,2026-09-26 21:51:22,5322,12000,Overload\nF-04,2026-09-27 19:57:00,2026-09-27 19:59:57,3500,3500,Fault\nF-07,2026-09-27 20:15:00,2026-09-27 20:57:18,2957,9600,Storm or vegetation\nF-07,2026-09-28 13:09:00,2026-09-28 19:13:45,7374,9600,Fault\nF-08,2026-09-29 10:13:00,2026-09-29 15:01:10,1860,2800,Planned works\nF-09,2026-09-29 11:44:00,2026-09-29 15:46:50,3309,7300,Planned works\nF-07,2026-09-30 06:06:00,2026-09-30 09:32:23,5801,9600,Fault\nF-03,2026-09-30 23:52:00,2026-09-30 23:58:00,6948,8800,Fault\n"];
+var CFG={"slug": "power-reliability", "wa": "250788312423", "defaultFor": "your network", "files": 1, "fileLabels": [], "summaryTitle": "Regulator-ready summary", "waMsg": "Muraho Frutos. I tried the Power Reliability Index for {name} and I'd like the full version.", "foot": "Read entirely in your browser \u00b7 nothing is uploaded \u00b7 personal numbers are masked on sight. 3-day trial with a code. \u00a9 2026 Frutos.", "plainTitle": "Power Reliability Index", "preset": "", "api": ""}, SAMPLES=["feeder,start,end,customers_affected,customers_served,cause\nF-06,2026-09-01 09:22:00,2026-09-01 14:24:39,4133,5400,Planned works\nF-07,2026-09-01 16:39:00,2026-09-01 16:49:21,5699,9600,Fault\nF-01,2026-09-01 19:30:00,2026-09-01 19:33:45,4200,4200,Fault\nF-07,2026-09-01 20:33:00,2026-09-01 20:36:29,9600,9600,Storm or vegetation\nF-14,2026-09-02 06:08:00,2026-09-02 06:12:49,8200,8200,Fault\nF-09,2026-09-02 18:35:00,2026-09-02 19:38:54,5337,7300,Overload\nF-05,2026-09-02 21:07:00,2026-09-03 01:42:53,9639,12000,Unknown\nF-08,2026-09-02 22:28:00,2026-09-02 22:32:59,2800,2800,Fault\nF-14,2026-09-03 20:35:00,2026-09-03 20:54:29,5038,8200,Overload\nF-07,2026-09-04 00:05:00,2026-09-04 00:38:31,7520,9600,Fault\nF-13,2026-09-04 13:35:00,2026-09-04 13:59:15,3487,3900,Fault\nF-05,2026-09-05 04:42:00,2026-09-05 04:44:34,12000,12000,Fault\nF-11,2026-09-05 09:01:00,2026-09-05 09:42:59,2086,4900,Storm or vegetation\nF-11,2026-09-05 09:40:00,2026-09-05 19:57:38,4309,4900,Fault\nF-07,2026-09-05 18:48:00,2026-09-05 19:31:29,4682,9600,Overload\nF-11,2026-09-06 02:47:00,2026-09-06 02:49:56,4900,4900,Fault\nF-03,2026-09-07 17:55:00,2026-09-07 18:47:29,1841,8800,Fault\nF-02,2026-09-07 19:05:00,2026-09-07 21:00:45,5338,6100,Storm or vegetation\nF-14,2026-09-07 21:55:00,2026-09-07 22:10:44,5048,8200,Fault\nF-11,2026-09-08 01:43:00,2026-09-08 01:50:59,3113,4900,Unknown\nF-09,2026-09-08 11:22:00,2026-09-08 17:09:00,2258,7300,Planned works\nF-05,2026-09-08 21:43:00,2026-09-08 22:13:19,2789,12000,Overload\nF-03,2026-09-09 11:34:00,2026-09-09 14:34:15,4397,8800,Planned works\nF-11,2026-09-09 19:58:00,2026-09-09 19:58:39,4900,4900,Storm or vegetation\nF-02,2026-09-10 19:17:00,2026-09-10 20:22:14,4051,6100,Fault\nF-07,2026-09-10 20:54:00,2026-09-10 21:08:03,3497,9600,Overload\nF-05,2026-09-10 22:10:00,2026-09-10 22:42:15,9036,12000,Storm or vegetation\nF-09,2026-09-11 10:03:00,2026-09-11 10:15:09,6907,7300,Fault\nF-02,2026-09-11 11:15:00,2026-09-11 16:09:51,5785,6100,Planned works\nF-11,2026-09-13 05:43:00,2026-09-13 06:18:00,1972,4900,Storm or vegetation\nF-05,2026-09-13 10:17:00,2026-09-13 14:23:26,6087,12000,Planned works\nF-11,2026-09-13 10:18:00,2026-09-13 12:46:34,3367,4900,Fault\nF-11,2026-09-13 12:42:00,2026-09-13 13:22:00,3530,4900,Unknown\nF-14,2026-09-13 20:44:00,2026-09-13 21:10:57,2708,8200,Overload\nF-07,2026-09-13 23:58:00,2026-09-14 01:48:36,2637,9600,Fault\nF-07,2026-09-14 09:16:00,2026-09-14 09:20:46,9600,9600,Fault\nF-11,2026-09-14 10:24:00,2026-09-14 13:30:04,1787,4900,Planned works\nF-07,2026-09-14 16:00:00,2026-09-14 22:54:35,8198,9600,Storm or vegetation\nF-11,2026-09-14 16:10:00,2026-09-14 20:29:05,3996,4900,Storm or vegetation\nF-02,2026-09-14 16:37:00,2026-09-14 21:09:55,3937,6100,Storm or vegetation\nF-11,2026-09-16 04:34:00,2026-09-16 04:36:47,4900,4900,Fault\nF-09,2026-09-16 05:10:00,2026-09-16 06:29:16,5404,7300,Fault\nF-11,2026-09-16 09:23:00,2026-09-16 14:06:31,2857,4900,Planned works\nF-14,2026-09-16 13:12:00,2026-09-16 13:59:15,1739,8200,Unknown\nF-07,2026-09-16 18:23:00,2026-09-16 20:11:46,6994,9600,Overload\nF-06,2026-09-16 21:01:00,2026-09-16 21:11:47,4454,5400,Storm or vegetation\nF-09,2026-09-17 03:19:00,2026-09-17 07:45:53,4550,7300,Unknown\nF-07,2026-09-17 05:49:00,2026-09-17 06:54:20,9099,9600,Storm or vegetation\nF-07,2026-09-17 08:18:00,2026-09-17 13:36:20,4440,9600,Planned works\nF-14,2026-09-17 15:40:00,2026-09-17 15:42:30,8200,8200,Unknown\nF-03,2026-09-17 15:55:00,2026-09-17 17:10:42,4343,8800,Fault\nF-11,2026-09-19 01:19:00,2026-09-19 02:15:08,1048,4900,Storm or vegetation\nF-07,2026-09-20 02:43:00,2026-09-20 02:44:49,9600,9600,Fault\nF-09,2026-09-20 03:08:00,2026-09-20 03:12:28,7300,7300,Fault\nF-11,2026-09-21 19:35:00,2026-09-21 21:32:28,1143,4900,Overload\nF-07,2026-09-22 13:00:00,2026-09-22 15:13:11,6205,9600,Storm or vegetation\nF-10,2026-09-23 01:40:00,2026-09-23 02:55:26,7870,10500,Fault\nF-09,2026-09-23 16:00:00,2026-09-23 20:37:02,5965,7300,Storm or vegetation\nF-07,2026-09-23 16:37:00,2026-09-23 21:11:16,9496,9600,Storm or vegetation\nF-13,2026-09-23 16:49:00,2026-09-23 21:03:01,2767,3900,Storm or vegetation\nF-07,2026-09-25 07:58:00,2026-09-25 09:18:07,5278,9600,Fault\nF-01,2026-09-25 21:48:00,2026-09-25 21:48:52,4200,4200,Fault\nF-01,2026-09-26 14:22:00,2026-09-26 14:26:29,4200,4200,Fault\nF-05,2026-09-26 21:17:00,2026-09-26 21:51:22,5322,12000,Overload\nF-04,2026-09-27 19:57:00,2026-09-27 19:59:57,3500,3500,Fault\nF-07,2026-09-27 20:15:00,2026-09-27 20:57:18,2957,9600,Storm or vegetation\nF-07,2026-09-28 13:09:00,2026-09-28 19:13:45,7374,9600,Fault\nF-08,2026-09-29 10:13:00,2026-09-29 15:01:10,1860,2800,Planned works\nF-09,2026-09-29 11:44:00,2026-09-29 15:46:50,3309,7300,Planned works\nF-07,2026-09-30 06:06:00,2026-09-30 09:32:23,5801,9600,Fault\nF-03,2026-09-30 23:52:00,2026-09-30 23:58:00,6948,8800,Fault\n"];
 var $=function(id){return document.getElementById(id);};
 var inst=$("inst"), errEl=$("err"), isSample=false, lastParsed=null, texts=[null,null];
 var U={};
@@ -364,13 +401,137 @@ $("theme").addEventListener("click",function(){
   document.documentElement.setAttribute("data-theme",nx);
   try{ localStorage.setItem(CFG.slug+"_theme",nx); }catch(e){}
 });
-var mem=null, KEY=CFG.slug+"_runs_v1";
-function getRuns(){ try{ var v=parseInt(localStorage.getItem(KEY)||"0",10); return isNaN(v)?0:v; }catch(e){ return mem===null?0:mem; } }
-function setRuns(v){ mem=v; try{ localStorage.setItem(KEY,String(v)); }catch(e){} }
-function paintRuns(){ var u=getRuns(), h="Trial runs used&nbsp;&nbsp;";
-  for(var i=0;i<CFG.maxRuns;i++) h+='<span class="pip'+(i<u?' used':'')+'"></span>';
-  $("runs").innerHTML=h+'&nbsp;&nbsp;'+Math.max(0,CFG.maxRuns-u)+' of '+CFG.maxRuns+' left'; }
-paintRuns();
+
+var G=(function(H){
+  var PUB={"kty": "EC", "crv": "P-256", "x": "dd_RAcn7vNcw2otkFdNpoI6U3_RyeEOu6SawgbThnho", "y": "zjKzBb8ADm1xZQ2tioXLYUyj-bstyz4fIcvI6VBocrA"}, KID="fk1-AqEPEA", LS="fk_codes", TITLE=CFG.plainTitle, mem=null, kp=null, pending=null, timer=null;
+  var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var esc=function(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+  var st={state:"locked", exp:0, org:"", code:""};
+  var hasCrypto=!!(window.crypto&&window.crypto.subtle&&window.TextEncoder&&window.TextDecoder&&window.Promise);
+  var MSG={bad:"That code isn't valid. Check it was copied in full, or ask Frutos for a new one.",
+    scope:"That code is for another tool. Ask Frutos for a code for the "+TITLE+".",
+    expired:"That code's trial has ended. Ask Frutos for a new one.",
+    early:"That code isn't active yet. Check the date and time on this device.",
+    nocrypto:"This browser cannot check trial codes; open the link in Chrome, Safari or Firefox.",
+    revoked:"That code has been withdrawn. Ask Frutos for a new one."};
+  function now(){ return Date.now()/1000; }
+  function b2u(s){ s=String(s).replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; var bin=atob(s), a=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a; }
+  function pick(raw){ var m=String(raw||"").match(/FK1\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{40,}/); return m?m[0]:null; }
+  function key(){ if(!kp) kp=crypto.subtle.importKey("jwk",PUB,{name:"ECDSA",namedCurve:"P-256"},false,["verify"]); return kp; }
+  function all(){ try{ var v=JSON.parse(localStorage.getItem(LS)||"null"); if(v&&v.c) v=[v]; return (v&&v.length)?v:(mem||[]); }catch(e){ return mem||[]; } }
+  function find(code){ var a=all(); for(var i=0;i<a.length;i++) if(a[i]&&a[i].c===code) return a[i]; return null; }
+  function put(list){ mem=list; try{ localStorage.setItem(LS,JSON.stringify(list)); }catch(e){} }
+  function save(o){ var a=all().filter(function(x){ return x&&x.c!==o.c; }); a.unshift(o); put(a.slice(0,6)); }
+  function forget(code){ put(all().filter(function(x){ return x&&x.c!==code; })); }
+  function check(code, first){
+    if(!hasCrypto) return Promise.resolve({ok:false, why:"nocrypto"});
+    var parts=String(code).split("."), p;
+    try{ p=JSON.parse(new TextDecoder().decode(b2u(parts[1]))); }catch(e){ return Promise.resolve({ok:false, why:"bad"}); }
+    return key().then(function(k){
+      return crypto.subtle.verify({name:"ECDSA",hash:{name:"SHA-256"}},k,b2u(parts[2]),new TextEncoder().encode(parts[0]+"."+parts[1]));
+    }).then(function(good){
+      if(!good||!p||p.v!==1||p.k!==KID) return {ok:false, why:"bad"};
+      var sc=p.s||[]; if(sc.indexOf("*")<0&&sc.indexOf(CFG.slug)<0) return {ok:false, why:"scope", p:p};
+      var t=now(), exp, f=first||null;
+      if(t<(p.i||0)-600) return {ok:false, why:"early", p:p};
+      if(typeof p.e==="number") exp=p.e;
+      else if(typeof p.d==="number"&&typeof p.h==="number"){ if(!f) f=Math.floor(t); exp=Math.min(f+p.d*86400,p.h); }
+      else return {ok:false, why:"bad"};
+      if(t>=exp) return {ok:false, why:"expired", p:p, exp:exp, first:f};
+      return {ok:true, p:p, exp:exp, first:f};
+    }, function(){ return {ok:false, why:"bad"}; });
+  }
+  function left(sec){ var d=Math.floor(sec/86400), h=Math.floor(sec%86400/3600), m=Math.floor(sec%3600/60);
+    if(d>0) return d+(d===1?" day ":" days ")+h+" h left"; if(h>0) return h+" h "+m+" min left"; return Math.max(1,m)+" min left"; }
+  function when(ts){ var d=new Date(ts*1000); return d.getDate()+" "+MON[d.getMonth()]+", "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2); }
+  function orgName(){ var v=inst.value.trim(); return (v&&v!==CFG.defaultFor)?v:"my organisation"; }
+  function paint(){
+    var el=$("runs"), h;
+    if(!hasCrypto) h='<span class="gdot end"></span><span>'+esc(MSG.nocrypto)+'</span>';
+    else if(st.state==="ok") h='<span class="gdot ok"></span><span>Trial unlocked for <b>'+esc(st.org||"you")+'</b> · '+left(st.exp-now())+'</span><button type="button" class="glink" id="gopen">Change code</button>';
+    else if(st.state==="expired") h='<span class="gdot end"></span><span>Your 3-day trial ended on '+when(st.exp)+'</span><button type="button" class="glink" id="gopen">Enter a new code</button>';
+    else h='<span class="gdot"></span><span>Sample: free · Your own file: trial code needed</span><button type="button" class="glink" id="gopen">Enter a code</button>';
+    el.innerHTML=h; var b=$("gopen"); if(b) b.addEventListener("click",function(){ open(""); });
+  }
+  function msgEl(m){ var e=$("uerr"); if(m){ e.textContent=m; e.hidden=false; } else e.hidden=true; }
+  function open(m){
+    var u=$("unlock"); u.hidden=false; msgEl(m);
+    $("uwa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent("Muraho Frutos. Please send a 3-day trial code for the "+TITLE+" for "+orgName()+".");
+    u.scrollIntoView({behavior:"smooth",block:"center"}); setTimeout(function(){ try{ $("ucode").focus({preventScroll:true}); }catch(e){ $("ucode").focus(); } },60);
+  }
+  function close(){ $("unlock").hidden=true; }
+  function closing(scroll){ H.closing(scroll); }
+  function sha(s){ return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){ var a=new Uint8Array(b), o="";
+    for(var i=0;i<a.length;i++) o+=("0"+a[i].toString(16)).slice(-2); return o; }); }
+  function api(ev){
+    if(!CFG.api||!st.code||!window.fetch) return;
+    try{ sha(st.code).then(function(hx){
+        return fetch(CFG.api.replace(/\/+$/,"")+"/v1/event",{method:"POST",keepalive:true,headers:{"content-type":"application/json"},
+          body:JSON.stringify({kid:KID,codeHash:hx,slug:CFG.slug,event:ev,ts:Math.floor(now())})});
+      }).then(function(r){ return (r&&r.ok)?r.json():null; }).then(function(j){
+        if(j&&j.revoked){ forget(st.code); st={state:"locked",exp:0,org:"",code:""}; paint(); open(MSG.revoked); }
+      })["catch"](function(){});
+    }catch(e){}
+  }
+  function tick(){ if(timer) clearInterval(timer); timer=setInterval(function(){
+    if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); closing(false); } else paint(); },60000); }
+  function activate(code, quiet){
+    var prev=find(code), first=prev?prev.f:null;
+    return check(code, first).then(function(r){
+      if(!r.ok){
+        if(r.why==="expired"){ st={state:"expired", exp:r.exp, org:(r.p&&r.p.o)||"", code:""}; paint(); }
+        if(!quiet) msgEl(MSG[r.why]||MSG.bad);
+        return r;
+      }
+      var fresh=!prev;
+      save({c:code, f:r.first||null});
+      st={state:"ok", exp:r.exp, org:r.p.o||"", code:code};
+      var cur=inst.value.trim();
+      if(r.p.o&&(cur===""||cur===CFG.defaultFor)){ inst.value=r.p.o; $("gate-inst").textContent=H.name(); }
+      paint(); close(); $("gate").hidden=true; tick();
+      if(fresh) api("activate");
+      if(pending!==null){ var a=pending; pending=null; H.run(a); }
+      return r;
+    });
+  }
+  function init(){
+    paint();
+    if(!hasCrypto) return;
+    var qs=null, qc=null; try{ qs=new URLSearchParams(location.search); qc=qs.get("code"); }catch(e){}
+    if(qc!==null&&qs){ try{ qs["delete"]("code"); var rest=qs.toString(); history.replaceState(null,"",location.pathname+(rest?"?"+rest:"")+location.hash); }catch(e){} }
+    var list=[], fromLink=pick(qc);
+    if(qc!==null&&!fromLink){ open(MSG.bad); }
+    [fromLink].concat(all().map(function(x){ return x&&x.c; }), [CFG.preset||null]).forEach(function(c){ if(c&&list.indexOf(c)<0) list.push(c); });
+    var i=0, last=null;
+    (function next(){
+      if(i>=list.length){
+        if(last&&last.why==="expired"&&st.state==="expired") closing(false);
+        if(fromLink&&last&&!last.ok) open(MSG[last.why]||MSG.bad);
+        return; }
+      var c=list[i++];
+      activate(c, true).then(function(r){ last=r; if(!r.ok) next(); });
+    })();
+  }
+  $("uform").addEventListener("submit",function(e){ e.preventDefault(); var c=pick($("ucode").value);
+    if(!hasCrypto){ msgEl(MSG.nocrypto); return; } if(!c){ msgEl(MSG.bad); return; } activate(c,false); });
+  $("ucode").addEventListener("keydown",function(e){ if(e.key==="Escape"||e.keyCode===27) close(); });
+  $("uclose").addEventListener("click",close);
+  return {
+    ok:function(){ if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); } return st.state==="ok"; },
+    ask:function(arr){ pending=arr;
+      if(st.state==="expired"){ open("Your 3-day trial ended on "+when(st.exp)+". Enter a new code, or ask Frutos for one."); closing(false); }
+      else open(""); },
+    ran:function(){ api("run"); },
+    init:init
+  };
+})({
+  name:function(){ return name(); },
+  run:function(a){ isSample=false; go(a); },
+  closing:function(scroll){ var v=name(); $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+    $("gate-inst").textContent=v; $("gate").hidden=false; if(scroll) $("gate").scrollIntoView({behavior:"smooth",block:"center"}); }
+});
+
 function name(){ return inst.value.trim()||CFG.defaultFor; }
 try{ var qf=new URLSearchParams(location.search).get("for"); if(qf){ inst.value=qf.slice(0,60); } }catch(e){}
 $("gate-inst").textContent=name();
@@ -395,13 +556,12 @@ $("sample").addEventListener("click",function(){ isSample=true; go(SAMPLES); });
 
 function go(arr){
   errEl.hidden=true;
-  var u=getRuns(); if(u>=CFG.maxRuns){ gate(); return; }
+  if(!isSample&&!G.ok()){ G.ask(arr); return; }
   var ps=[], R;
   try{ arr.forEach(function(t,ix){ var p=U.parseCSV(t); if(!p||!p.rows.length) throw (CFG.files===2?(CFG.fileLabels[ix]+": "):"")+"I couldn't find any rows in that file."; ps.push(p); });
        R=TOOL.analyse(ps, inputs(), U); }
   catch(e){ showErr(typeof e==="string"?e:"That file couldn't be read."); return; }
-  setRuns(u+1); paintRuns(); lastParsed=ps; draw(R);
-  if(getRuns()>=CFG.maxRuns) setTimeout(gate,400);
+  lastParsed=ps; draw(R); if(!isSample) G.ran();
 }
 document.querySelectorAll("[data-in]").forEach(function(el){ el.addEventListener("change",function(){
   if(!lastParsed) return; try{ draw(TOOL.analyse(lastParsed, inputs(), U)); }catch(e){} }); });
@@ -411,10 +571,11 @@ function draw(R){
   var H='<div class="verdict"><p class="vh">What the data shows'+(isSample?' · illustrative sample, not your data':'')+'</p><p>'+out.verdict+'</p></div>';
   if(out.tiles&&out.tiles.length) H+='<div class="tiles">'+out.tiles.join("")+'</div>';
   (out.sections||[]).forEach(function(s){ H+='<div class="card"><h3>'+U.esc(s.title)+'</h3>'+(s.cap?'<p class="cap">'+U.esc(s.cap)+'</p>':'')+s.html+'</div>'; });
-  H+='<div class="summary"><div class="summary-h"><h3>'+U.esc(CFG.summaryTitle)+'</h3><button class="copy" id="copy" type="button">Copy</button></div><pre id="smtext">'+U.esc(out.summary)+'</pre></div>';
+  H+='<div class="summary"><div class="summary-h"><h3>'+U.esc(CFG.summaryTitle)+'</h3><span class="acts"><button class="copy pdf" id="pdf" type="button">Save PDF</button><button class="copy" id="copy" type="button">Copy</button></span></div><pre id="smtext">'+U.esc(out.summary)+'</pre></div>';
   var rep=$("report"); rep.innerHTML=H; rep.hidden=false;
   var cp=$("copy"); cp.addEventListener("click",function(){ var t=$("smtext").textContent;
     if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ cp.textContent="Copied"; cp.classList.add("done"); }); } });
+  $("pdf").addEventListener("click",function(){ window.print(); });
   rep.scrollIntoView({behavior:"smooth",block:"start"});
 }
 function gate(){
@@ -423,7 +584,8 @@ function gate(){
   $("gate-inst").textContent=v; $("gate").hidden=false;
   $("gate").scrollIntoView({behavior:"smooth",block:"center"});
 }
-$("foot").textContent=CFG.foot.replace("{n}",CFG.maxRuns);
+$("foot").textContent=CFG.foot;
+G.init();
 })();
 </script>
 </body>
