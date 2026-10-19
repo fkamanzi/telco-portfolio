@@ -232,10 +232,14 @@ var RE = {
   sentA:    new RegExp("([\\d,]+) RWF transferred to (.+?) \\((\\d+)\\) from \\S+ at "+DT, "i"),
   sentB:    new RegExp("You have transferred ([\\d,]+) RWF to (.+?) \\((\\d+)\\) from your mobile money account.*? at "+DT, "i"),
   debit:    new RegExp("A transaction of ([\\d,]+) RWF by (.+?) on your MOMO account was successfully completed at "+DT, "i"),
-  payment:  new RegExp("Your payment of ([\\d,]+) RWF to (.+?) has been completed at "+DT, "i")
+  payment:  new RegExp("Your payment of ([\\d,]+) RWF to (.+?) has been completed at "+DT, "i"),
+  enOut:    /\b([A-Za-z][A-Za-z ]{1,30}?) of RWF ?([\d,]+) to (.+?) (?:is|was|has been) successful/i,
+  rwOut:    /\b(Kwishyura|Kohereza|Kubikuza|Kugura) RWF ?([\d,]+) kuri (.+?) byagenze neza/i
 };
+var GENERIC = /ekash|p2m|collection/i;
+var LEARN = "https://wa.me/250788312423?text=" + encodeURIComponent("Hi Frutos, Where Did My MoMo Go did not read this MoMo message (names removed):\n\n");
 /* where one message ends and the next begins, when several are pasted together */
-var START = /(?=You have received \d|TxId:\s*\d|\*\d{3}\*(?:S|R|TxId)|You have transferred \d|Your payment of \d|You [^\n]{1,80}? have via agent|Yello!\s*Umaze|A reversal has been initiated|<#>|\d+\) \d{4}-\d{2}-\d{2} )/;
+var START = /(?=You have received \d|TxId:\s*\d|\*\d{3}\*(?:S|R|TxId|TID|TXN)|You have transferred \d|Your payment of \d|You [^\n]{1,80}? have via agent|Yello!\s*Umaze|A reversal has been initiated|<#>|\d+\) \d{4}-\d{2}-\d{2} )/;
 var FRAG = /^(?:\*\d{3}\*)?(?:TxId:?\s*\d*[\s.*]*(?:[SR]\*)?)?$/i;
 
 function num(s){ return parseInt(String(s).replace(/,/g,""),10)||0; }
@@ -245,8 +249,17 @@ function toDate(s, fb){
   return fb ? new Date(fb) : null;
 }
 function mask(s){ var d=String(s||"").replace(/\D/g,""); return d.length>=3 ? "•••"+d.slice(-3) : ""; }
-function feeOf(b){ var m=b.match(/Fee (?:was|paid):?\s*([\d,]+)\s*RWF/i); return m?num(m[1]):0; }
-function txid(b){ var m=b.match(/(?:TxId:\s*|Financial Transaction Id:\s*)(\d{6,})/i); return m?m[1]:null; }
+function feeOf(b){ var m=b.match(/\bfee(?:\s+was|\s+paid)?\s*:?\s*(?:RWF\s*)?([\d,]+)/i); return m?num(m[1]):0; }
+function txid(b){
+  var m = b.match(/(?:TxId:\s*|Financial Transaction Id:\s*)(\d{6,})/i) || b.match(/\b(?:TID|TXN ID|Transaction ID)\s*:?\s*\(?\s*([A-Z0-9][A-Z0-9.\-]{4,}[A-Z0-9])/i);
+  return m ? m[1].toUpperCase() : null;
+}
+/* new-style transaction ids carry the time: MP261019.1904... = 2026-10-19 19:04 */
+function idDate(id){
+  var m = id && id.match(/^[A-Z]{2}(\d{2})(\d{2})(\d{2})\.(\d{2})(\d{2})/);
+  if(!m || +m[2] < 1 || +m[2] > 12 || +m[3] < 1 || +m[3] > 31 || +m[4] > 23 || +m[5] > 59) return null;
+  return new Date(2000 + +m[1], +m[2]-1, +m[3], +m[4], +m[5], 0);
+}
 function clean(s){ return String(s||"").replace(/\s+/g," ").trim(); }
 
 function payCat(name, hasPhone, hasCode){
@@ -269,8 +282,20 @@ function parse(body, fb){
   if(/Umaze kugura/i.test(b)) return {skip:"Bundle confirmations (the payment is already counted)"};
   if(/reversal has been initiated/i.test(b)) return {skip:"Reversal notices (counted when the money comes back)"};
   if(/transaction with amount [\d,]+ RWF .*?failed|has failed at/i.test(b)) return {skip:"Failed payments (no money moved)"};
-  var id = txid(b), fee = feeOf(b);
-  function T(dir, cat, amount, f, party, tag, dt){ return {dir:dir, cat:cat, amount:num(amount), fee:f, party:clean(party), tag:tag, date:toDate(dt, fb), id:id}; }
+  var id = txid(b), fee = feeOf(b), idd = idDate(id);
+  function T(dir, cat, amount, f, party, tag, dt){ return {dir:dir, cat:cat, amount:num(amount), fee:f, party:clean(party), tag:tag, date:toDate(dt, null) || idd || (fb ? new Date(fb) : null), id:id}; }
+  function newOut(verb, amount, party){
+    var p = clean(party), prov = "", code = null, phone = null, mm;
+    if((mm = p.match(/^(.*?)\s+in\s+([A-Za-z][\w&.]*)$/))){ p = mm[1]; prov = mm[2]; }
+    if((mm = p.match(/^(.*?)\s+Kode\s+(\d+)$/i))){ p = mm[1]; code = mm[2]; }
+    if((mm = p.match(/\(?\b((?:250)?7\d{8}|07\d{8})\b\)?/))){ phone = mm[1]; p = clean(p.replace(mm[0], "")); }
+    if(!code && (mm = p.match(/^(.*?)\s+(\d{4,})$/))){ p = mm[1]; code = mm[2]; }
+    var v = verb.toLowerCase(), cat = /withdraw|cash ?out|kubikuza/.test(v) ? "cash" : payCat(p, !!phone, !!code);
+    if((cat === "pay" || cat === "bills") && /transfer|send|kohereza/.test(v)) cat = "people";
+    var tag = phone ? mask(phone) : (code ? "code " + code : "");
+    if(prov) tag = tag ? tag + " · " + prov : prov;
+    return T("out", cat, amount, fee, p || "Payment", tag, null);
+  }
   if((m = b.match(RE.received))) return T("in", "received", m[1], 0, m[2], mask(m[3]), m[4]);
   if((m = b.match(RE.deposit)))  return T("in", "deposit", m[1], 0, "Bank or cash deposit", "", m[2]);
   if((m = b.match(RE.reversal))) return T("in", "reversal", m[3], 0, m[1], mask(m[2]), m[4]);
@@ -284,6 +309,8 @@ function parse(body, fb){
     var cm = name.match(/^(.*?)\s+(\d{3,})$/); if(cm){ name = cm[1]; code = cm[2]; }
     return T("out", payCat(name, !!phone, !!code), m[1], fee, name || "Payment", phone ? mask(phone[1]) : (code ? "code " + code : ""), m[3]);
   }
+  if((m = b.match(RE.enOut)) && !/receiv|deposit|refund|revers/i.test(m[1])) return newOut(m[1], m[2], m[3]);
+  if((m = b.match(RE.rwOut))) return newOut(m[1], m[2], m[3]);
   return {skip:"Messages this page does not read yet"};
 }
 
@@ -299,10 +326,10 @@ function readAll(items){
     }
     if(!r.date || isNaN(r.date) || !r.amount){ skipped["Messages without a date or amount"] = (skipped["Messages without a date or amount"]||0) + 1; return; }
     var k = r.id ? "id" + r.id : "b" + clean(it.body);
-    if(seen[k]){ dup++; return; }
-    seen[k] = 1; tx.push(r);
+    if(seen[k]){ dup++; var o = seen[k]; if(GENERIC.test(o.party) && !GENERIC.test(r.party)){ o.party = r.party; o.tag = r.tag; o.cat = r.cat; } return; }
+    seen[k] = r; tx.push(r);
   });
-  if(dup) skipped["Repeated messages (counted once)"] = dup;
+  if(dup) skipped["Copies of the same transaction, e.g. English and Kinyarwanda (counted once)"] = dup;
   tx.sort(function(a,b){ return a.date - b.date; });
   return {tx:tx, skipped:skipped, examples:examples};
 }
@@ -459,7 +486,7 @@ function render(){
   el("skipped").hidden = !sn;
   el("skipped-s").textContent = plural(sn, "message", "messages") + " not counted. Tap to see why.";
   el("skipped-l").innerHTML = Object.keys(sk).map(function(k){
-    var ex = (k.indexOf("does not read") > -1 && DATA.examples.length) ? DATA.examples.map(function(x){ return "<q>" + esc(x) + "…</q>"; }).join("") : "";
+    var ex = (k.indexOf("does not read") > -1 && DATA.examples.length) ? DATA.examples.map(function(x){ return "<q>" + esc(x) + "…</q>"; }).join("") + '<a href="' + LEARN + '" target="_blank" rel="noopener">Send one to Frutos on WhatsApp so the page learns it (delete names first)</a>' : "";
     return "<li>" + esc(k) + ": " + sk[k] + ex + "</li>"; }).join("");
   drawCard(S, when.replace(/^In /, ""), cats);
   if(FONTS) FONTS.then(function(){ drawCard(S, when.replace(/^In /, ""), cats); });
@@ -501,10 +528,15 @@ function drawCard(S, when, cats){
 }
 
 /* ---------------- flow */
-function status(msg, isErr){ var s = el("status"); s.textContent = msg || ""; s.hidden = !msg; s.className = "status" + (isErr ? " err" : ""); }
+function status(msg, isErr, html){ var s = el("status"); if(html) s.innerHTML = msg; else s.textContent = msg || ""; s.hidden = !msg; s.className = "status" + (isErr ? " err" : ""); }
 function show(items, sample){
   var R = readAll(items);
-  if(!R.tx.length){ status(sample ? "" : "No MoMo payments or transfers found. Paste messages from the M-Money chat, or open the SMS backup file (with Messages included).", true); return; }
+  if(!R.tx.length){
+    if(sample) return;
+    if(R.examples.length) status('This MoMo message type is new to the page. <a href="' + LEARN + '" target="_blank" rel="noopener">Send it to Frutos on WhatsApp</a> (delete names first) and it will be added.', true, true);
+    else status("No MoMo payments or transfers found. Paste messages from the M-Money chat, or open the SMS backup file (with Messages included).", true);
+    return;
+  }
   status("");
   DATA = R; IS_SAMPLE = !!sample; el("sample-flag").hidden = !IS_SAMPLE;
   var months = {}; R.tx.forEach(function(t){ months[mkey(t.date)] = 1; });
