@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>RwandAir · Nine checks</title>
+<meta name="description" content="Nine checks prepared for RwandAir from its 2026 openings: payments, bookings, help desk, revenue files, vehicles and station links.">
+<meta property="og:title" content="Nine checks for the teams RwandAir is hiring">
+<meta property="og:description" content="Payments, bookings, help desk, revenue files, vehicles and station links. Your data stays in your browser.">
+<meta property="og:image" content="https://fkamanzi.github.io/telco-portfolio/rwandair/card.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Same instrument look as the checks themselves: grid paper, ink rules, one green accent; four group colours. */
+:root{
+  --bg:#0E1512; --panel:#14201B; --panel2:#0B130F; --ink:#E8F0EA; --dim:#8BA596; --line:#27372F;
+  --grid:rgba(126,214,168,.08); --accent:#39D98A; --on-accent:#06130C;
+  --g1:#39D98A; --g2:#F2B134; --g3:#6CB8FF; --g4:#FF8A65;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace; color-scheme:dark;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){
+  --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#55695D; --line:#D3E0D7;
+  --grid:rgba(20,80,50,.06); --accent:#15935A; --on-accent:#FFFFFF;
+  --g1:#15935A; --g2:#A86A00; --g3:#1F6FC0; --g4:#C2410C; color-scheme:light } }
+:root[data-theme="light"]{
+  --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#55695D; --line:#D3E0D7;
+  --grid:rgba(20,80,50,.06); --accent:#15935A; --on-accent:#FFFFFF;
+  --g1:#15935A; --g2:#A86A00; --g3:#1F6FC0; --g4:#C2410C; color-scheme:light }
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif; font-size:16px; line-height:1.5;
+  -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px); background-size:26px 26px}
+a{color:inherit}
+.wrap{max-width:980px; margin:0 auto; padding:max(18px,env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom)); display:grid; gap:18px}
+.mono{font-family:var(--mono)}
+.panel{background:var(--panel); border:1.5px solid var(--line); border-radius:14px}
+.head{border:1.5px solid var(--ink); background:var(--panel); border-radius:14px; overflow:hidden}
+.head-top{padding:18px 18px 16px}
+.brandline{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 8px}
+h1{font-stretch:125%; font-weight:800; font-size:clamp(28px,6.4vw,46px); line-height:1.02; margin:0; letter-spacing:-.015em; text-wrap:balance}
+.sub{margin:10px 0 0; color:var(--dim); font-size:15.5px; max-width:60ch}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 0; padding:0; list-style:none}
+.chips li{font-family:var(--mono); font-size:12px; border:1.5px solid var(--line); border-radius:999px; padding:5px 10px; color:var(--ink)}
+.chips li b{color:var(--accent); font-weight:700}
+.now{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-top:1.5px solid var(--ink); margin:0; padding:0; list-style:none}
+.now li{padding:12px 16px; font-size:14px; display:grid; gap:4px; border-right:1px solid var(--line); min-width:0}
+.now li:last-child{border-right:0}
+.now .k{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim)}
+h2{font-stretch:125%; font-weight:800; font-size:22px; margin:0; letter-spacing:-.01em}
+h2 small{font-family:var(--mono); font-weight:500; font-size:12px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase; margin-left:8px}
+.sec{display:grid; gap:12px}
+.cols{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.col{background:var(--panel); border:1.5px solid var(--line); border-radius:14px; padding:14px; min-width:0}
+.col h3{font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin:0 0 10px}
+.roles{list-style:none; margin:0; padding:0; display:grid; gap:8px}
+.roles li{display:grid; gap:1px; border-left:3px solid var(--accent); padding-left:10px}
+.roles b{font-weight:700; font-size:15px; line-height:1.25}
+.roles small{font-family:var(--mono); font-size:11.5px; color:var(--dim)}
+blockquote{margin:12px 0 0; padding:10px 12px; background:var(--panel2); border-radius:10px; font-size:14px; font-style:italic}
+.group{display:grid; gap:10px}
+.group h3{display:flex; align-items:center; gap:8px; margin:6px 0 0; font-size:15px; font-weight:800; font-stretch:112%}
+.group h3 small{font-family:var(--mono); font-size:12px; color:var(--dim); font-weight:500}
+.dot{width:10px; height:10px; border-radius:50%; background:var(--gc)}
+.tools{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.tool{background:var(--panel); border:1.5px solid var(--line); border-top:4px solid var(--gc); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; min-width:0}
+.thumb{display:block; background:var(--panel2); aspect-ratio:16/10; overflow:hidden; border-bottom:1px solid var(--line)}
+.thumb img{width:100%; height:100%; object-fit:cover; object-position:top; display:block}
+.tbody{padding:12px 14px 14px; display:flex; flex-direction:column; gap:8px; flex:1}
+.tool h4{margin:0; font-size:16.5px; font-weight:800; line-height:1.2}
+.tool p{margin:0; font-size:14.5px; color:var(--dim)}
+.for{list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:6px}
+.for li{font-family:var(--mono); font-size:11px; border:1px solid var(--line); border-radius:6px; padding:2px 7px; color:var(--dim)}
+.open{margin-top:auto; align-self:flex-start; background:var(--accent); color:var(--on-accent); text-decoration:none; font-weight:800; font-size:14.5px; padding:9px 14px; border-radius:10px}
+.open:focus-visible,.btn:focus-visible,.thumb:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.rules{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.rule{background:var(--panel); border:1.5px solid var(--line); border-radius:14px; padding:14px; min-width:0}
+.rk{font-weight:800; font-size:17px; font-stretch:112%}
+.rd{font-family:var(--mono); font-size:11.5px; color:var(--accent); text-transform:uppercase; letter-spacing:.08em; margin:2px 0 8px}
+.rule p{margin:0; font-size:14.5px}
+.ideas{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+.ideas li{background:var(--panel); border:1.5px solid var(--line); border-radius:14px; padding:14px; display:flex; gap:12px; min-width:0}
+.num{flex:none; width:32px; height:32px; border-radius:10px; background:var(--accent); color:var(--on-accent); display:grid; place-items:center; font-weight:800}
+.ideas b{font-size:15.5px} .ideas p{margin:4px 0 0; font-size:14.5px; color:var(--dim)}
+.offer{border:1.5px solid var(--ink); background:var(--panel); border-radius:14px; padding:18px; display:grid; gap:12px}
+.offer p{margin:0; font-size:17px; font-weight:600; max-width:62ch}
+.btns{display:flex; flex-wrap:wrap; gap:10px}
+.btn{display:inline-block; text-decoration:none; font-weight:800; font-size:15px; padding:11px 16px; border-radius:10px; border:1.5px solid var(--line)}
+.btn.main{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.ref{display:inline-grid; place-items:center; min-width:18px; height:18px; padding:0 4px; margin-left:2px; border-radius:5px; font-family:var(--mono); font-size:10.5px; font-style:normal; font-weight:700; text-decoration:none; background:var(--panel2); border:1px solid var(--line); color:var(--dim); vertical-align:1px}
+.sources{font-size:13px; color:var(--dim)} .sources ol{margin:6px 0 0; padding-left:22px; display:grid; gap:3px}
+footer{font-size:13px; color:var(--dim); text-align:center}
+.theme{position:absolute; top:14px; right:14px; border:1.5px solid var(--line); background:transparent; color:var(--dim); font:inherit; font-size:12.5px; padding:5px 9px; border-radius:8px; cursor:pointer}
+.head{position:relative}
+@media (max-width:820px){ .tools{grid-template-columns:repeat(2,minmax(0,1fr))} .cols,.rules{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:560px){ .tools,.ideas{grid-template-columns:minmax(0,1fr)} .now{grid-template-columns:minmax(0,1fr)} .now li{border-right:0; border-bottom:1px solid var(--line)} .now li:last-child{border-bottom:0}
+  .head-top{padding-right:18px} .theme{position:static; margin:0 0 10px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header class="head">
+  <div class="head-top">
+   <button class="theme" id="theme" type="button" aria-label="Switch light or dark">◐ Theme</button>
+   <p class="brandline">Prepared for RwandAir · 21 October 2026</p>
+   <h1>Nine checks for the teams RwandAir is hiring</h1>
+   <p class="sub">Your openings since August point to payments, bookings, the help desk, revenue files, vehicles and stations. Each check reads one export of your own data, in your browser.</p>
+   <ul class="chips"><li><b>●</b> Nothing is uploaded</li><li><b>3-day</b> code built into every link</li><li>Starts on first open · valid to <b>31 Dec 2026</b></li></ul>
+  </div>
+  <ul class="now"><li><span class="k">Fleet</span><span>One A330 delivered in August, four more expected by year end; Europe and the Far East next. <a class="ref" href="#src-1" aria-label="Source 1">1</a></span></li><li><span class="k">Schedule</span><span>Kigali–Paris–Brussels drops from five to four flights a week, 1 Nov–12 Dec 2026. <a class="ref" href="#src-2" aria-label="Source 2">2</a></span></li><li><span class="k">Hiring</span><span>Your E-Commerce Help Desk Manager opening closes on 22 October 2026. <a class="ref" href="#src-3" aria-label="Source 3">3</a></span></li></ul>
+ </header>
+
+ <section class="sec"><h2>What your openings ask for<small>Aug–Oct 2026</small></h2><div class="cols"><div class="col"><h3>Commercial &amp; e-commerce</h3><ul class="roles"><li><b>E-Commerce Help Desk Manager</b><small>RN000531 · closes 22 Oct <a class="ref" href="#src-3" aria-label="Source 3">3</a></small></li><li><b>E-Commerce Help Desk Specialist</b><small>Sep 2026 <a class="ref" href="#src-4" aria-label="Source 4">4</a></small></li><li><b>Digital Channels Sales Specialist</b><small>Sep 2026 <a class="ref" href="#src-4" aria-label="Source 4">4</a></small></li><li><b>User Experience Specialist</b><small>Sep 2026 <a class="ref" href="#src-4" aria-label="Source 4">4</a></small></li></ul><blockquote>“booking issues, payment failures, login problems” <a class="ref" href="#src-3" aria-label="Source 3">3</a></blockquote></div><div class="col"><h3>IT &amp; revenue</h3><ul class="roles"><li><b>Software and Application Engineer</b><small>RN000522 · Oct 2026 <a class="ref" href="#src-5" aria-label="Source 5">5</a></small></li></ul><blockquote>“BSP, HOT, RET, ATPCO and bank files, with error detection” <a class="ref" href="#src-5" aria-label="Source 5">5</a></blockquote></div><div class="col"><h3>Ground &amp; stations</h3><ul class="roles"><li><b>Head of Outstation Operations</b><small>Aug 2026 <a class="ref" href="#src-6" aria-label="Source 6">6</a></small></li><li><b>Senior Manager, GSE Maintenance</b><small>Aug 2026 <a class="ref" href="#src-6" aria-label="Source 6">6</a></small></li><li><b>Drivers ×7</b><small>Aug 2026 <a class="ref" href="#src-6" aria-label="Source 6">6</a></small></li><li><b>Cargo Equipment Operators ×12</b><small>closes 22 Oct <a class="ref" href="#src-7" aria-label="Source 7">7</a></small></li></ul></div></div></section>
+
+ <section class="sec"><h2>Your nine checks<small>open any · sample runs free</small></h2><section class="group"><h3 style="--gc:var(--g1)"><span class="dot"></span>Payments &amp; bookings <small>3</small></h3><div class="tools"><article class="tool" style="--gc:var(--g1)"><a class="thumb" href="../tools/payment-decoder/rwandair/" aria-label="Open Payment Failure Decoder"><img src="../tools/payment-decoder/thumb.webp" alt="" loading="lazy" width="640" height="400"></a><div class="tbody"><h4>Payment Failure Decoder</h4><p>Why each card or wallet payment failed, and whose side it was on.</p><ul class="for"><li>Help desk</li><li>Digital channels</li></ul><a class="open" href="../tools/payment-decoder/rwandair/">Open check →</a></div></article><article class="tool" style="--gc:var(--g1)"><a class="thumb" href="../tools/channel-xray/rwandair/" aria-label="Open Channel Journey X-ray"><img src="../tools/channel-xray/thumb.webp" alt="" loading="lazy" width="640" height="400"></a><div class="tbody"><h4>Channel Journey X-ray</h4><p>The booking step, market and hour where customers give up.</p><ul class="for"><li>User experience</li><li>Digital channels</li></ul><a class="open" href="../tools/channel-xray/rwandair/">Open check →</a></div></article><article class="tool" style="--gc:var(--g1)"><a class="thumb" href="../tools/api-health/rwandair/" aria-label="Open API &amp; App Health Lens"><img src="../tools/api-health/thumb.webp" alt="" loading="lazy" width="640" height="400"></a><div class="tbody"><h4>API &amp; App Health Lens</h4><p>Which booking and partner APIs fail or crawl, and how fast the uptime target burns.</p><ul class="for"><li>IT</li><li>Digital channels</li></ul><a class="open" href="../tools/api-health/rwandair/">Open check →</a></div></article></div></section><section class="group"><h3 style="--gc:var(--g2)"><span class="dot"></span>Help desk <small>2</small></h3><div class="tools"><article class="tool" style="--gc:var(--g2)"><a class="thumb" href="../tools/turnaround/rwandair/" aria-label="Open Turnaround &amp; Backlog Lens"><img src="../tools/turnaround/thumb.webp" alt="" loading="lazy" width="640" height="400"></a><div class="tbody"><h4>Turnaround &amp; Backlog Lens</h4><p>Time to first answer and to close, cases past target, and the age of the open backlog.</p><ul class="for"><li>Help desk manager</li></ul><a class="open" href="../tools/turnaround/rwandair/">Open check →</a></div></article><article class="tool" style="--gc:var(--g2)"><a class="thumb" href="../tools/staffing-lens/rwandair/" aria-label="Open Contact Centre Staffing Lens"><img src="../tools/staffing-lens/thumb.webp" alt="" loading="lazy" width="640" height="400"></a><div class="tbody"><h4>Contact Centre Staffing Lens</h4><p>Agents needed each hour to answer on time, across your time zones.</p><ul class="for"><li>Help desk manager</li></ul><a class="open" href="../tools/staffing-lens/rwandair/">Open check →</a></div></article></div></section><section class="group"><h3 style="--gc:var(--g3)"><span class="dot"></span>Revenue &amp; finance <small>2</small></h3><div class="tools"><article class="tool" style="--gc:var(--g3)"><a class="thumb" href="../tools/reconciler/rwandair/" aria-label="Open Collections Reconciler"><img src="../tools/reconciler/thumb.webp" alt="" loading="lazy" width="640" height="400"></a><div class="tbody"><h4>Collections Reconciler</h4><p>Paid but not ticketed, ticketed but not paid, and wrong amounts.</p><ul class="for"><li>Revenue Accounting</li><li>Finance</li></ul><a class="open" href="../tools/reconciler/rwandair/">Open check →</a></div></article><article class="tool" style="--gc:var(--g3)"><a class="thumb" href="../tools/settlement/rwandair/" aria-label="Open Settlement Checker"><img src="../tools/settlement/thumb.webp" alt="" loading="lazy" width="640" height="400"></a><div class="tbody"><h4>Settlement Checker</h4><p>Your sales against BSP, banks or partners, day by day: what is in dispute and what it is worth.</p><ul class="for"><li>Revenue Accounting</li><li>IT</li></ul><a class="open" href="../tools/settlement/rwandair/">Open check →</a></div></article></div></section><section class="group"><h3 style="--gc:var(--g4)"><span class="dot"></span>Ground &amp; stations <small>2</small></h3><div class="tools"><article class="tool" style="--gc:var(--g4)"><a class="thumb" href="../tools/fleet-fuel/rwandair/" aria-label="Open Fleet Fuel Leak Finder"><img src="../tools/fleet-fuel/thumb.webp" alt="" loading="lazy" width="640" height="400"></a><div class="tbody"><h4>Fleet Fuel Leak Finder</h4><p>Vehicles burning more than their type explains, valued at today&#x27;s diesel price.</p><ul class="for"><li>Ground support</li><li>Fleet</li></ul><a class="open" href="../tools/fleet-fuel/rwandair/">Open check →</a></div></article><article class="tool" style="--gc:var(--g4)"><a class="thumb" href="../tools/link-sla/rwandair/" aria-label="Open Link SLA Auditor"><img src="../tools/link-sla/thumb.webp" alt="" loading="lazy" width="640" height="400"></a><div class="tbody"><h4>Link SLA Auditor</h4><p>Which station links broke their SLA, and which provider owes you.</p><ul class="for"><li>Outstations</li><li>IT</li></ul><a class="open" href="../tools/link-sla/rwandair/">Open check →</a></div></article></div></section></section>
+
+ <section class="sec"><h2>Rules with dates on them</h2><div class="rules"><article class="rule"><div class="rk">PCI DSS v4.0.1</div><div class="rd">Since 31 Mar 2025</div><p>Every script on the payment page inventoried and authorised (6.4.3); payment-page changes detected at least every seven days (11.6.1). <a class="ref" href="#src-8" aria-label="Source 8">8</a></p></article><article class="rule"><div class="rk">EU 261/2004 · Art. 8</div><div class="rd">Paris &amp; Brussels departures</div><p>Refund within seven days for a cancelled flight; your 1 Nov–12 Dec schedule drops one weekly frequency. <a class="ref" href="#src-9" aria-label="Source 9">9</a><a class="ref" href="#src-2" aria-label="Source 2">2</a></p></article><article class="rule"><div class="rk">Rwanda Law 058/2021</div><div class="rd">Data protection</div><p>Register with NCSA before processing personal data; report a personal-data breach within 48 hours. <a class="ref" href="#src-10" aria-label="Source 10">10</a></p></article></div></section>
+
+ <section class="sec"><h2>Four ideas for RwandAir</h2><ul class="ideas"><li><span class="num">1</span><div><b>Day-one baseline</b><p>Until your new E-Commerce Help Desk Manager starts, I run the help-desk checks every week. They inherit a measured baseline, not a blank page.</p></div></li><li><span class="num">2</span><div><b>Paid-not-ticketed sweep before 08:00</b><p>Each morning, match gateway and wallet receipts to tickets issued, and fix or refund before the customer calls.</p></div></li><li><span class="num">3</span><div><b>Wallet order by success</b><p>Rank MTN, Airtel, M-Pesa and Tigo by success rate in each market, and show the strongest first at checkout.</p></div></li><li><span class="num">4</span><div><b>Route-launch watch</b><p>For each new A330 route and schedule change, watch payment and booking failures in that market for the first 30 days.</p></div></li></ul></section>
+
+ <section class="offer"><p>If a check shows a leak, I return a confirmed root cause and a fix plan within 3 working days of receiving one day of data, at a fixed price agreed before I start.</p>
+  <div class="btns"><a class="btn main" href="https://wa.me/250788312423?text=Muraho%20Frutos.%20RwandAir%20here%2C%20about%20the%20nine%20checks." target="_blank" rel="noopener">WhatsApp Frutos · +250 788 312 423</a><a class="btn" href="mailto:fkamanzi@gmail.com?subject=RwandAir%20%C2%B7%20nine%20checks">fkamanzi@gmail.com</a><a class="btn" href="https://fkamanzi.github.io/telco-portfolio/" target="_blank" rel="noopener">Portfolio</a></div>
+ </section>
+
+ <section class="sources"><b>Sources</b><ol><li id="src-1"><a href="https://aviationweek.com/air-transport/airlines-lessors/rwandair-eyes-europe-far-east-expansion-fleet-grows" target="_blank" rel="noopener">Aviation Week, 10 Sep 2026</a></li><li id="src-2"><a href="https://www.aeroroutes.com/eng/261009-wbnw26cdgbru" target="_blank" rel="noopener">AeroRoutes, 9 Oct 2026</a></li><li id="src-3"><a href="https://erecruitment.rwandair.com/" target="_blank" rel="noopener">RwandAir e-recruitment, job RN000531 (closes 22 Oct 2026)</a></li><li id="src-4"><a href="https://www.afrocareers.com/2026/09/27-job-positions-at-rwandair-deadline.html" target="_blank" rel="noopener">Afro Careers, RwandAir openings, Sep 2026</a></li><li id="src-5"><a href="https://erecruitment.rwandair.com/Jobs/DownloadDetails?no=RN000522" target="_blank" rel="noopener">RwandAir job RN000522, Software and Application Engineer</a></li><li id="src-6"><a href="https://www.afrocareers.com/2026/08/15-job-vacancies-in-9-positions-at.html" target="_blank" rel="noopener">Afro Careers, RwandAir openings, Aug 2026</a></li><li id="src-7"><a href="https://ndangira.com/12-job-positions-of-cargo-equipment-operator-at-rwandair-ltd-deadline-22-oct-2026" target="_blank" rel="noopener">Ndangira, 12 Cargo Equipment Operator posts (closes 22 Oct 2026)</a></li><li id="src-8"><a href="https://pagecrawl.io/blog/pci-dss-4-client-side-script-monitoring-6-4-3-11-6-1" target="_blank" rel="noopener">PCI DSS 4.0 requirements 6.4.3 and 11.6.1 (summary)</a></li><li id="src-9"><a href="https://www.legislation.gov.uk/eur/2004/261/article/8/2004-02-11" target="_blank" rel="noopener">Regulation (EC) No 261/2004, Article 8</a></li><li id="src-10"><a href="https://hlc.com/en/publications/key-features-of-the-new-rwandan-data-protection-law" target="_blank" rel="noopener">Hogan Lovells on Rwanda&#x27;s Law No. 058/2021</a></li><li id="src-11"><a href="https://www.rwandair.com/information/prepare-to-fly/payment-options/" target="_blank" rel="noopener">RwandAir, Payment options</a></li></ol></section>
+ <footer>Prepared by Frutos · independent network engineer · Kigali. Independent work, not affiliated with RwandAir.</footer>
+</div>
+<script>
+(function(){ var b=document.getElementById("theme"), r=document.documentElement;
+ try{ var t=localStorage.getItem("fk_theme"); if(t) r.setAttribute("data-theme",t); }catch(e){}
+ b.addEventListener("click",function(){ var dark = r.getAttribute("data-theme") ? r.getAttribute("data-theme")==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  var n = dark ? "light" : "dark"; r.setAttribute("data-theme",n); try{ localStorage.setItem("fk_theme",n); }catch(e){} }); })();
+</script>
+</body>
+</html>
