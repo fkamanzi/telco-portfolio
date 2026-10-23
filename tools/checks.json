@@ -357,6 +357,19 @@
     "url": "https://techafricanews.com/2026/08/28/arpce-dismantles-sixth-sim-box-fraud-network-in-brazzaville/",
     "source": "TechAfrica News, 28 Aug 2026"
    }
+  },
+  {
+   "slug": "sim-box-finder",
+   "name": "SIM-Box Finder",
+   "paths": [
+    "sim-box-finder/index.html"
+   ],
+   "expect": "30 of 351 international test calls (8.5%)",
+   "why": {
+    "text": "On 13 February 2026 the ITU-T approved Recommendation E.371, which lists SIM boxes, call masking and refiling as impermissible traffic and sets out monthly test-call audits of interconnect partners.",
+    "url": "https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-E.371-202602-I%21%21PDF-E&type=items",
+    "source": "ITU-T E.371, Feb 2026"
+   }
   }
  ]
 }
