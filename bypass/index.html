@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Call Bypass and Satellites · Frutos</title>
+<meta name="description" content="International call bypass is a routing and settlement offence, not a technology. What it costs, how to prove it from records operators already keep, and the three openings satellite and NTN service create.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="International call bypass fraud: economic impact, satellites and NTN networks">
+<meta property="og:description" content="Bypass is proven with four records, not guessed. Satellite carriage is not bypass; direct-to-device service opens three specific gaps, each with a record that closes it.">
+<meta property="og:image" content="https://fkamanzi.github.io/telco-portfolio/bypass/card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Same instrument look as the trial tools: grid paper, ink rules, one accent. */
+:root{
+  --bg:#0E1512; --panel:#14201B; --panel2:#0B130F; --ink:#E8F0EA; --dim:#8BA596; --line:#27372F;
+  --grid:rgba(157,180,255,.07); --accent:#9DB4FF; --on-accent:#0A1024; --bad:#FF6B5E; --warn:#F2B134; --good:#39D98A;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace; color-scheme:dark;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){
+  --bg:#EEF1F6; --panel:#FFFFFF; --panel2:#F4F6FA; --ink:#121826; --dim:#55607A; --line:#D5DBE6;
+  --grid:rgba(52,81,209,.06); --accent:#3451D1; --on-accent:#FFFFFF; --bad:#C23A2E; --warn:#B5790C; --good:#15935A; color-scheme:light } }
+:root[data-theme="light"]{
+  --bg:#EEF1F6; --panel:#FFFFFF; --panel2:#F4F6FA; --ink:#121826; --dim:#55607A; --line:#D5DBE6;
+  --grid:rgba(52,81,209,.06); --accent:#3451D1; --on-accent:#FFFFFF; --bad:#C23A2E; --warn:#B5790C; --good:#15935A; color-scheme:light }
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif; font-size:17px; line-height:1.6;
+  -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px); background-size:26px 26px}
+a{color:var(--accent); text-underline-offset:2px}
+.wrap{max-width:860px; margin:0 auto; padding:max(18px,env(safe-area-inset-top)) 16px calc(48px + env(safe-area-inset-bottom)); display:grid; gap:20px}
+.head{border:1.5px solid var(--ink); background:var(--panel); border-radius:14px; overflow:hidden}
+.head-top{padding:20px 20px 18px; display:flex; gap:14px; align-items:flex-start; justify-content:space-between}
+.brandline{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+h1{font-stretch:118%; font-weight:800; font-size:clamp(28px,5.6vw,44px); line-height:1.05; margin:0; letter-spacing:-.015em; text-wrap:balance}
+.dek{margin:12px 0 0; color:var(--dim); font-size:17.5px; max-width:62ch}
+.theme{border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); border-radius:999px; padding:6px 12px; font:inherit; font-family:var(--mono); font-size:12px; cursor:pointer; white-space:nowrap}
+.byline{display:flex; flex-wrap:wrap; gap:6px 18px; border-top:1.5px solid var(--ink); padding:12px 20px; font-family:var(--mono); font-size:12.5px; color:var(--dim)}
+.byline b{color:var(--ink); font-weight:500}
+.key{background:var(--panel); border:1.5px solid var(--line); border-left:5px solid var(--accent); border-radius:14px; padding:18px 20px}
+.key h2{margin:0 0 10px}
+.key ol{margin:0; padding-left:22px; display:grid; gap:10px}
+.key li::marker{font-family:var(--mono); color:var(--accent); font-weight:700}
+h2{font-stretch:118%; font-weight:800; font-size:clamp(21px,3.6vw,26px); line-height:1.2; margin:0; letter-spacing:-.01em; text-wrap:balance}
+h2 .n{font-family:var(--mono); font-weight:500; font-size:13px; letter-spacing:.12em; color:var(--accent); display:block; margin-bottom:4px; font-stretch:100%}
+.sec{display:grid; gap:14px}
+.sec p{margin:0; max-width:68ch}
+.card{background:var(--panel); border:1.5px solid var(--line); border-radius:14px; padding:16px 18px; min-width:0}
+.cap{font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin:0 0 12px}
+.lane{display:flex; flex-direction:column; align-items:stretch; gap:3px}
+.lf{margin:10px 0 0; font-size:14px; line-height:1.5; color:var(--dim)}
+.node{border:1.5px solid var(--line); background:var(--panel2); border-radius:10px; padding:7px 10px; font-size:14.5px; line-height:1.25}
+.node small{display:block; font-family:var(--mono); font-size:11px; color:var(--dim)}
+.node.ok{border-color:var(--good)} .node.bad{border-color:var(--bad); color:var(--bad); font-weight:700}
+.node.bad small{color:var(--bad); font-weight:500}
+.arr{color:var(--dim); font-family:var(--mono); text-align:center; font-size:13px; line-height:1.1}
+.lanes{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px}
+.lt{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; margin:0 0 8px}
+.lt.ok{color:var(--good)} .lt.bad{color:var(--bad)}
+.grid2{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+.grid3{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+.q{font-stretch:112%; font-weight:800; font-size:18px; line-height:1.25; margin:0 0 8px}
+.kv{margin:0; display:grid; gap:6px; font-size:15px}
+.kv dt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim)}
+.kv dd{margin:0 0 4px}
+.formula{font-family:var(--mono); font-size:14px; line-height:1.7; background:var(--panel2); border:1.5px dashed var(--line); border-radius:10px; padding:12px 14px; overflow-x:auto; white-space:pre}
+.facts{list-style:none; margin:0; padding:0; display:grid; gap:12px}
+.facts li{border-left:3px solid var(--accent); padding:2px 0 2px 12px}
+.facts b{font-weight:700}
+.facts .src{font-family:var(--mono); font-size:12px; color:var(--dim)}
+.bars{display:grid; gap:9px; margin:4px 0 12px}
+.brow{display:grid; grid-template-columns:minmax(96px,26%) 1fr auto; align-items:center; gap:10px; font-size:14px}
+.brow .bl{color:var(--dim); font-family:var(--mono); font-size:12.5px}
+.brow .bb{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.brow .bb span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.brow .bb span.hi{background:var(--bad)}
+.brow .bv{font-family:var(--mono); font-size:13px; text-align:right; min-width:92px; font-variant-numeric:tabular-nums}
+.note{font-size:13.5px; color:var(--dim); margin:10px 0 0}
+.ladder{display:grid; gap:8px}
+.rung{display:grid; grid-template-columns:120px 1fr; gap:12px; align-items:start; border:1.5px solid var(--line); border-radius:10px; padding:10px 12px; background:var(--panel)}
+.rung b{font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase}
+.rung.p b{color:var(--good)} .rung.s b{color:var(--warn)} .rung.i b{color:var(--dim)}
+.open h3{margin:0 0 8px; font-size:17px; font-stretch:112%; font-weight:800; line-height:1.25}
+.open .tag{display:inline-block; font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--bad); margin-bottom:6px}
+.acts{list-style:none; margin:0; padding:0; counter-reset:a; display:grid; gap:10px}
+.acts li{counter-increment:a; display:grid; grid-template-columns:34px 1fr; gap:10px; background:var(--panel); border:1.5px solid var(--line); border-radius:12px; padding:12px 14px}
+.acts li::before{content:counter(a); font-family:var(--mono); font-weight:700; color:var(--on-accent); background:var(--accent); border-radius:8px; width:28px; height:28px; display:grid; place-items:center; font-size:13px}
+.acts p{margin:0}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px}
+.chip{font-family:var(--mono); font-size:11px; border:1px solid var(--line); border-radius:999px; padding:2px 8px; color:var(--dim)}
+.tool{border:1.5px solid var(--ink); background:var(--panel); border-radius:14px; overflow:hidden}
+.tool .tin{padding:18px 20px; display:grid; gap:12px}
+.tool img{display:block; width:100%; height:auto; border-top:1.5px solid var(--line)}
+.btn{display:inline-block; background:var(--accent); color:var(--on-accent); border-radius:10px; padding:11px 16px; font-weight:700; text-decoration:none; font-size:15px}
+.btn.ghost{background:transparent; color:var(--ink); border:1.5px solid var(--line)}
+.btns{display:flex; flex-wrap:wrap; gap:10px}
+.close{font-size:19px; line-height:1.55; font-stretch:105%; border-top:1.5px solid var(--ink); border-bottom:1.5px solid var(--ink); padding:16px 0; margin:0}
+.src-list{margin:0; padding-left:22px; display:grid; gap:6px; font-size:14px; color:var(--dim)}
+.src-list a{overflow-wrap:anywhere}
+.foot{font-family:var(--mono); font-size:12px; color:var(--dim); text-align:center}
+@media (max-width:640px){ .grid2,.grid3,.lanes{grid-template-columns:1fr} .rung{grid-template-columns:1fr; gap:4px} .head-top{flex-direction:column-reverse} .theme{align-self:flex-end} }
+@media print{ :root,:root[data-theme]{--bg:#fff;--panel:#fff;--panel2:#f4f4f4;--ink:#111;--dim:#555;--line:#ccc;color-scheme:light} body{background:#fff} .theme{display:none} }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="head">
+    <div class="head-top">
+      <div>
+        <p class="brandline">Field note · Interconnect assurance</p>
+        <h1>International call bypass fraud: economic impact, satellites and NTN networks</h1>
+        <p class="dek">Bypass is a routing and settlement offence, not a technology. What it costs, how to prove it from records operators already keep, and what satellites change: the test is the same whether a call crossed fibre, microwave or a satellite.</p>
+      </div>
+      <button class="theme" id="theme" type="button" aria-label="Switch light or dark">&#9680; Theme</button>
+    </div>
+    <div class="byline"><span><b>Frutos</b> · independent network engineer, Kigali</span><span>23 October 2026</span><span>9-minute read</span></div>
+  </header>
+
+  <section class="key" aria-label="Key points">
+    <h2>In four points</h2>
+    <ol>
+      <li><b>A call becomes bypass when it is placed abroad but ended as a local call</b>, usually through a SIM box, so the terminating network and the state are paid for a local call instead of an international one. In February 2026 the ITU-T listed SIM boxes, call masking and refiling as &ldquo;deemed impermissible traffic&rdquo; (Recommendation E.371).</li>
+      <li><b>Losses are proven with four records, not estimated:</b> test calls on each route, the carrier agreements, the terminating network&rsquo;s calling records, and the settlement ledger.</li>
+      <li><b>Satellite carriage is not bypass.</b> Direct-to-device satellite service opens three specific gaps: traffic landing outside a licensed gateway, caller ID or traffic class being altered, and phones across a border appearing domestic.</li>
+      <li><b>Each gap has a record that closes it:</b> test calls on every route, caller-ID checks at the gateway, and the access type and network-verified location of satellite calls in calling records (3GPP Release 18).</li>
+    </ol>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">01</span>What bypass is, and what it is not</h2>
+    <div class="card">
+      <p class="cap">The same call, two paths</p>
+      <div class="lanes">
+        <div>
+          <p class="lt ok">Licensed path · paid as an international call</p>
+          <div class="lane">
+            <span class="node">Caller abroad</span><span class="arr">↓</span>
+            <span class="node">International carrier</span><span class="arr">↓</span>
+            <span class="node ok">Licensed international gateway</span><span class="arr">↓</span>
+            <span class="node">Terminating network</span><span class="arr">↓</span>
+            <span class="node ok">Phone shows +44 7&middot;&middot;&middot;<small>the caller&rsquo;s number</small></span>
+          </div>
+          <p class="lf">Paid: the international termination rate, plus any levy. Caller ID: the caller&rsquo;s own, with its country code (ITU-T E.157).</p>
+        </div>
+        <div>
+          <p class="lt bad">Bypass path · paid as a local call</p>
+          <div class="lane">
+            <span class="node">Caller abroad</span><span class="arr">↓</span>
+            <span class="node">Cheapest carrier</span><span class="arr">↓</span>
+            <span class="node">Internet link<small>fibre, microwave or satellite</small></span><span class="arr">↓</span>
+            <span class="node bad">SIM box<small>local SIMs re-dial the call</small></span><span class="arr">↓</span>
+            <span class="node">Terminating network</span><span class="arr">↓</span>
+            <span class="node bad">Phone shows 078&middot;&middot;&middot;<small>a local SIM&rsquo;s number</small></span>
+          </div>
+          <p class="lf">Paid: a local call, often inside a bundle. Caller ID: a local SIM&rsquo;s, so the person called cannot see who is calling or from where. All it takes is a softswitch, an internet link and a box of local SIMs.</p>
+        </div>
+      </div>
+    </div>
+    <p>ITU-T Recommendation E.157 expects a calling number that crosses a border to carry at least the originating country code, passed on unchanged by transit networks. Bypass breaks exactly that. Recommendation E.371, approved by ITU-T Study Group 2 on 13 February 2026, defines <b>deemed impermissible traffic</b> as international traffic &ldquo;that may be contrary to the legal and regulatory framework of a Member State&rdquo;, and lists call refiling, call masking, SIM boxes (&ldquo;one way of achieving call masking&rdquo;), OTT bypass and incoming international calls with an unknown caller ID among its types.</p>
+    <p><b>Not bypass:</b> a visitor roaming on your network who calls home; an app-to-app call that never touches the phone network; international traffic carried over a satellite link into a licensed gateway; a direct-to-device satellite service run with a licensed operator through its core. The technology that carried the call is not the test.</p>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">02</span>Four records prove it</h2>
+    <div class="grid2">
+      <div class="card"><p class="q">Where was the call placed?</p><dl class="kv"><dt>Record</dt><dd>Test calls placed abroad, with the caller ID sent and the route used</dd><dt>Proves</dt><dd>That a route delivers international calls as local ones, with the relaying SIM&rsquo;s number as evidence</dd></dl></div>
+      <div class="card"><p class="q">How was it routed?</p><dl class="kv"><dt>Record</dt><dd>Carrier agreements and route plans</dd><dt>Proves</dt><dd>Which partner handed the traffic on, and at what rate</dd></dl></div>
+      <div class="card"><p class="q">Where and how did it end?</p><dl class="kv"><dt>Record</dt><dd>The terminating network&rsquo;s calling records</dd><dt>Proves</dt><dd>Which SIMs relay calls, from which cells and devices, and for how many minutes</dd></dl></div>
+      <div class="card"><p class="q">How was it settled?</p><dl class="kv"><dt>Record</dt><dd>Interconnect billing, reconciled with gateway counts</dd><dt>Proves</dt><dd>The minutes declared and paid against the minutes actually delivered</dd></dl></div>
+    </div>
+    <p><b>Test calls and calling records cover each other&rsquo;s blind spots.</b> A test call catches a SIM on its first relayed call; calling records catch the SIMs no test call happened to reach. On a SIM, the signs are plain: it is busy (30 or more calls a day), one-way (5% or fewer of its calls received), it calls many different people, it sits on one or two cells, it shares a device with other SIMs, and it works at night. These thresholds are settings to tune, not laws. Machine-learning models can weigh the same signs across millions of SIMs; what they return is a ranking to test, not proof.</p>
+    <p><b>At the gateway, caller ID can be checked.</b> CEPT&rsquo;s ECC Report 338 (June 2022) describes checking whether a domestic mobile number shown on an incoming international call is really roaming abroad, and replacing, flagging or blocking invalid caller IDs. Italy put such filters into force under AGCOM Delibera 106/25/CONS, for fixed numbers from 19 August 2025 and mobile numbers from 19 November 2025; within weeks almost 43 million calls had been blocked, about 1.3 million a day and 5.7% of calls received in the period observed. That rule targets spoofing, but the control is the same one that exposes masked international traffic.</p>
+    <div class="ladder" aria-label="How strong the evidence is">
+      <div class="rung p"><b>Proven</b><span>A test call ended through a named SIM, that SIM&rsquo;s relayed minutes in the calling records, and the settlement gap on that route.</span></div>
+      <div class="rung s"><b>Supported</b><span>The calling-record signs, without a test call yet.</span></div>
+      <div class="rung i"><b>Indicative</b><span>Declared international minutes falling against gateway counts or retail trends.</span></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">03</span>The economic impact, measured rather than guessed</h2>
+    <div class="formula">lost per bypassed minute = termination rate − what the minute earns as a local call
+                           + levy per international minute, where one applies
+lost per year            = bypassed minutes a day × 365 × lost per minute</div>
+    <p><b>Who pays:</b> the terminating operator loses termination revenue; the state loses levies and taxes on international traffic where they exist, and part of its tax base; licensed carriers and gateways are undercut by an unlicensed competitor; customers get a stranger&rsquo;s local number, poorer calls and callbacks to numbers that are not the caller&rsquo;s. E.371 lists loss of revenue, enforcement and competition problems, and degraded service and security for users among the impacts.</p>
+    <ul class="facts">
+      <li><b>Republic of Congo, 21 August 2026:</b> the regulator ARPCE dismantled its sixth SIM-box network of the year, in Brazzaville. More than 422,000 minutes had been diverted, an estimated CFA 42 million lost in two months: about CFA 100 a minute. <span class="src">TechAfrica News, 28 Aug 2026</span></li>
+      <li><b>Rwanda, 2017:</b> a syndicate traced to Rubavu cost about Rwf 1 billion from January to October 2017, Rwf 450 million to the regulator and Rwf 550 million to the operator. <span class="src">The New Times, 10 Dec 2017</span></li>
+      <li><b>Worldwide:</b> the CFCA&rsquo;s 2025 survey puts losses to all forms of telecom fraud at US$41.82 billion; bypass is one of many types. <span class="src">CFCA via TNS, 7 Jan 2026</span></li>
+      <li><b>Rwanda&rsquo;s scale:</b> mobile networks received 30.5 million international minutes in the second quarter of 2025, 41% more than a year earlier. <span class="src">RURA ICT statistics, Q2 2025, Table 10</span></li>
+    </ul>
+    <div class="card">
+      <p class="cap">Each 1% of Rwanda&rsquo;s Q2 2025 international incoming minutes, if bypassed, per quarter</p>
+      <div class="bars">
+        <div class="brow"><span class="bl">RWF 50 a min</span><span class="bb"><span style="width:25%"></span></span><span class="bv">RWF 15.3M</span></div>
+        <div class="brow"><span class="bl">RWF 100 a min</span><span class="bb"><span style="width:50%"></span></span><span class="bv">RWF 30.5M</span></div>
+        <div class="brow"><span class="bl">RWF 140 a min</span><span class="bb"><span style="width:70%"></span></span><span class="bv">RWF 42.7M</span></div>
+        <div class="brow"><span class="bl">RWF 200 a min</span><span class="bb"><span style="width:100%"></span></span><span class="bv">RWF 61.1M</span></div>
+      </div>
+      <p class="note">1% = 305,265 minutes a quarter; RWF 140 a minute is the gap used in the tool&rsquo;s sample. The gap per minute is an assumption, not a published rate: replace it with the termination rate in your agreements, less what a local minute earns. A real loss figure needs the four records above.</p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">04</span>Satellites and NTN: what changes, and what does not</h2>
+    <ul class="facts">
+      <li><b>Standards:</b> 3GPP made non-terrestrial networks normative in Release 17 (NR-NTN and IoT-NTN, with new L-band and S-band operating bands n255 and n256). Release 18 added network verification of a phone&rsquo;s reported location, because a satellite cell can be too large for national regulatory needs. Release 19 adds regenerative payloads, and studies store-and-forward and phone-satellite-phone links. <span class="src">3GPP NTN overview</span></li>
+      <li><b>Spectrum:</b> WRC-27 agenda item 1.13 studies new mobile-satellite allocations for direct links between satellites and ordinary phones, between 694/698 MHz and 2.7 GHz. East African preparation flags national authorisation, cross-border coordination and beam spillover. <span class="src">UCC agenda item brief, Jul 2026</span></li>
+      <li><b>Africa:</b> Airtel Africa and SpaceX agreed a direct-to-cell service across 14 markets, Rwanda included, starting with SMS and messaging and subject to approvals. Tanzania&rsquo;s regulator requires satellite operators to deliver through licensed mobile operators, who keep control of the spectrum. <span class="src">MEA Tech Watch, 18 Dec 2025 · Space in Africa, 8 Aug 2025</span></li>
+    </ul>
+    <p><b>Why satellite carriage alone is not bypass:</b> when a direct-to-device call enters the licensed operator&rsquo;s core, carries the right caller ID, leaves through the licensed gateway and is settled at the international rate, the satellite is just another radio link. The openings are elsewhere.</p>
+    <div class="grid3">
+      <div class="card open"><span class="tag">Opening 1</span><h3>Landing outside a licensed gateway</h3><dl class="kv"><dt>What happens</dt><dd>A satellite internet terminal feeds a SIM box or VoIP gateway. The satellite is only transport; the offence is the local re-dial.</dd><dt>Record that closes it</dt><dd>Test calls per route; calling records at the SIM box&rsquo;s cell</dd><dt>Control</dt><dd>Terminal licensing, landing-rights conditions, gateway audits</dd></dl></div>
+      <div class="card open"><span class="tag">Opening 2</span><h3>Caller ID or traffic class altered</h3><dl class="kv"><dt>What happens</dt><dd>International traffic is presented as domestic, or carried as data and turned into a voice call with a local number.</dd><dt>Record that closes it</dt><dd>Caller ID sent against caller ID received; minutes declared against minutes delivered, partner by partner</dd><dt>Control</dt><dd>E.157 caller ID at gateways; E.371 mitigation; monthly reconciliation</dd></dl></div>
+      <div class="card open"><span class="tag">Opening 3</span><h3>Phones across a border appearing domestic</h3><dl class="kv"><dt>What happens</dt><dd>A phone outside the country attaches to a domestic satellite cell and places calls that look local.</dd><dt>Record that closes it</dt><dd>The access type of each call (satellite types such as NR_LEO, 3GPP TS 29.571) and the network-verified location</dd><dt>Control</dt><dd>Both fields mandatory in records of satellite calls; calls verified outside the territory flagged or refused</dd></dl></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2><span class="n">05</span>What regulators and operators can do now</h2>
+    <ol class="acts">
+      <li><div><p><b>Test every international route every month, satellite routes included,</b> and give each carrier its own evidence.</p><div class="chips"><span class="chip">Operators · regulator</span><span class="chip">ITU-T E.371 Annex A.1</span></div></div></li>
+      <li><div><p><b>Reconcile declared international minutes</b> with gateway counts and terminating records, partner by partner. Rwanda&rsquo;s 2012 gateway traffic-verification regulation lists undeclared incoming international traffic among fraudulent traffic.</p><div class="chips"><span class="chip">Regulator · operators</span><span class="chip">RURA regulation, Article 9</span></div></div></li>
+      <li><div><p><b>Check caller ID at the international gateway:</b> country code present, domestic mobile numbers on international calls checked against roaming status, unknown caller IDs replaced or flagged.</p><div class="chips"><span class="chip">Gateway operators</span><span class="chip">ITU-T E.157 · ECC Report 338 · E.371 A.6</span></div></div></li>
+      <li><div><p><b>Read calling records for SIM-box signs every day;</b> bar SIMs with the evidence attached, and share device and SIM blacklists between operators.</p><div class="chips"><span class="chip">Operators</span><span class="chip">Fraud and revenue assurance</span></div></div></li>
+      <li><div><p><b>For satellite service, make the access type and network-verified location mandatory</b> in calling records; tie landing rights to routing through licensed gateways, with lawful interception and settlement visible; put satellite routes into test-call campaigns.</p><div class="chips"><span class="chip">Regulator · licensees</span><span class="chip">3GPP Release 18 · TS 29.571</span></div></div></li>
+      <li><div><p><b>Work across borders:</b> share evidence with neighbouring regulators and report misused numbering to the ITU&rsquo;s shared list.</p><div class="chips"><span class="chip">Regulators</span><span class="chip">ITU-T E.371 clause 9.2</span></div></div></li>
+    </ol>
+  </section>
+
+  <section class="tool" aria-label="Try it on your own records">
+    <div class="tin">
+      <h2><span class="n">06</span>Try it on your own records</h2>
+      <p>I built <b>International Bypass Lens</b> to run these checks in a browser. It reads calling records, test-call results, or both. On its illustrative sample, <b>30 of 351 international test calls (8.5%)</b> arrived showing a local number, all through two routes; the calling records show <b>30 SIMs working like SIM-box lines at 3 sites</b>, six of them on satellite access with a verified location outside the country, about <b>RWF 265.8M a year</b> at the sample&rsquo;s rates.</p>
+      <div class="btns"><a class="btn" href="../tools/bypass-lens/">Open the tool</a><a class="btn ghost" href="https://wa.me/250788312423?text=Muraho%20Frutos.%20Please%20send%20a%203-day%20trial%20code%20for%20the%20International%20Bypass%20Lens." target="_blank" rel="noopener">Get a 3-day code</a></div>
+      <p class="note">The sample runs free. Your own files are read in your browser and never uploaded; they open with a 3-day code. Full version: send 30 days of calling records and your test-call results, and I return the SIMs to bar, the evidence per route for your carriers and the regulator, and the revenue to recover, in 10 working days at a fixed price.</p>
+    </div>
+    <img src="tool.png" width="1752" height="1548" alt="The tool's result on its illustrative sample: 8.5% of test calls bypassed, 30 SIM-box suspects, 5,202 minutes relayed a day, RWF 265.8M a year at risk, and the caller ID that arrived on each route." loading="lazy" decoding="async">
+  </section>
+
+  <p class="close">The question is never &ldquo;did a satellite carry this call?&rdquo; It is four questions, each with a record behind it: where was the call placed, how was it routed, where and how did it end, and how was it settled. Answer those, and the technology question answers itself.</p>
+
+  <section class="sec" aria-label="Sources">
+    <h2>Sources</h2>
+    <ol class="src-list">
+      <li><a href="https://www.itu.int/epublications/ru/publication/itu-t-e-371-2026-02-deemed-impermissible-traffic/en" target="_blank" rel="noopener">ITU-T E.371 (02/2026), Deemed impermissible traffic</a></li>
+      <li><a href="https://www.itu.int/rec/dologin_pub.asp?lang=e&amp;id=T-REC-E.157-200911-S%21%21PDF-E&amp;type=items" target="_blank" rel="noopener">ITU-T E.157 (11/2009), International calling party number delivery</a></li>
+      <li><a href="https://docdb.cept.org/download/4026" target="_blank" rel="noopener">CEPT ECC Report 338, CLI spoofing (June 2022)</a></li>
+      <li><a href="https://lentepubblica.it/cittadini-e-imprese/spoofing-telefonico-nuove-regole-agcom-bloccate-43-milioni-di-chiamate/" target="_blank" rel="noopener">Lentepubblica: AGCOM anti-spoofing rules, 43 million calls blocked (12 Sep 2025)</a></li>
+      <li><a href="https://techafricanews.com/2026/08/28/arpce-dismantles-sixth-sim-box-fraud-network-in-brazzaville/" target="_blank" rel="noopener">TechAfrica News: ARPCE dismantles sixth SIM-box network in Brazzaville (28 Aug 2026)</a></li>
+      <li><a href="https://www.newtimes.co.rw/article/146833/News/three-arrested-over-rwf1bn-sim-box-fraud-targeting-mtn-rwanda/amp" target="_blank" rel="noopener">The New Times: Three arrested over Rwf1bn SIM box fraud (10 Dec 2017)</a></li>
+      <li><a href="https://tnsi.com/resource/com/the-telecom-fraud-landscape-in-2026-how-the-industry-is-fighting-back-blog" target="_blank" rel="noopener">TNS: The telecom fraud landscape in 2026, citing the CFCA 2025 survey (7 Jan 2026)</a></li>
+      <li><a href="https://www.rura.rw/fileadmin/user_upload/RURA/Documents/Sectors/ICT/Statistics/Quarterly_publication/ICT_Sector_Statistics_Report_as_of_second_Quarter_of_the_year_2025-R.pdf" target="_blank" rel="noopener">RURA ICT sector statistics, second quarter 2025</a></li>
+      <li><a href="https://www.ictpolicyafrica.org/en/document/ioz50603bfq?page=8" target="_blank" rel="noopener">RURA, Regulations for International Gateway Traffic Verification System (2012), Article 9</a></li>
+      <li><a href="https://www.3gpp.org/technologies/ntn-overview" target="_blank" rel="noopener">3GPP: Non-Terrestrial Networks (NTN) overview</a></li>
+      <li><a href="https://itecspec.com/3gpp/29.571/s/5.4.3.2" target="_blank" rel="noopener">3GPP TS 29.571, clause 5.4.3.2: RatType values</a></li>
+      <li><a href="https://www.ucc.co.ug/wp-content/uploads/2026/07/Brief-of-AI-1.13.pdf" target="_blank" rel="noopener">UCC: WRC-27 agenda item 1.13 brief (Jul 2026)</a></li>
+      <li><a href="https://meatechwatch.com/2025/12/18/airtel-africa-to-roll-out-starlink-direct-to-cell-service-across-14-markets-in-2026/" target="_blank" rel="noopener">MEA Tech Watch: Airtel Africa to roll out Starlink Direct-to-Cell across 14 markets (18 Dec 2025)</a></li>
+      <li><a href="https://spaceinafrica.com/2025/08/08/tanzania-introduces-new-guidelines-for-satellite-to-mobile-phone-services/" target="_blank" rel="noopener">Space in Africa: Tanzania&rsquo;s satellite-to-mobile guidelines (8 Aug 2025)</a></li>
+    </ol>
+  </section>
+
+  <p class="foot">Prepared by Frutos · Kigali · <a href="../tools/">Trial tools</a> · <a href="https://wa.me/250788312423" target="_blank" rel="noopener">WhatsApp</a></p>
+</main>
+<script>
+(function(){
+  var r=document.documentElement;
+  try{ var s=localStorage.getItem("fk_bypass_theme"); if(s) r.setAttribute("data-theme",s); }catch(e){}
+  document.getElementById("theme").addEventListener("click",function(){
+    var cur=r.getAttribute("data-theme"), dk=window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var nx=cur?(cur==="dark"?"light":"dark"):(dk?"light":"dark"); r.setAttribute("data-theme",nx);
+    try{ localStorage.setItem("fk_bypass_theme",nx); }catch(e){}
+  });
+})();
+</script>
+</body>
+</html>
