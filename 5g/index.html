@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>5G Hands-on Weekend · Frutos Kamanzi</title>
+<meta name="description" content="Two live Saturday mornings online, 7 and 14 November 2026: trace a 5G call end to end and find the fault when it fails. RWF 60,000 until 1 November. 15 seats.">
+<meta name="author" content="Frutos Kamanzi">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Frutos Kamanzi">
+<meta property="og:title" content="5G Hands-on Weekend · live online, 7 and 14 Nov">
+<meta property="og:description" content="Trace a 5G call end to end and find the fault when it fails. Two Saturday mornings with an engineer who spent 18 years inside Rwanda's mobile cores. RWF 60,000 until 1 Nov.">
+<meta property="og:url" content="https://fkamanzi.github.io/telco-portfolio/5g/">
+<meta property="og:image" content="https://fkamanzi.github.io/telco-portfolio/5g/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="5G Hands-on Weekend with Frutos Kamanzi: live online, Saturday 7 and Saturday 14 November 2026">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050D1A; --panel:#0A1628; --panel2:#071121; --ink:#EAF2FF; --dim:#93ABCF; --line:#1B3358;
+  --accent:#3FD0FF; --amber:#F5B942; --green:#39D98A; --on:#03111F;
+  --grid:rgba(63,208,255,.055); --glow:rgba(63,208,255,.20);
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EEF3FA; --panel:#FFFFFF; --panel2:#F4F7FC; --ink:#0A1A33; --dim:#4B6487; --line:#CFDBEC;
+    --accent:#0B78B5; --amber:#9A6200; --green:#13844F; --on:#FFFFFF;
+    --grid:rgba(11,120,181,.06); --glow:rgba(11,120,181,.14); color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EEF3FA; --panel:#FFFFFF; --panel2:#F4F7FC; --ink:#0A1A33; --dim:#4B6487; --line:#CFDBEC;
+  --accent:#0B78B5; --amber:#9A6200; --green:#13844F; --on:#FFFFFF;
+  --grid:rgba(11,120,181,.06); --glow:rgba(11,120,181,.14); color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif; font-size:16px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px; padding-bottom:76px;
+}
+a{color:inherit}
+.wrap{max-width:1080px; margin:0 auto; padding:0 16px}
+.top{position:sticky; top:0; z-index:5; background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(8px); border-bottom:1px solid var(--line)}
+.top .wrap{display:flex; align-items:center; justify-content:space-between; gap:12px; height:54px}
+.mark{font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; text-decoration:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mark b{color:var(--accent); font-weight:600}
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; background:var(--accent); color:var(--on); font-weight:700; font-size:15.5px; padding:12px 16px; border-radius:11px; text-decoration:none; border:1px solid var(--accent); cursor:pointer}
+.btn.ghost{background:transparent; color:var(--ink); border-color:var(--line)}
+.btn.small{font-size:14px; padding:8px 12px; border-radius:9px}
+.btn svg{width:18px; height:18px; flex:none}
+.kick{font-family:var(--mono); font-size:12.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent)}
+h1{font-stretch:112%; font-weight:800; font-size:clamp(34px,6.4vw,62px); line-height:1.02; letter-spacing:-.02em; margin:14px 0 16px}
+h1 em{font-style:normal; color:var(--amber)}
+h2{font-stretch:108%; font-weight:800; font-size:clamp(24px,3.6vw,34px); line-height:1.1; letter-spacing:-.01em; margin:0 0 18px}
+.lead{font-size:clamp(17px,2.1vw,20px); color:var(--dim); max-width:640px; margin:0 0 22px}
+.lead b{color:var(--ink); font-weight:700}
+.hero{padding:44px 0 30px; display:grid; grid-template-columns:1.35fr .9fr; gap:34px; align-items:center}
+.ctas{display:flex; flex-wrap:wrap; gap:10px; margin-top:6px}
+.price{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:0 0 0 1px transparent, 0 20px 60px -30px var(--glow)}
+.price .who{display:flex; gap:14px; align-items:center; margin-bottom:16px}
+.price .who img{width:74px; height:74px; border-radius:50%; object-fit:cover; object-position:50% 12%; background:linear-gradient(160deg,var(--accent),#1a4f7a); border:2px solid var(--line)}
+.price .who p{margin:0; font-size:14px; color:var(--dim); line-height:1.4}
+.price .who p b{display:block; color:var(--ink); font-size:16px}
+.amount{font-stretch:110%; font-weight:800; font-size:44px; line-height:1; letter-spacing:-.02em}
+.amount small{font-size:18px; font-weight:700; letter-spacing:0; color:var(--dim); margin-right:6px}
+.until{font-family:var(--mono); font-size:12.5px; color:var(--amber); margin:8px 0 2px}
+.then{font-size:14px; color:var(--dim); margin:0 0 14px}
+.facts{list-style:none; padding:0; margin:0 0 16px; display:grid; gap:7px; font-size:14.5px}
+.facts li{display:flex; gap:9px; align-items:flex-start}
+.facts li::before{content:""; flex:none; width:7px; height:7px; margin-top:8px; border-radius:2px; background:var(--green)}
+.price .btn{width:100%}
+section{padding:34px 0}
+.grid4{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+.card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px}
+.card .n{font-family:var(--mono); font-size:12px; color:var(--accent); letter-spacing:.08em}
+.card h3{font-size:18px; line-height:1.2; margin:8px 0 8px; font-stretch:105%}
+.card p{margin:0; color:var(--dim); font-size:14.5px}
+.lab{display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:center; background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--panel)), var(--panel)); border:1px solid var(--line); border-radius:16px; padding:22px}
+.lab .flow{font-family:var(--mono); font-size:13px; display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.lab .flow span{border:1px solid var(--line); background:var(--panel2); border-radius:8px; padding:5px 9px}
+.lab .flow span.bad{border-color:#E5484D; color:#E5484D}
+.lab .flow span.ok{border-color:var(--green); color:var(--green)}
+.lab h2{margin-bottom:8px}
+.lab p{margin:0; color:var(--dim)}
+.days{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.day{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px}
+.day .d{font-family:var(--mono); font-size:12.5px; color:var(--amber); letter-spacing:.06em; text-transform:uppercase}
+.day h3{font-size:20px; margin:6px 0 12px; line-height:1.2; font-stretch:106%}
+.day ol{margin:0; padding-left:20px; color:var(--dim); display:grid; gap:5px}
+.day ol li b{color:var(--ink); font-weight:600}
+.between{margin:14px 0 0; color:var(--dim); font-size:14.5px}
+.two{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.list{list-style:none; padding:0; margin:0; display:grid; gap:9px}
+.list li{display:flex; gap:10px; align-items:flex-start}
+.list li svg{flex:none; width:20px; height:20px; color:var(--green); margin-top:2px}
+.ways{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+.way{display:flex; flex-direction:column; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px}
+.way .tag{font-family:var(--mono); font-size:12px; color:var(--accent); letter-spacing:.08em; text-transform:uppercase}
+.way h3{margin:0; font-size:19px; line-height:1.2}
+.way .p{font-weight:800; font-size:26px; font-stretch:108%}
+.way p{margin:0; color:var(--dim); font-size:14.5px; flex:1}
+.steps{counter-reset:s; list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+.steps li{counter-increment:s; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px 18px 18px 60px; position:relative}
+.steps li::before{content:counter(s); position:absolute; left:18px; top:16px; width:30px; height:30px; border-radius:50%; background:var(--accent); color:var(--on); font-weight:800; display:grid; place-items:center}
+.steps li b{display:block; margin-bottom:4px}
+.steps li span{color:var(--dim); font-size:14.5px}
+.note{color:var(--dim); font-size:14.5px; margin:14px 0 0}
+.me{display:grid; grid-template-columns:150px 1fr; gap:22px; align-items:center}
+.me img{width:150px; height:150px; border-radius:50%; object-fit:cover; object-position:50% 12%; background:linear-gradient(160deg,var(--accent),#1a4f7a); border:2px solid var(--line)}
+.me p{margin:0 0 10px; color:var(--dim)}
+.me p b{color:var(--ink)}
+.faq{display:grid; gap:10px}
+.faq details{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+.faq summary{cursor:pointer; font-weight:700}
+.faq details p{margin:8px 0 0; color:var(--dim)}
+footer{border-top:1px solid var(--line); padding:22px 0 30px; color:var(--dim); font-size:14px}
+footer .wrap{display:flex; flex-wrap:wrap; gap:10px 22px; justify-content:space-between}
+.bar{position:fixed; left:0; right:0; bottom:0; z-index:6; background:color-mix(in srgb, var(--panel) 94%, transparent); backdrop-filter:blur(8px); border-top:1px solid var(--line)}
+.bar .wrap{display:flex; align-items:center; justify-content:space-between; gap:12px; height:64px}
+.bar .t{font-size:14px; line-height:1.25; color:var(--dim)}
+.bar .t b{color:var(--ink); font-size:16px}
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr; padding-top:28px}
+  .grid4{grid-template-columns:1fr 1fr}
+  .ways,.steps{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .grid4,.days,.two{grid-template-columns:1fr}
+  .lab{grid-template-columns:1fr}
+  .me{grid-template-columns:1fr}
+  .me img{width:120px; height:120px}
+  .top .btn span{display:none}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="../">Frutos Kamanzi · <b>5G hands-on</b></a>
+    <a class="btn small" data-wa="seat" href="https://wa.me/250788312423?text=Muraho%20Frutos.%20I%20want%20a%20seat%20in%20the%205G%20Hands-on%20Weekend%20(7%20and%2014%20Nov)."><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg><span>Book on WhatsApp</span></a>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <div class="kick" id="kick">Live online · Sat 7 + Sat 14 Nov 2026 · 09:00–13:00 Kigali</div>
+      <h1>Trace a 5G call end to end. <em>Find the fault</em> when it fails.</h1>
+      <p class="lead">Two Saturday mornings, live, with <b>Frutos Kamanzi</b>: 18 years inside Rwanda's mobile cores at MTN, Tigo, Airtel and Ericsson Managed Services.</p>
+      <div class="ctas">
+        <a class="btn" data-wa="seat" href="https://wa.me/250788312423?text=Muraho%20Frutos.%20I%20want%20a%20seat%20in%20the%205G%20Hands-on%20Weekend%20(7%20and%2014%20Nov).">Book my seat on WhatsApp</a>
+        <a class="btn ghost" href="#pay">How to pay</a>
+      </div>
+    </div>
+    <aside class="price" aria-label="Price and seats">
+      <div class="who"><img src="../frutos.webp" width="738" height="751" alt="Frutos Kamanzi"><p><b>Frutos Kamanzi</b>Core network engineer, Kigali</p></div>
+      <div class="amount" id="amt"><small>RWF</small>60,000</div>
+      <p class="until" id="until">Early-bird price until Sunday 1 November, 23:59</p>
+      <p class="then" id="then">Then RWF 90,000. 15 seats.</p>
+      <ul class="facts">
+        <li>2 live sessions, 4 hours each</li>
+        <li>The 9 narrated 5G lessons to keep</li>
+        <li>Course pack, quiz and certificate</li>
+        <li>Pay by MoMo; card from abroad</li>
+      </ul>
+      <a class="btn" data-wa="seat" href="https://wa.me/250788312423?text=Muraho%20Frutos.%20I%20want%20a%20seat%20in%20the%205G%20Hands-on%20Weekend%20(7%20and%2014%20Nov).">Book my seat</a>
+    </aside>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>By the end you can</h2>
+    <div class="grid4">
+      <div class="card"><div class="n">01</div><h3>Follow a phone from power-on to a voice call</h3><p>Registration, PDU session, IMS and the VoNR call, paging and handover: what each node does and what it logs.</p></div>
+      <div class="card"><div class="n">02</div><h3>Read how the core treats your traffic</h3><p>QoS flows, policy and charging, and the point where a call starts to lose quality.</p></div>
+      <div class="card"><div class="n">03</div><h3>See the whole network in one picture</h3><p>Transport, sync, roaming, slicing, NR carriers, beams and BWP: what breaks a 5G service outside the core.</p></div>
+      <div class="card"><div class="n">04</div><h3>Find the cause, not the symptom</h3><p>Capstone: after a gNB upgrade, VoNR calls land on LTE. You trace why and write the fix.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="lab">
+      <div>
+        <h2>On a live 5G core, not slides</h2>
+        <p>Each session runs on a live open-source 5G core (Open5GS with UERANSIM). We register a simulated phone and open a data session. Then we break it on purpose and read the logs until it works again.</p>
+        <div class="flow" aria-label="Lab flow"><span>UE</span><span>gNB</span><span>AMF</span><span>SMF</span><span>UPF</span><span class="bad">fault</span><span>logs</span><span class="ok">fixed</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The two Saturdays</h2>
+    <div class="days">
+      <div class="day"><div class="d">Sat 7 Nov · 09:00–13:00</div><h3>Getting on the network and making a call</h3>
+        <ol><li><b>Registration</b> and the PDU session</li><li><b>IMS</b> and VoNR call set-up</li><li><b>Paging</b>: how the network finds the phone</li><li><b>Handover</b>, including when a call drops to 4G</li><li><b>Live lab:</b> register, break, fix</li></ol></div>
+      <div class="day"><div class="d">Sat 14 Nov · 09:00–13:00</div><h3>Quality, money and the rest of the network</h3>
+        <ol><li><b>QoS</b>, policy and charging</li><li><b>Transport</b>, sync and roaming</li><li><b>Slicing</b>, NR carriers, beams and BWP</li><li><b>Capstone:</b> the VoNR-to-LTE fault hunt</li><li><b>Certificate</b> of completion</li></ol></div>
+    </div>
+    <p class="between">Between the two: watch the narrated lessons at your own pace and bring your questions to the cohort WhatsApp group.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap two">
+    <div>
+      <h2>You get</h2>
+      <ul class="list">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>2 live sessions online, 8 hours in all</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>The 9 narrated 5G lessons, yours to keep</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Course pack: check cards, labs, MOP and evidence templates, quiz</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Certificate of completion</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Questions answered in the cohort group until 21 November</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Made for</h2>
+      <ul class="list">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>NOC, core, RAN, transport and IT engineers</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Final-year students and graduates in telecom or IT</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Anyone moving from 4G work into 5G</li>
+      </ul>
+      <p class="note">You need a laptop or phone with internet. Basic IP networking helps. No 5G experience needed. Taught in English; questions welcome in French, Kiswahili or Kinyarwanda.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Other ways to learn with me</h2>
+    <div class="ways">
+      <div class="way"><div class="tag">Start today</div><h3>Self-paced 4G + 5G</h3><div class="p">RWF 45,000</div><p>All 18 narrated lessons (9 for 4G, 9 for 5G, about 115 minutes), the course pack with 72 quiz questions, and one 30-minute live call with me.</p><a class="btn ghost" href="https://wa.me/250788312423?text=Muraho%20Frutos.%20I%20want%20the%20self-paced%204G%20%2B%205G%20course.">Get the course</a></div>
+      <div class="way"><div class="tag">This week</div><h3>1:1 session, 60 minutes</h3><div class="p">RWF 40,000</div><p>Your fault, your lab or your interview. Bring it and we work on it together, live.</p><a class="btn ghost" href="https://wa.me/250788312423?text=Muraho%20Frutos.%20I%20want%20a%201%3A1%20session.">Book a session</a></div>
+      <div class="way"><div class="tag">For companies</div><h3>Your team</h3><div class="p">Your dates</div><p>A private course for your engineers, on your own vendors' networks, on dates you choose. Ask me for a quote.</p><a class="btn ghost" href="https://wa.me/250788312423?text=Muraho%20Frutos.%20I%20would%20like%20a%20quote%20for%20a%20private%205G%20course%20for%20my%20team.">Ask for a quote</a></div>
+    </div>
+  </div>
+</section>
+
+<section id="pay">
+  <div class="wrap">
+    <h2>Book and pay in 3 steps</h2>
+    <ol class="steps">
+      <li><b>WhatsApp me</b><span>Send "5G SEAT" to 0788 312 423.</span></li>
+      <li><b>Pay by MoMo</b><span>Send the fee to 0788 312 423 (Frutos Kamanzi), then reply with the MoMo confirmation.</span></li>
+      <li><b>Receive everything</b><span>The joining link, the lessons and the course pack, the same day.</span></li>
+    </ol>
+    <p class="note">Outside Rwanda? Ask for a card payment link. Paid but can't make the dates? Your seat moves to the next cohort.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap me">
+    <img src="../frutos.webp" width="738" height="751" alt="Frutos Kamanzi">
+    <div>
+      <h2>Your trainer</h2>
+      <p><b>Frutos Kamanzi.</b> 18 years inside Rwanda's mobile cores at MTN, Tigo, Airtel and Ericsson Managed Services.</p>
+      <p>Today I build diagnostic tools that show where service and money leak, and I teach engineers to go from evidence to root cause.</p>
+      <a class="btn ghost small" href="../">See my work</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Questions</h2>
+    <div class="faq">
+      <details><summary>Do I need a 5G phone or my own lab?</summary><p>No. The lab runs on my side and you follow it live, step by step.</p></details>
+      <details><summary>Is it recorded?</summary><p>The live sessions are not recorded. You keep the 9 narrated 5G lessons and the course pack.</p></details>
+      <details><summary>Which platform?</summary><p>Google Meet. The link comes on WhatsApp after payment.</p></details>
+      <details><summary>Can my company pay?</summary><p>Yes. Ask on WhatsApp, or choose "Your team" for a private course on your dates.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap"><span>© 2026 Frutos Kamanzi · Kigali</span><a href="../">Portfolio and tools</a></div>
+</footer>
+
+<div class="bar" role="complementary" aria-label="Book a seat">
+  <div class="wrap">
+    <div class="t"><b id="barPrice">RWF 60,000</b><br><span id="barNote">until Sun 1 Nov · 15 seats</span></div>
+    <a class="btn" data-wa="seat" href="https://wa.me/250788312423?text=Muraho%20Frutos.%20I%20want%20a%20seat%20in%20the%205G%20Hands-on%20Weekend%20(7%20and%2014%20Nov).">Book my seat</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Kigali is UTC+2 all year. Early bird ends Sun 1 Nov 2026 23:59:59 Kigali; the cohort starts Sat 7 Nov 09:00 Kigali.
+  var EB = Date.UTC(2026,10,1,21,59,59), START = Date.UTC(2026,10,7,7,0,0), now = Date.now();
+  function $(i){ return document.getElementById(i); }
+  if (now > START) {
+    $("kick").textContent = "Next cohort: dates on WhatsApp";
+    $("amt").innerHTML = "<small>RWF</small>90,000";
+    $("until").textContent = "This cohort has started.";
+    $("then").textContent = "Message me to join the next one.";
+    $("barPrice").textContent = "Next cohort";
+    $("barNote").textContent = "join the waiting list";
+    var t = "https://wa.me/250788312423?text=" + encodeURIComponent("Muraho Frutos. Please put me on the list for the next 5G Hands-on Weekend.");
+    [].forEach.call(document.querySelectorAll('[data-wa="seat"]'), function(a){ a.href = t; });
+  } else if (now > EB) {
+    $("amt").innerHTML = "<small>RWF</small>90,000";
+    $("until").textContent = "Starts Saturday 7 November, 09:00 Kigali";
+    $("then").textContent = "15 seats.";
+    $("barPrice").textContent = "RWF 90,000";
+    $("barNote").textContent = "starts Sat 7 Nov · 15 seats";
+  }
+})();
+</script>
+</body>
+</html>
