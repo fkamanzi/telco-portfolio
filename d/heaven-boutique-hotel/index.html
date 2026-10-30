@@ -83,7 +83,7 @@ background-image:radial-gradient(rgba(0,0,0,.035) 1px,transparent 1px);backgroun
       <li>Never quotes a price or a promise you have not published</li>
       <li>Every enquiry lands in one place, so no customer waits</li>
     </ul>
-    <div class="price"><b>RWF 450,000</b><span>first 3 months, setup included · then RWF 150,000 a month · live on your own number in 10 days</span></div>
+    <div class="price"><b>Live in 10 days</b><span>on your own WhatsApp number, with your team still in charge</span></div>
     <a class="btn" href="https://wa.me/250788312423?text=Muraho%20Frutos%2C%20about%20the%20WhatsApp%20assistant%20demo%20for%20Heaven%20Boutique%20Hotel." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg>Set it up on our number</a>
     <div class="by">Demo built from heavenrwanda.com by Frutos Kamanzi, Kigali · not live and not affiliated with Heaven Boutique Hotel · WhatsApp 0788 312 423</div>
   </section>
@@ -140,7 +140,7 @@ const WA="https://wa.me/250788312423?text=Muraho%20Frutos%2C%20about%20the%20Wha
   function cta(){
     if(ctaShown||SHOT) return; ctaShown=true;
     const d=document.createElement('div');d.className='card';
-    d.innerHTML='This is how your '+esc(D.who)+' would be answered on WhatsApp, day and night. <b>Live on your own number in 10 days.</b> RWF 450,000 for the first 3 months, setup included, then RWF 150,000 a month.<a class="btn" href="'+WA+'" target="_blank" rel="noopener">Set it up on our number</a>';
+    d.innerHTML='This is how your '+esc(D.who)+' would be answered on WhatsApp, day and night. <b>Live on your own number in 10 days.</b><a class="btn" href="'+WA+'" target="_blank" rel="noopener">Set it up on our number</a>';
     chat.appendChild(d);scroll();
   }
   function reply(q,instant){
