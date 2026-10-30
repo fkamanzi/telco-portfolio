@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Kigali Car Rental · WhatsApp assistant demo</title>
+<meta name="description" content="A demo built for Kigali Car Rental from carrentalinkigali.com: ask it what your customers ask and get the answer in seconds.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kigali Car Rental: your WhatsApp assistant (demo)">
+<meta property="og:description" content="Ask it what your customers ask. Every answer comes from carrentalinkigali.com.">
+<meta property="og:url" content="https://fkamanzi.github.io/telco-portfolio/d/kigali-car-rental/">
+<meta property="og:image" content="https://fkamanzi.github.io/telco-portfolio/d/kigali-car-rental/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050D1A;--ink:#EAF2FF;--dim:#93ABCF;--line:#1B3358;--a:#F5B942;--wa:#1FA855;--biz:#2F6B3B;
+--chat:#EFE7DD;--me:#D9FDD3;--them:#FFFFFF;--txt:#111B21;--sub:#667781}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;
+background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:28px 28px}
+a{color:inherit}
+.app{min-height:100%;display:flex;align-items:center;justify-content:center;gap:56px;padding:28px 16px}
+.side{max-width:430px}
+.k{font-family:"JetBrains Mono",monospace;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--a)}
+.side h1{font-size:44px;line-height:1.05;letter-spacing:-.02em;margin:12px 0 14px;font-weight:800}
+.side h1 em{font-style:normal;color:var(--a)}
+.side p{color:#C9D8EE;font-size:17px;line-height:1.5;margin:0 0 16px}
+.side ul{list-style:none;padding:0;margin:0 0 22px;display:grid;gap:10px}
+.side li{display:flex;gap:10px;font-size:16px;line-height:1.45}
+.side li::before{content:"";flex:none;width:9px;height:9px;border-radius:3px;background:var(--a);margin-top:7px}
+.price{border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:16px;background:rgba(10,22,40,.7)}
+.price b{display:block;font-size:30px;color:var(--a);font-weight:800;line-height:1.1}
+.price span{color:var(--dim);font-size:14.5px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--wa);color:#fff;font-weight:800;font-size:17px;padding:14px 18px;border-radius:14px;text-decoration:none;border:0;cursor:pointer}
+.btn svg{width:21px;height:21px}
+.by{color:var(--dim);font-size:13px;margin-top:16px;line-height:1.5}
+.phone{width:100%;max-width:420px;height:min(860px,calc(100vh - 56px));display:flex;flex-direction:column;border-radius:28px;overflow:hidden;background:var(--chat);
+border:1px solid #23395E;box-shadow:0 30px 80px -30px rgba(63,208,255,.35);color:var(--txt);color-scheme:light}
+.hd{display:flex;align-items:center;gap:11px;background:var(--biz);color:#fff;padding:12px 14px}
+.av{flex:none;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-weight:800;font-size:15px;letter-spacing:.02em}
+.hd .nm{font-weight:800;font-size:16.5px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .st{font-size:12.5px;opacity:.85}
+.hd .tx{flex:1;min-width:0}
+.hd a{flex:none;font-size:12.5px;font-weight:800;text-decoration:none;background:#fff;color:var(--biz);border-radius:999px;padding:7px 11px}
+.strip{background:#FFF4D6;color:#5A4300;font-size:12px;line-height:1.35;padding:7px 14px;text-align:center;border-bottom:1px solid #F0DDA8}
+.chat{flex:1;overflow-y:auto;padding:14px 12px 6px;display:flex;flex-direction:column;gap:8px;
+background-image:radial-gradient(rgba(0,0,0,.035) 1px,transparent 1px);background-size:14px 14px}
+.day{align-self:center;background:#fff;color:var(--sub);font-size:11.5px;border-radius:8px;padding:4px 10px;box-shadow:0 1px .5px rgba(0,0,0,.08);margin-bottom:2px}
+.m{max-width:84%;padding:7px 10px 6px;border-radius:10px;font-size:15px;line-height:1.38;box-shadow:0 1px .5px rgba(0,0,0,.12);position:relative;white-space:pre-wrap;word-wrap:break-word}
+.m .t{display:block;text-align:right;font-size:11px;color:var(--sub);margin-top:2px}
+.them{align-self:flex-start;background:var(--them);border-top-left-radius:2px}
+.me{align-self:flex-end;background:var(--me);border-top-right-radius:2px}
+.src{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:12px;color:#027EB5;text-decoration:none;white-space:normal}
+.src svg{width:13px;height:13px;flex:none}
+.note{display:block;margin-top:6px;font-size:12px;color:var(--sub);font-style:italic}
+.typing{align-self:flex-start;background:#fff;border-radius:10px;border-top-left-radius:2px;padding:10px 12px;box-shadow:0 1px .5px rgba(0,0,0,.12)}
+.typing i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#9AA6AE;margin:0 2px;animation:b 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+.card{align-self:stretch;background:#0B1E36;color:#EAF2FF;border-radius:14px;padding:13px 14px;font-size:14px;line-height:1.45;margin:4px 0}
+.card b{color:var(--a)}
+.card .btn{margin-top:10px;font-size:15px;padding:11px 14px}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:8px 10px 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid #C9D3D9;background:#fff;color:#0B5F7A;font:600 13.5px/1 "Archivo",system-ui,sans-serif;border-radius:999px;padding:9px 12px;cursor:pointer}
+.bar{display:flex;gap:8px;padding:8px 10px calc(10px + env(safe-area-inset-bottom))}
+.bar input{flex:1;min-width:0;border:0;border-radius:22px;padding:12px 15px;font:15px "Archivo",system-ui,sans-serif;background:#fff;color:var(--txt);outline:none;box-shadow:0 1px .5px rgba(0,0,0,.1)}
+.bar button{flex:none;width:46px;height:46px;border-radius:50%;border:0;background:#00A884;color:#fff;display:grid;place-items:center;cursor:pointer}
+.bar button svg{width:20px;height:20px}
+@media (max-width:900px){.side{display:none}.app{padding:0;display:block}.phone{max-width:none;height:100vh;height:100dvh;border-radius:0;border:0}}
+</style></head>
+<body>
+<div class="app">
+  <section class="side">
+    <div class="k">Demo for Kigali Car Rental</div>
+    <h1>Every WhatsApp answered <em>in seconds, day and night.</em></h1>
+    <p>Ask it what your customers ask. The answers come only from carrentalinkigali.com, with the page behind each one.</p>
+    <ul>
+      <li>Answers only from your own pages, and links the page behind each answer</li>
+      <li>Hands over to your team when it is unsure, instead of guessing</li>
+      <li>Never quotes a price or a promise you have not published</li>
+      <li>Every enquiry lands in one place, so no customer waits</li>
+    </ul>
+    <div class="price"><b>RWF 450,000</b><span>first 3 months, setup included · then RWF 150,000 a month · live on your own number in 10 days</span></div>
+    <a class="btn" href="https://wa.me/250788312423?text=Muraho%20Frutos%2C%20about%20the%20WhatsApp%20assistant%20demo%20for%20Kigali%20Car%20Rental." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3Z"/></svg>Set it up on our number</a>
+    <div class="by">Demo built from carrentalinkigali.com by Frutos Kamanzi, Kigali · not live and not affiliated with Kigali Car Rental · WhatsApp 0788 312 423</div>
+  </section>
+
+  <main class="phone" aria-label="Chat demo">
+    <header class="hd">
+      <div class="av">KC</div>
+      <div class="tx"><div class="nm">Kigali Car Rental</div><div class="st" id="st">assistant · demo</div></div>
+      <a href="https://wa.me/250788312423?text=Muraho%20Frutos%2C%20about%20the%20WhatsApp%20assistant%20demo%20for%20Kigali%20Car%20Rental." target="_blank" rel="noopener">Get this</a>
+    </header>
+    <div class="strip">Demo built from carrentalinkigali.com · not live · every answer links the page it comes from</div>
+    <div class="chat" id="chat" aria-live="polite"><div class="day">TODAY</div></div>
+    <div class="chips" id="chips"></div>
+    <form class="bar" id="f" autocomplete="off">
+      <input id="t" placeholder="Ask like a customer would…" aria-label="Your question" enterkeyhint="send">
+      <button aria-label="Send"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 20.5 22 12 2.5 3.5 2.5 10l13 2-13 2z"/></svg></button>
+    </form>
+  </main>
+</div>
+<script>
+const D={"name": "Kigali Car Rental", "short": "Kigali Car Rental", "who": "customers", "hello": "Muraho! Welcome to Kigali Car Rental. Ask about daily prices, a driver, the deposit, airport delivery, insurance or how to book.", "chips": ["prices", "driver", "deposit", "airport", "momo", "cancel"], "qa": [{"id": "prices", "chip": "Daily prices", "q": "How much is a car per day?", "a": "Economy sedans $35 a day, SUVs and 4x4 $45, 4x4 pickups $75, vans and minibuses $80, and luxury Land Cruisers from $110. The 2023 Land Cruiser Safari (7 seats) is from $170 a day.", "src": "https://carrentalinkigali.com/", "k": ["per day", "a day", "daily", "rate", "rates", "4x4", "sedan", "land cruiser", "rav4", "van", "minibus", "pickup", "prix", "igiciro"], "g": ["price", "how much", "cost", "usd", "dollar", "car", "suv"]}, {"id": "driver", "chip": "With a driver", "q": "Can I hire a driver too?", "a": "Yes, a professional English-speaking driver is available with any vehicle for an extra $20 a day.", "src": "https://carrentalinkigali.com/", "k": ["driver", "chauffeur", "with driver", "umushoferi"], "g": []}, {"id": "rules", "chip": "Self-drive rules", "q": "What do I need to rent a self-drive car?", "a": "You must be at least 23 (25 for the Land Cruiser V8 and premium SUVs), have held your licence for at least 2 years, and bring a passport or national ID. An International Driving Permit is recommended if your licence isn't in English.", "src": "https://carrentalinkigali.com/terms/", "k": ["self drive", "self-drive", "licence", "license", "permit", "age", "requirements", "documents", "passport", "need to rent", "permis"], "g": []}, {"id": "deposit", "chip": "Deposit", "q": "Is there a deposit?", "a": "Yes, a refundable security deposit at pickup: $200 for economy cars, $300 for SUVs and $500 for Land Cruisers. It comes back within 24 hours of return if there is no damage.", "src": "https://carrentalinkigali.com/", "k": ["deposit", "the deposit", "a deposit", "deposit for", "security", "caution", "guarantee", "refundable"], "g": []}, {"id": "momo", "chip": "Pay by MoMo?", "q": "Can I pay with MoMo?", "a": "Yes. Cash (USD or RWF), MTN Mobile Money, Airtel Money, bank transfer and card are accepted. Full payment is made before handover.", "src": "https://carrentalinkigali.com/", "k": ["momo", "mobile money", "airtel money", "card", "visa", "mastercard", "cash", "bank transfer", "payment method", "how to pay", "pay with", "kwishyura"], "g": ["pay", "payment"]}, {"id": "airport", "chip": "Airport delivery", "q": "Can you bring the car to the airport?", "a": "Yes, delivery at Kigali International Airport is free for every rental, with meet-and-greet and a name sign in arrivals. Your flight is tracked, and if it is late the driver waits at no extra charge.", "src": "https://carrentalinkigali.com/airport-transfer-kigali/", "k": ["airport", "kgl", "flight", "arrival", "arrivals", "pick me up", "pickup at", "deliver", "delivery", "aéroport"], "g": []}, {"id": "cancel", "chip": "Cancellation", "q": "What is your cancellation policy?", "a": "Free cancellation up to 48 hours before pickup. Cancelling within 48 hours costs 30%, and a no-show is charged one day's rental.", "src": "https://carrentalinkigali.com/terms/", "k": ["cancel", "cancellation", "refund", "no show", "no-show", "change my booking", "annuler"], "g": []}, {"id": "insurance", "chip": "Insurance", "q": "Is insurance included?", "a": "Yes, every rental includes comprehensive insurance (CDW) with an excess of $300 to $800 depending on the car category. Optional Super Cover reduces the excess to zero for a small daily fee.", "src": "https://carrentalinkigali.com/terms/", "k": ["insurance", "insured", "cdw", "excess", "accident", "damage", "super cover", "assurance", "ubwishingizi"], "g": []}, {"id": "fuel", "chip": "Fuel policy", "q": "What is the fuel policy?", "a": "Full to full: the car comes with a full tank and goes back full. Otherwise the refuelling cost plus a $15 service charge comes off the deposit.", "src": "https://carrentalinkigali.com/terms/", "k": ["fuel", "petrol", "diesel", "tank", "gas", "essence", "lisansi"], "g": []}, {"id": "office", "chip": "Office hours", "q": "Where is your office and when are you open?", "a": "The office is on KG 624 St, Kigali, open 6:00 AM to 10:00 PM every day, with 24/7 WhatsApp support and roadside assistance.", "src": "https://carrentalinkigali.com/", "k": ["office", "where", "address", "open", "hours", "located", "location", "aho", "adresse"], "g": ["when", "time"]}, {"id": "book", "chip": "How to book", "q": "How do I book?", "a": "Send your dates, the car you want and the pickup point (the Kigali office, KGL airport, your hotel or another place in Kigali). Full payment before handover, refundable deposit at pickup.", "src": "https://carrentalinkigali.com/", "k": ["book", "booking", "reserve", "reservation", "rent a car", "hire a car", "available", "availability", "tomorrow", "next week", "réserver"], "g": []}, {"id": "border", "chip": "Uganda / Tanzania?", "q": "Can I drive the car to Uganda or Tanzania?", "a": "Cross-border travel needs written authorisation in advance and extra insurance, so ask the team before you book.", "src": "https://carrentalinkigali.com/terms/", "k": ["cross border", "cross-border", "border", "uganda", "tanzania", "burundi", "congo", "drc", "kenya", "outside rwanda"], "g": []}]};
+const WA="https://wa.me/250788312423?text=Muraho%20Frutos%2C%20about%20the%20WhatsApp%20assistant%20demo%20for%20Kigali%20Car%20Rental.";
+(function(){
+  const chat=document.getElementById('chat'), chips=document.getElementById('chips'), f=document.getElementById('f'), t=document.getElementById('t'), st=document.getElementById('st');
+  const P=new URLSearchParams(location.search);
+  const PLAY=(P.get('play')||'').split(',').filter(Boolean), SHOT=P.has('shot');
+  const asked=new Set(); let answered=0, ctaShown=false, busy=false;
+  function norm(s){
+    return (' '+String(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim()+' ')
+      .split(' ').map(w=>(w.length>3&&w.endsWith('s')&&!w.endsWith('ss'))?w.slice(0,-1):w).join(' ');
+  }
+  const QA=D.qa.map(q=>Object.assign({},q,{K:[...new Set(q.k.map(norm))],G:[...new Set(q.g.map(norm))]}));
+  function match(text){
+    const s=norm(text); let best=null, bs=0;
+    for(const q of QA){
+      let sc=0;
+      for(const k of q.K) if(k.trim() && s.includes(k)) sc+=3+k.length/1000;
+      for(const g of q.G) if(g.trim() && s.includes(g)) sc+=1;
+      if(sc>bs){bs=sc;best=q;}
+    }
+    return bs>=2?best:null;
+  }
+  const now=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  function scroll(){chat.scrollTop=chat.scrollHeight;}
+  function bubble(cls,html){const d=document.createElement('div');d.className='m '+cls;d.innerHTML=html+'<span class="t">'+now()+'</span>';chat.appendChild(d);scroll();return d;}
+  function srcLink(u){let p=u.replace(/^https?:\/\/(www\.)?/,'').replace(/\/$/,'');p=decodeURIComponent(p);
+    return '<a class="src" href="'+esc(u)+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>'+esc(p)+'</a>';}
+  function renderChips(){
+    const order=D.chips.concat(D.qa.map(q=>q.id)).filter((v,i,a)=>a.indexOf(v)===i);
+    const left=order.filter(id=>!asked.has(id)).slice(0,5);
+    chips.innerHTML=left.map(id=>{const q=D.qa.find(x=>x.id===id);return '<button type="button" class="chip" data-id="'+id+'">'+esc(q.chip)+'</button>';}).join('');
+  }
+  function cta(){
+    if(ctaShown||SHOT) return; ctaShown=true;
+    const d=document.createElement('div');d.className='card';
+    d.innerHTML='This is how your '+esc(D.who)+' would be answered on WhatsApp, day and night. <b>Live on your own number in 10 days.</b> RWF 450,000 for the first 3 months, setup included, then RWF 150,000 a month.<a class="btn" href="'+WA+'" target="_blank" rel="noopener">Set it up on our number</a>';
+    chat.appendChild(d);scroll();
+  }
+  function reply(q,instant){
+    const go=()=>{
+      if(q&&q.h){asked.add(q.id);bubble('them',esc(q.a)+'<span class="note">Demo: in the live version this question reaches the team\u2019s phone at once, and their answer is added for next time.</span>');}
+      else if(q){asked.add(q.id);bubble('them',esc(q.a)+'<br>'+srcLink(q.src));answered++;}
+      else{bubble('them','Good question. A person from the '+esc(D.short)+' team will answer you here shortly.<span class="note">Demo: in the live version this question reaches the team’s phone at once, and their answer is added for next time.</span>');}
+      st.textContent='assistant · demo';renderChips();busy=false;
+      if(answered===2) setTimeout(cta,instant?0:900);
+    };
+    if(instant){go();return;}
+    busy=true;st.textContent='typing…';
+    const ty=document.createElement('div');ty.className='typing';ty.innerHTML='<i></i><i></i><i></i>';chat.appendChild(ty);scroll();
+    setTimeout(()=>{ty.remove();go();},650+Math.min(900,(q?q.a.length:80)*4));
+  }
+  function ask(text,q,instant){
+    if(busy) return;
+    bubble('me',esc(text));
+    reply(q||match(text),instant);
+  }
+  chips.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const q=D.qa.find(x=>x.id===b.dataset.id);ask(q.q,q);});
+  f.addEventListener('submit',e=>{e.preventDefault();const v=t.value.trim();if(!v)return;t.value='';ask(v);});
+  bubble('them',esc(D.hello));
+  renderChips();
+  if(PLAY.length){for(const id of PLAY){const q=D.qa.find(x=>x.id===id);if(q){bubble('me',esc(q.q));reply(q,true);}}}
+})();
+</script>
+</body></html>
