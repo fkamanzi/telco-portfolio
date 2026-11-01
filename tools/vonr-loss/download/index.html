@@ -68,7 +68,7 @@ footer { border-top: 1px solid var(--line); padding-top: 12px; font-size: 12px; 
   <p>One HTML file. Open it in any browser on your laptop: your PM files are read on your computer and never uploaded.</p>
   <div class="actions">
     <a class="btn primary" id="get" href="../VoNR_Loss.html" download="VoNR_Loss.html">Download the HTML file</a>
-    <a class="btn ghost" href="../">Open it online instead</a>
+    <a class="btn ghost" id="online" href="../">Open it online</a>
   </div>
   <p class="file">VoNR_Loss.html · 285 KB</p>
   <ul>
@@ -80,9 +80,16 @@ footer { border-top: 1px solid var(--line); padding-top: 12px; font-size: 12px; 
 </main>
 <script>
 (function () {
-  var a = document.getElementById('get'), s = document.getElementById('status');
+  var a = document.getElementById('get'), s = document.getElementById('status'), on = document.getElementById('online');
+  var phone = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') || (window.matchMedia && matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 820);
+  if (phone) {
+    s.textContent = 'On a phone, open it online. Phone file viewers show a downloaded HTML file without running it.';
+    on.className = 'btn primary'; a.className = 'btn ghost';
+    a.parentNode.insertBefore(on, a);
+    return;
+  }
   setTimeout(function () {
-    try { a.click(); s.textContent = 'Your download has started. If it did not, use the button below.'; }
+    try { a.click(); s.textContent = 'Your download has started. Open the file with Chrome, Edge, Firefox or Safari. If it did not start, use the button below.'; }
     catch (e) { s.textContent = 'Use the button below to download the file.'; }
   }, 600);
 }());
