@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Download VoNR Loss Studio</title>
+<meta name="description" content="Download VoNR Loss Studio as one HTML file. Open it in any browser: VoNR DL/UL packet loss from Ericsson NR PDCP counters, read on your computer. Prepared by Frutos.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Download VoNR Loss Studio · trial by Frutos">
+<meta property="og:description" content="One HTML file. Open it in any browser; your PM files are read on your computer and never uploaded.">
+<meta property="og:image" content="https://fkamanzi.github.io/telco-portfolio/tools/vonr-loss/preview.png">
+<meta property="og:url" content="https://fkamanzi.github.io/telco-portfolio/tools/vonr-loss/download/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* One card, one action: the file. Same tokens as the tool. */
+:root {
+  --bg: #e8eff0; --panel: #fbfdfd; --ink: #0c1b21; --ink-2: #3e535c; --muted: #687b84; --line: #d3dee1; --line-2: #bccbd0;
+  --accent: #00717b; --accent-strong: #008c98; --accent-wash: #dcf0f1; --accent-ink: #ffffff; --focus: #1f6fd1;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif; --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0b1214; --panel: #121b1e; --ink: #e4eef0; --ink-2: #adc0c5; --muted: #7f949b; --line: #222f33; --line-2: #33444a; --accent: #3fc3cc; --accent-strong: #67d6dd; --accent-wash: #0f282b; --accent-ink: #061416; --focus: #6aa8ff; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #0b1214; --panel: #121b1e; --ink: #e4eef0; --ink-2: #adc0c5; --muted: #7f949b; --line: #222f33; --line-2: #33444a; --accent: #3fc3cc; --accent-strong: #67d6dd; --accent-wash: #0f282b; --accent-ink: #061416; --focus: #6aa8ff; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font-body); min-height: 100vh; display: grid; place-items: center;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: max(24px, env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-bottom, 0px)); }
+main { width: 100%; max-width: 560px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 28px 24px; display: flex; flex-direction: column; gap: 18px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand svg { flex: none; }
+.brand svg .bx { stroke: var(--line-2); stroke-width: 1.5; } .brand svg .pk { fill: var(--ink-2); }
+.brand svg .ls { fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 2 2; } .brand svg .wv { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; }
+h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 32px; line-height: 1; letter-spacing: .01em; }
+h1 span { color: var(--accent); }
+.sub { margin: 4px 0 0; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+p { margin: 0; color: var(--ink-2); max-width: 60ch; }
+.status { font-weight: 600; color: var(--ink); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 6px; padding: 11px 18px; font: 600 15px var(--font-body); text-decoration: none; border: 1px solid var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
+.btn.ghost { color: var(--accent); background: transparent; }
+.btn.ghost:hover { background: var(--accent-wash); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.file { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+ul { margin: 0; padding-left: 18px; color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; }
+footer { border-top: 1px solid var(--line); padding-top: 12px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <div class="brand">
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+      <rect class="bx" x="1" y="1" width="38" height="38" rx="8" fill="none"/>
+      <path class="wv" d="M7 15c2.5-5 5.5-5 8 0s5.5 5 8 0 5.5-5 8 0"/>
+      <rect class="pk" x="7" y="23" width="4.6" height="9" rx="1.2"/><rect class="pk" x="13.6" y="23" width="4.6" height="9" rx="1.2"/>
+      <rect class="ls" x="20.2" y="23" width="4.6" height="9" rx="1.2"/><rect class="pk" x="26.8" y="23" width="4.6" height="9" rx="1.2"/>
+    </svg>
+    <div><h1>VoNR Loss <span>Studio</span></h1><p class="sub">Ericsson NR · voice bearer DL/UL packet loss · 3GPP TS 28.552</p></div>
+  </div>
+  <p class="status" id="status" role="status">The download starts in a moment.</p>
+  <p>One HTML file. Open it in any browser on your laptop: your PM files are read on your computer and never uploaded.</p>
+  <div class="actions">
+    <a class="btn primary" id="get" href="../vonr_loss_studio_v1.0_01Nov2026.html" download="vonr_loss_studio_v1.0_01Nov2026.html">Download the HTML file</a>
+    <a class="btn ghost" href="../">Open it online instead</a>
+  </div>
+  <p class="file">vonr_loss_studio_v1.0_01Nov2026.html · 283 KB</p>
+  <ul>
+    <li>A synthetic demo is inside, so you see it work before you add your own files.</li>
+    <li>The demo and the calculator are free; your own files get 3 runs.</li>
+    <li>Reading XLSX exports needs an internet connection; CSV and 3GPP XML do not.</li>
+  </ul>
+  <footer>Isaano · Prepared by Frutos · v1.0 · 1 Nov 2026 · Independent tool, not affiliated with Ericsson.</footer>
+</main>
+<script>
+(function () {
+  var a = document.getElementById('get'), s = document.getElementById('status');
+  setTimeout(function () {
+    try { a.click(); s.textContent = 'Your download has started. If it did not, use the button below.'; }
+    catch (e) { s.textContent = 'Use the button below to download the file.'; }
+  }, 600);
+}());
+</script>
+</body>
+</html>
