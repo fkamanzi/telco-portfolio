@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3G Device Census</title>
+<meta name="description" content="A self-serve trial that turns an organisation's list of connected devices into 4G readiness, the units that stop working when 3G and then 2G are switched off, and a month-by-month replacement plan. Prepared by Frutos.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="3G Device Census · trial by Frutos">
+<meta property="og:description" content="A self-serve trial that turns an organisation's list of connected devices into 4G readiness, the units that stop working when 3G and then 2G are switched off, and a month-by-month replacement plan. Prepared by Frutos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1512; --panel:#14201B; --panel2:#0B130F; --ink:#E8F0EA; --dim:#8BA596; --line:#27372F;
+  --grid:rgba(190,242,100,.07); --accent:#BEF264; --accent2:#A3E635; --warn:#F2B134; --bad:#FF6B5E; --good:#39D98A;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+    --grid:rgba(20,80,50,.06); --accent:#4D7C0F; --accent2:#3F6212; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+  --grid:rgba(20,80,50,.06); --accent:#4D7C0F; --accent2:#3F6212; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+.wrap{max-width:860px; margin:0 auto; padding-inline:16px; padding-block:22px 40px}
+.exp{font-family:"Archivo",sans-serif; font-stretch:125%}
+.mono{font-family:var(--mono)}
+
+/* Header / title block */
+.head{border:1.5px solid var(--ink); background:var(--panel)}
+.head-top{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:14px 16px}
+.brandline{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 6px}
+.title{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:26px; line-height:1.05; margin:0; letter-spacing:-.01em}
+.subtitle{margin:6px 0 0; font-size:14.5px; color:var(--dim); max-width:46ch}
+.theme{flex:none; border:1.5px solid var(--line); background:transparent; color:var(--dim); font:inherit; font-size:13px; padding:6px 10px; cursor:pointer; border-radius:8px}
+.head-grid{display:grid; grid-template-columns:1fr 1fr; border-top:1.5px solid var(--ink)}
+.head-grid>div{padding:9px 16px; min-width:0}
+.head-grid>div:first-child{border-right:1px solid var(--line)}
+.head-grid dt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim)}
+.head-grid dd{margin:3px 0 0; font-weight:600; font-size:14.5px}
+.inst-field{display:inline-block; min-width:12ch; border:0; border-bottom:1.5px dashed var(--line); background:transparent; color:var(--ink); font:inherit; font-weight:600; font-size:14.5px; padding:0 2px}
+.inst-field:focus{outline:0; border-bottom-color:var(--accent)}
+
+/* Intake */
+.intake{margin-top:16px; border:1.5px solid var(--line); background:var(--panel); border-radius:0}
+.intake-in{padding:16px}
+.drop{border:1.6px dashed var(--line); background:var(--panel2); border-radius:12px; padding:20px 16px; text-align:center; transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,var(--panel2))}
+.drop h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; margin:0 0 4px}
+.drop p{margin:0 0 14px; font-size:14px; color:var(--dim)}
+.btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+.btn{border:1.5px solid var(--ink); background:var(--ink); color:var(--bg); font:inherit; font-weight:700; font-size:15px; padding:11px 16px; border-radius:10px; cursor:pointer}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.hint{margin:12px 2px 0; font-family:var(--mono); font-size:11.5px; color:var(--dim); line-height:1.6}
+.runs{display:flex; align-items:center; gap:8px; margin-top:14px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+.pip{width:9px; height:9px; border-radius:50%; border:1.5px solid var(--line)}
+.pip.used{background:var(--accent); border-color:var(--accent)}
+
+/* Report */
+#report[hidden]{display:none}
+.report{margin-top:16px; display:flex; flex-direction:column; gap:14px}
+.verdict{border:1.5px solid var(--ink); background:var(--panel); padding:16px; border-left:5px solid var(--accent)}
+.verdict .vh{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin:0 0 6px}
+.verdict p{margin:0; font-size:16.5px; line-height:1.45}
+.verdict b{color:var(--accent)}
+.tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+.tile{border:1.5px solid var(--line); background:var(--panel); padding:12px}
+.tile .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+.tile .v{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:25px; line-height:1.1; margin-top:5px; font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px; color:var(--dim); margin-top:2px}
+.tile .v.warn{color:var(--warn)} .tile .v.bad{color:var(--bad)} .tile .v.good{color:var(--good)}
+.card{border:1.5px solid var(--line); background:var(--panel); padding:14px 16px}
+.card h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:15px; margin:0 0 2px}
+.card .cap{font-size:12.5px; color:var(--dim); margin:0 0 12px}
+.funnel{display:flex; flex-direction:column; gap:7px}
+.frow{display:grid; grid-template-columns:92px 1fr auto; align-items:center; gap:10px}
+.frow .fl{font-size:13px; color:var(--dim)}
+.fbar{height:26px; background:var(--panel2); border:1px solid var(--line); position:relative; overflow:hidden}
+.fbar>span{position:absolute; inset:0 auto 0 0; background:linear-gradient(90deg,var(--accent2),var(--accent)); opacity:.9}
+.frow .fv{font-family:var(--mono); font-size:12.5px; font-variant-numeric:tabular-nums; min-width:68px; text-align:right}
+.drop-tag{display:inline-block; font-family:var(--mono); font-size:10.5px; color:var(--bad); margin-left:6px}
+.net{display:flex; flex-direction:column; gap:9px}
+.nrow{display:grid; grid-template-columns:70px 1fr auto; align-items:center; gap:10px}
+.nrow .nl{font-size:13.5px; font-weight:600}
+.nbar{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.nbar>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.nbar>span.low{background:var(--bad)}
+.nrow .nv{font-family:var(--mono); font-size:12.5px; min-width:48px; text-align:right}
+.hours{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:4px}
+.hcell{aspect-ratio:1/2.2; border:1px solid var(--line); position:relative}
+.hlabels{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:5px; font-family:var(--mono); font-size:8.5px; color:var(--dim)}
+.hlabels span{text-align:center}
+.lat{display:flex; gap:10px}
+.lat .lc{flex:1; border:1px solid var(--line); background:var(--panel2); padding:10px; text-align:center}
+.lat .lk{font-family:var(--mono); font-size:10.5px; color:var(--dim); text-transform:uppercase}
+.lat .lv{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:20px; margin-top:3px; font-variant-numeric:tabular-nums}
+.legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--dim)}
+.legend i{display:inline-block; width:11px; height:11px; margin-right:5px; vertical-align:-1px}
+.summary{border:1.5px solid var(--ink); background:var(--panel2)}
+.summary-h{display:flex; justify-content:space-between; align-items:center; padding:11px 16px; border-bottom:1.5px solid var(--line)}
+.summary-h h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:14px; margin:0}
+.copy{border:1.5px solid var(--line); background:transparent; color:var(--ink); font:inherit; font-size:13px; font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer}
+.copy.done{border-color:var(--accent); color:var(--accent)}
+.summary pre{margin:0; padding:16px; font-family:var(--mono); font-size:12.5px; line-height:1.65; white-space:pre-wrap; color:var(--ink)}
+
+/* Gate */
+.gate{margin-top:16px; border:1.5px solid var(--accent); background:var(--panel); padding:20px 16px; text-align:center}
+.gate h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:19px; margin:0 0 6px}
+.gate p{margin:0 auto 14px; font-size:14.5px; color:var(--dim); max-width:48ch}
+.gate .btn{background:var(--accent); border-color:var(--accent); color:#06140D; text-decoration:none; display:inline-block}
+
+.foot{margin-top:20px; font-family:var(--mono); font-size:11px; color:var(--dim); line-height:1.7}
+.err{color:var(--bad); font-family:var(--mono); font-size:12.5px; margin-top:10px}
+@media (max-width:560px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .title{font-size:22px}
+  .frow{grid-template-columns:70px 1fr auto}
+  .lat{flex-wrap:wrap}
+}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+.drops{display:grid; grid-template-columns:1fr; gap:12px}
+.drops.two{grid-template-columns:1fr 1fr}
+.fname{margin:10px 0 0; font-family:var(--mono); font-size:12px; color:var(--accent); min-height:1.3em; overflow-wrap:anywhere}
+.runrow{display:flex; justify-content:center; gap:10px; margin-top:12px; flex-wrap:wrap}
+.assume{display:flex; flex-wrap:wrap; gap:12px; margin-top:14px}
+.assume label{font-family:var(--mono); font-size:11.5px; color:var(--dim); display:flex; flex-direction:column; gap:4px}
+.assume input{width:140px; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font:inherit; font-family:var(--mono); font-size:13px; padding:7px 8px; border-radius:8px}
+.bars{display:flex; flex-direction:column; gap:9px}
+.brow{display:grid; grid-template-columns:minmax(70px,24%) 1fr auto; align-items:center; gap:10px}
+.brow .bl{font-size:13px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.brow .bb{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.brow .bb>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.brow .bb>span.bad{background:var(--bad)}
+.brow .bb>span.warn{background:var(--warn)}
+.brow .bb>span.dim{background:var(--dim); opacity:.55}
+.brow .bv{font-family:var(--mono); font-size:12.5px; text-align:right; min-width:70px; font-variant-numeric:tabular-nums}
+.brow.pair .bb{height:9px}
+.brow.pair .bbs{display:flex; flex-direction:column; gap:3px}
+.stack{display:flex; height:24px; border:1px solid var(--line); overflow:hidden}
+.stack span{display:block; height:100%}
+.tbl{width:100%; border-collapse:collapse; font-size:13px}
+.tbl th{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); text-align:left; padding:6px 6px; border-bottom:1.5px solid var(--line)}
+.tbl td{padding:8px 6px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; vertical-align:top}
+.tbl td.num,.tbl th.num{text-align:right}
+.tbl td.flag{color:var(--bad); font-weight:700}
+.tbl td.ok{color:var(--good); font-weight:700}
+.tblwrap{overflow-x:auto}
+.tile .v .u{font-size:.56em; font-weight:600; font-stretch:100%; color:var(--dim); letter-spacing:0}
+.note-s{font-size:12px; color:var(--dim); margin:10px 0 0; line-height:1.5}
+.why{margin:10px 0 0; font-size:13px; line-height:1.5; max-width:62ch; border-left:3px solid var(--accent); padding:2px 0 2px 10px}
+.why-k{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-right:6px}
+.why a{color:var(--dim); white-space:nowrap}
+.chip{display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; padding:2px 7px; border:1px solid var(--line); border-radius:999px; color:var(--dim); white-space:nowrap}
+@media (max-width:560px){ .drops.two{grid-template-columns:1fr} .brow{grid-template-columns:minmax(60px,30%) 1fr auto} }
+
+.runs{display:block; line-height:1.65}
+.runs b{color:var(--ink); font-weight:700}
+.gdot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--warn); margin-right:8px; vertical-align:0}
+.gdot.ok{background:var(--good)} .gdot.end{background:var(--bad)}
+.glink{border:0; background:none; color:var(--accent); font:inherit; font-family:var(--mono); font-size:12px; text-decoration:underline; text-underline-offset:2px; cursor:pointer; padding:0 2px; margin-left:8px; white-space:nowrap}
+.unlock{position:relative; margin-top:14px; border:1.5px solid var(--accent); background:var(--panel); padding:16px 16px 14px; text-align:left}
+.unlock h3{margin:0 30px 4px 0; font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; line-height:1.2}
+.unlock p{margin:0; font-size:14px; color:var(--dim); line-height:1.5}
+.unlock label{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin:12px 0 5px}
+.urow{display:flex; gap:8px; flex-wrap:wrap}
+.urow input{flex:1 1 220px; min-width:0; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font-family:var(--mono); font-size:13px; padding:10px; border-radius:9px}
+.urow input:focus{outline:0; border-color:var(--accent)}
+.urow .btn{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+.unlock .uerr{margin-top:9px; color:var(--bad); font-family:var(--mono); font-size:12.5px}
+.unlock .uask{margin-top:12px; font-size:13.5px}
+.unlock .uask a{color:var(--accent); font-weight:700}
+.uclose{position:absolute; top:6px; right:6px; border:0; background:none; color:var(--dim); font-size:24px; line-height:1; cursor:pointer; padding:4px 9px}
+.gate .btn{color:var(--bg)}
+.summary-h .acts{display:flex; gap:8px}
+@media print{
+  :root,:root[data-theme]{--bg:#fff; --panel:#fff; --panel2:#f4f4f4; --ink:#111; --dim:#555; --line:#ccc; color-scheme:light}
+  body{background:#fff!important}
+  .intake,.gate,.unlock,#theme,.copy,.pdf,.foot{display:none!important}
+  .card,.tiles,.verdict,.summary{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="head">
+    <div class="head-top">
+      <div>
+        <p class="brandline">Network migration · Trial</p>
+        <h1 class="title">3G Device Census</h1>
+        <p class="subtitle">Turn your list of connected devices (payment terminals, ATMs, meters, trackers, alarms) into 4G readiness, the units that stop working when 3G and then 2G are switched off, and a month-by-month replacement plan.</p>
+        <p class="why"><span class="why-k">Why now</span>On 28 Jul 2026 the ICT ministry asked every organisation to identify equipment that relies on 2G or 3G, test replacements and confirm service before 3G goes off on 30 June 2027. <a href="https://www.minict.gov.rw/news-detail/rwanda-to-switch-off-3g-networks-on-30-june-2027" target="_blank" rel="noopener">MINICT, 28 Jul 2026 ↗</a></p>
+      </div>
+      <button class="theme" id="theme" type="button" aria-label="Switch light or dark">◐ Theme</button>
+    </div>
+    <dl class="head-grid">
+      <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your organisation" aria-label="Organisation name" spellcheck="false"></dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+    </dl>
+  </header>
+  <section class="intake">
+    <div class="intake-in">
+      <div class="drop" id="drop0"><h2>Drop in your device list</h2><p>A CSV with one row per connected device, or one row per model with a count. It is read in your browser and never leaves this page.</p><div class="btns"><button class="btn" id="pick0" type="button">Choose a CSV file</button><button class="btn ghost" id="sample" type="button">Run an illustrative sample</button></div><input id="file0" type="file" accept=".csv,text/csv" hidden></div>
+      <p class="hint">Expected columns (any order, matched loosely): <b>network</b> (2G, 3G, 4G, LTE-M, NB-IoT), optional <b>type</b> (POS terminal, meter, tracker, alarm), <b>site</b> (branch or district), <b>critical</b> (yes or no), <b>status</b> (none, ordered, installed, tested), <b>last_seen</b> (date) and <b>count</b>. Method: devices that support 4G, LTE-M, NB-IoT or 5G are ready; 3G-at-best devices lose 3G on 30 June 2027; 2G-only devices stop when 2G is retired (working towards December 2028); a replacement counts as done once it is tested.</p>
+      <div class="assume"><label>Finish replacements by<input data-in="finish" type="date" value="2027-05-31"></label><label>Cost per replacement, RWF<input data-in="cost" type="number" step="any" min="0" placeholder="optional"></label></div>
+      <div class="runs" id="runs" aria-live="polite"></div>
+      <div class="unlock" id="unlock" hidden>
+        <button class="uclose" id="uclose" type="button" aria-label="Close">×</button>
+        <h3>Your own file needs a 3-day trial code</h3>
+        <p>The illustrative sample is free. To read your own export, enter the code Frutos sent you. Your file still never leaves this page.</p>
+        <form id="uform" autocomplete="off">
+          <label for="ucode">Trial code</label>
+          <div class="urow"><input id="ucode" name="code" spellcheck="false" autocapitalize="off" placeholder="FK1… or the full link"><button class="btn" type="submit">Unlock</button></div>
+        </form>
+        <p class="uerr" id="uerr" role="alert" hidden></p>
+        <p class="uask">No code yet? <a id="uwa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a> · or call +250 731 000 163</p>
+      </div>
+      <p class="err" id="err" hidden></p>
+    </div>
+  </section>
+  <section id="report" class="report" hidden aria-live="polite"></section>
+  <section id="gate" class="gate" hidden>
+    <h2>Your 3-day trial has ended</h2>
+    <p>The full version reads your whole device register, sets the replacement order and the test protocol for each device class, and keeps the migration plan current for the transition working group until 30 June 2027. Let's set it up for <b id="gate-inst">your organisation</b>.</p>
+    <a class="btn" id="gate-wa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a>
+    <p class="hint" style="margin-top:12px">Or call +250 731 000 163</p>
+  </section>
+  <p class="foot" id="foot"></p>
+</main>
+<script>
+var T3G=new Date(2027,5,30).getTime(), T2G=new Date(2028,11,1).getTime(), DORM=90*864e5;
+var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function yes(v){ return /^(y|yes|true|1|critical|high|essential|tier\s?1|p1)$/i.test(String(v||"").trim()); }
+function radioOf(v){ // the best network a device supports: "lte" (4G, LTE-M, NB-IoT, 5G), "g3" 3G at best, "g2" 2G only, "off" not cellular, null unreadable
+  var x=String(v||"").toLowerCase().replace(/[_\-\/()+,;|]+/g," ").replace(/\s+/g," ").trim();
+  if(!x) return null;
+  if(/\b(4g|lte|cat ?m1?|lte ?m|nb ?iot|nbiot|cat ?1|cat ?4|5g|nr|volte)\b/.test(x)) return "lte";
+  if(/\b(3g|umts|wcdma|hspa|hsdpa|hsupa)\b/.test(x)) return "g3";
+  if(/\b(2g|gsm|gprs|edge)\b/.test(x)) return "g2";
+  if(/\b(ethernet|lan|fibre|fiber|wifi|wi fi|wired|no sim|vsat|satellite|microwave)\b/.test(x)) return "off";
+  return null; }
+function stOf(v){ var x=String(v||"").toLowerCase().trim();
+  if(/\b(not|un|to be)\s?tested\b|pending test|awaiting test/.test(x)) return "plan";
+  if(/tested|verified|migrated|complete|done|live on 4g/.test(x)) return "done";
+  if(/install|replac|order|plan|schedul|procur|progress|budget|purchas/.test(x)) return "plan";
+  return "none"; }
+var TOOL={
+ analyse:function(ps,inp,U){
+  var P=ps[0],H=P.header,used=[];
+  function pk(al){ var c=U.pick(H.filter(function(h){return used.indexOf(h)<0;}),al); if(c) used.push(c); return c; }
+  pk(["device_id","id","serial","serial_no","serial_number","imei","asset_id","asset_tag","terminal_id","meter_no","meter_number","msisdn","sim","iccid","tag"]);
+  pk(["operator","sim_operator","mno","carrier","network_operator","provider"]);
+  var cL=pk(["last_seen","last_active","last_report","last_contact","last_connected","last_seen_date","seen"]);
+  var cP=pk(["status","replacement_status","migration_status","migration","replacement","stage","progress"]);
+  var cC=pk(["critical","criticality","priority","essential","tier"]);
+  var cQ=pk(["count","quantity","qty","units","number_of_devices","devices"]);
+  var cR=pk(["network","radio","technology","tech","rat","max_rat","capability","generation","connectivity","bearer","module","modem"]);
+  var cT=pk(["type","device_type","equipment","category","class","kind","asset_type"]);
+  var cS=pk(["site","branch","district","location","area","region","zone","station","depot","office","sector"]);
+  if(!cR) throw "I need a column with each device's network (2G, 3G, 4G, LTE-M or NB-IoT), for example 'network'.";
+  var D=[], bad=0, off=0, tMax=0, dated=0;
+  P.rows.forEach(function(r){
+    var q=1; if(cQ){ q=U.num(r[cQ]); if(isNaN(q)||q<0){ bad++; return; } }
+    var k=radioOf(r[cR]); if(k==="off"){ off+=q; return; }
+    var ls=cL?U.time(r[cL]):NaN; if(!isNaN(ls)){ dated++; if(ls>tMax) tMax=ls; }
+    D.push({k:k||"unk", st:cP?stOf(r[cP]):"none", crit:cC?yes(r[cC]):false, q:q,
+      t:cT?(String(r[cT]||"").trim()||"(blank)"):"Devices", s:cS?(String(r[cS]||"").trim()||"(blank)"):"All", ls:ls});
+  });
+  if(!D.length) throw "No cellular devices found. Check the network column (2G, 3G, 4G, LTE-M, NB-IoT).";
+  return {D:D,bad:bad,off:off,tMax:tMax,hasL:dated>0,hasC:!!cC,hasP:!!cP,hasS:!!cS,hasT:!!cT};
+ },
+ render:function(R,inp,U,ctx){
+  var tg=U.time(inp.finish); if(isNaN(tg)) tg=new Date(2027,4,31).getTime(); if(tg>T3G) tg=T3G;
+  var cost=U.num(inp.cost), now=new Date(), m0=new Date(now.getFullYear(),now.getMonth(),1), tgD=new Date(tg);
+  var months=Math.max(1,(tgD.getFullYear()-m0.getFullYear())*12+(tgD.getMonth()-m0.getMonth())+1);
+  var ref=R.hasL?R.tMax:Date.now();
+  var Z={n:0,lte:0,done:0,g3p:0,g3n:0,g2:0,unk:0,c3:0,dorm:0}, byT={}, byS={};
+  function sl(o,k){ return o[k]||(o[k]={k:k,n:0,ready:0,g3:0,g2:0,plan:0,crit:0,risk:0,dorm:0,tt:{}}); }
+  R.D.forEach(function(d){
+    var q=d.q, a=sl(byT,d.t), b=sl(byS,d.s), risk=(d.k==="g3"||d.k==="g2")&&d.st!=="done";
+    Z.n+=q; a.n+=q; b.n+=q;
+    if(d.st==="done"){ Z.done+=q; a.ready+=q; b.ready+=q; }
+    else if(d.k==="lte"){ Z.lte+=q; a.ready+=q; b.ready+=q; }
+    else if(d.k==="g3"){ if(d.st==="plan"){ Z.g3p+=q; a.plan+=q; b.plan+=q; } else Z.g3n+=q; a.g3+=q; b.g3+=q; if(d.crit){ Z.c3+=q; a.crit+=q; b.crit+=q; } }
+    else if(d.k==="g2"){ Z.g2+=q; a.g2+=q; b.g2+=q; if(d.st==="plan"){ a.plan+=q; b.plan+=q; } }
+    else Z.unk+=q;
+    if(risk){ a.risk+=q; b.risk+=q; b.tt[d.t]=(b.tt[d.t]||0)+q; if(!isNaN(d.ls)&&ref-d.ls>DORM){ Z.dorm+=q; a.dorm+=q; } }
+  });
+  var ready=Z.lte+Z.done, g3=Z.g3p+Z.g3n, rate=Math.ceil(g3/months);
+  var T=Object.keys(byT).map(function(k){return byT[k];}).sort(function(a,b){ return (b.risk-a.risk)||(b.n-a.n); });
+  var S=Object.keys(byS).map(function(k){return byS[k];}).sort(function(a,b){ return (b.crit-a.crit)||(b.risk-a.risk)||(b.n-a.n); });
+  function mainType(s){ var best=null; Object.keys(s.tt).forEach(function(t){ if(best===null||s.tt[t]>s.tt[best]) best=t; }); return best; }
+  // month-by-month order for 3G-at-best devices: critical first, then the sites with most devices at risk
+  var srank={}; S.forEach(function(s,i){ srank[s.k]=i; });
+  var lots=R.D.filter(function(d){ return d.k==="g3"&&d.st!=="done"; }).slice().sort(function(a,b){ return (b.crit-a.crit)||(srank[a.s]-srank[b.s])||(a.t<b.t?-1:a.t>b.t?1:0); });
+  var plan=[], li=0, left=lots.length?lots[0].q:0, cum=0;
+  for(var m=0;m<months&&li<lots.length;m++){ var md=new Date(m0.getFullYear(),m0.getMonth()+m,1), cap=rate, row={t:md,n:0,c:0,s:{}};
+    while(cap>0&&li<lots.length){ var take=Math.min(cap,left), L=lots[li]; row.n+=take; if(L.crit) row.c+=take; row.s[L.s]=(row.s[L.s]||0)+take; cap-=take; left-=take; if(left<=0){ li++; left=li<lots.length?lots[li].q:0; } }
+    cum+=row.n; row.cum=cum; plan.push(row); }
+  function mon(t){ var d=new Date(t); return MONTHS[d.getMonth()]+" "+d.getFullYear(); }
+  function topSites(o){ return Object.keys(o).sort(function(a,b){ return o[b]-o[a]; }).slice(0,2).join(", "); }
+  var after=new Date(tgD.getFullYear(),tgD.getMonth()+1,1), m2=Math.max(1,(new Date(T2G).getFullYear()-after.getFullYear())*12+(new Date(T2G).getMonth()-after.getMonth()));
+  var rate2=Math.ceil(Z.g2/m2), st=S.filter(function(s){ return s.risk>0; })[0], tdd=U.dd(tg);
+  var v="Of <b>"+U.fmt(Z.n)+"</b> connected devices, <b>"+U.pct(ready,Z.n)+"%</b> are ready for 4G. ";
+  v+="<b>"+U.fmt(g3)+"</b> run on 3G at best and lose 3G on <b>30 June 2027</b>, falling back to 2G at most; <b>"+U.fmt(Z.g2)+"</b> are 2G-only and stop when 2G is retired (working towards December 2028). ";
+  if(Z.unk) v+="<b>"+U.fmt(Z.unk)+"</b> have no readable network: check them first. ";
+  if(R.hasC) v+="<b>"+U.fmt(Z.c3)+"</b> of the 3G-at-best devices are marked critical. ";
+  if(R.hasP) v+="<b>"+U.fmt(Z.done)+"</b> replacements are tested and <b>"+U.fmt(Z.g3p)+"</b> more are under way. ";
+  if(g3>0){ v+="To finish by <b>"+tdd+"</b>, replace <b>"+U.fmt(rate)+"</b> a month from <b>"+mon(m0)+"</b>";
+    if(st&&S.length>1) v+="; start with <b>"+U.esc(st.k)+"</b>: <b>"+U.fmt(st.risk)+"</b> devices at risk (largest group: <b>"+U.esc(mainType(st)||"devices")+"</b>)";
+    v+=". "; }
+  else v+="No 3G-at-best device is left to replace. ";
+  if(Z.dorm) v+="<b>"+U.fmt(Z.dorm)+"</b> devices at risk have not reported for 90 days: confirm them before buying replacements. ";
+  if(cost>0) v+="At RWF "+U.fmt(cost)+" a unit, replacing every device at risk costs <b>"+U.rwf((g3+Z.g2)*cost)+"</b>.";
+  var rp=U.pct(ready,Z.n);
+  var tiles=[U.tile("Ready for 4G",rp+"%","of "+U.fmt(Z.n)+" devices",rp>=95?"good":(rp>=80?"warn":"bad")),
+    U.tile("3G at best",U.fmt(g3),"lose 3G on 30 Jun 2027",g3?"bad":"good"),
+    U.tile("2G only",U.fmt(Z.g2),"stop when 2G is retired",Z.g2?"warn":"good"),
+    U.tile("Replace a month",g3?U.fmt(rate):"0","to finish by "+tdd,g3?"warn":"good")];
+  var Sc=[];
+  Sc.push({title:"Device types ranked by devices at risk",cap:U.of("Ready = supports 4G, LTE-M, NB-IoT or 5G, or replaced and tested; in progress = replacement ordered or installed, not yet tested",12,T.length),
+    html:U.table(["Type","Devices","Ready","3G at best","2G only","In progress","At risk"],T.slice(0,12).map(function(a){ var p=U.pct(a.risk,a.n); return [a.k,U.fmt(a.n),U.fmt(a.ready),U.fmt(a.g3),U.fmt(a.g2),U.fmt(a.plan),{t:p+"%",cls:p>=50?"flag":""}]; }),[1,2,3,4,5,6])});
+  if(R.hasS&&S.length>1){ var hd=["Site","Devices","3G at best","2G only"], nc=[1,2,3]; if(R.hasC){ hd.push("Critical"); nc.push(hd.length-1); } hd.push("Mostly"); hd.push("Share at risk"); nc.push(hd.length-1);
+    Sc.push({title:"Sites ranked by devices at risk",cap:U.of("Critical 3G-at-best devices first, then the most devices at risk",12,S.length),
+      html:U.table(hd,S.slice(0,12).map(function(s){ var r=[s.k,U.fmt(s.n),U.fmt(s.g3),U.fmt(s.g2)]; if(R.hasC) r.push(s.crit?{t:U.fmt(s.crit),cls:"flag"}:"0"); r.push(s.risk?(mainType(s)||"—"):"—"); r.push(U.pct(s.risk,s.n)+"%"); return r; }),nc)}); }
+  if(g3>0) Sc.push({title:"Replacement plan to "+tdd,cap:"3G-at-best devices, critical first, then the sites with most devices at risk; test each replacement on 4G before the old unit is retired",
+    html:U.table(["Month","Replace","Critical","Main sites","Done by month end"],plan.map(function(p){ return [mon(p.t),U.fmt(p.n),U.fmt(p.c),topSites(p.s),U.pct(p.cum,g3)+"%"]; }),[1,2,4])});
+  function part(l,n,c){ return {label:l,v:n,text:U.fmt(n)+" · "+U.pct(n,Z.n)+"%",color:c}; }
+  var mix=[part("4G-capable",Z.lte,"var(--accent)"),part("Replaced and tested",Z.done,"var(--good)"),part("3G at best, replacement under way",Z.g3p,"var(--warn)"),part("3G at best, no action yet",Z.g3n,"var(--bad)"),part("2G only",Z.g2,"color-mix(in srgb, var(--warn) 45%, var(--panel2))")];
+  if(Z.unk) mix.push(part("Network not readable",Z.unk,"var(--line)"));
+  Sc.push({title:"Readiness mix",cap:"Connected devices by the best network they support and the state of their replacement",html:U.stack(mix)});
+  if(Z.dorm){ var DT=T.filter(function(a){ return a.dorm>0; }).sort(function(a,b){ return b.dorm-a.dorm; });
+    Sc.push({title:"Devices at risk that have gone quiet",cap:"No report for 90 days or more before the latest report in the file: confirm or retire them before buying replacements",
+      html:U.table(["Type","Quiet 90 days","Of devices at risk"],DT.slice(0,12).map(function(a){ return [a.k,U.fmt(a.dorm),U.fmt(a.risk)]; }),[1,2])}); }
+  var L=[]; L.push("3G DEVICE CENSUS — "+ctx.name.toUpperCase());
+  L.push(U.fmt(Z.n)+" connected devices"+(R.hasS?" across "+S.length+" sites":"")+(R.hasT?", "+T.length+" device types":"")+"   |   Prepared by Frutos"); L.push("");
+  L.push("FINDING");
+  L.push("- Ready for 4G: "+U.pct(ready,Z.n)+"% ("+U.fmt(Z.lte)+" 4G-capable"+(R.hasP?", "+U.fmt(Z.done)+" replaced and tested":"")+")");
+  L.push("- 3G at best: "+U.fmt(g3)+" devices lose 3G on 30 June 2027 and fall back to 2G at most"+(R.hasC?" ("+U.fmt(Z.c3)+" critical)":"")+(R.hasP?"; "+U.fmt(Z.g3p)+" replacements under way":""));
+  L.push("- 2G only: "+U.fmt(Z.g2)+" devices stop when 2G is retired (working towards December 2028)");
+  if(Z.unk) L.push("- Network not readable: "+U.fmt(Z.unk)+" devices; check them first");
+  if(Z.dorm) L.push("- Quiet for 90 days: "+U.fmt(Z.dorm)+" devices at risk; confirm or retire them before buying replacements");
+  if(cost>0) L.push("- Budget at RWF "+U.fmt(cost)+" a unit: "+U.rwf((g3+Z.g2)*cost)+" for "+U.fmt(g3+Z.g2)+" replacements");
+  L.push(""); L.push("MIGRATION PLAN");
+  if(g3>0){ L.push("- Replace "+U.fmt(rate)+" 3G-at-best devices a month from "+mon(m0)+" to finish by "+tdd+", critical first");
+    plan.slice(0,6).forEach(function(p){ L.push("  "+mon(p.t)+": "+U.fmt(p.n)+(p.c?" ("+U.fmt(p.c)+" critical)":"")+", mainly "+topSites(p.s)); });
+    if(plan.length>6) L.push("  … then "+U.fmt(rate)+" a month to "+mon(plan[plan.length-1].t)); }
+  else L.push("- No 3G-at-best device left to replace");
+  if(Z.g2) L.push("- Then 2G-only: "+U.fmt(Z.g2)+" devices, about "+U.fmt(rate2)+" a month from "+mon(after)+" to finish before December 2028");
+  L.push("- Test each replacement on 4G (data, SMS and voice where used) and confirm the service before the old unit is retired");
+  if(R.bad) L.push("- "+R.bad+" rows skipped (unreadable count)");
+  if(R.off) L.push("- "+U.fmt(R.off)+" devices on wired or satellite links left out of the census");
+  L.push(""); L.push("NEXT STEP");
+  L.push("- Share the full device register; I return the replacement order, the test protocol for each");
+  L.push("  device class and a migration plan ready for the regulator, in 10 working days, at a fixed price.");
+  L.push(""); L.push("Method: each device is classed by the best network it supports; the 4G class includes LTE, LTE-M, NB-IoT and 5G.");
+  L.push("Dates as announced by the ICT ministry on 28 Jul 2026: 3G off on 30 June 2027; 2G later (working towards December 2028).");
+  L.push("Note: a trial read. Figures are indicative until run on your full register.");
+  return {verdict:v,tiles:tiles,sections:Sc,summary:L.join("\n")};
+ }
+};
+</script>
+<script>
+(function(){
+"use strict";
+var CFG={"slug": "device-census", "wa": "250788312423", "defaultFor": "your organisation", "files": 1, "fileLabels": [], "summaryTitle": "CIO-ready summary", "waMsg": "Muraho Frutos. I tried the 3G Device Census for {name} and I'd like the full version.", "foot": "Read entirely in your browser \u00b7 nothing is uploaded \u00b7 personal numbers are masked on sight. 3-day trial with a code. \u00a9 2026 Frutos.", "plainTitle": "3G Device Census", "preset": "", "api": ""}, SAMPLES=["device_id,type,network,site,critical,status,last_seen\nD-0001,POS terminal,LTE Cat-1,Site 01,yes,none,2026-10-27\nD-0002,POS terminal,3G,Site 04,yes,none,2026-10-21\nD-0003,POS terminal,2G/3G,Site 06,yes,none,2026-10-27\nD-0004,POS terminal,3G,Site 01,yes,tested,2026-05-22\nD-0005,POS terminal,4G,Site 07,yes,none,2026-10-17\nD-0006,POS terminal,LTE Cat-1,Site 05,yes,none,2026-10-17\nD-0007,POS terminal,4G,Site 08,yes,none,2026-10-04\nD-0008,POS terminal,3G,Site 07,yes,none,2026-10-30\nD-0009,POS terminal,2G,Site 01,yes,tested,2026-10-20\nD-0010,POS terminal,4G,Site 01,yes,none,2026-10-04\nD-0011,POS terminal,2G/3G,Site 09,yes,none,2026-10-01\nD-0012,POS terminal,3G,Site 01,yes,none,2026-10-23\nD-0013,POS terminal,2G,Site 02,yes,installed,2026-10-12\nD-0014,POS terminal,3G,Site 10,yes,none,2026-10-03\nD-0015,POS terminal,2G,Site 08,yes,none,2026-10-19\nD-0016,POS terminal,LTE Cat-1,Site 07,yes,none,2026-10-22\nD-0017,POS terminal,2G/3G,Site 01,yes,none,2026-06-27\nD-0018,POS terminal,LTE Cat-1,Site 04,yes,none,2026-10-19\nD-0019,POS terminal,2G/3G,Site 07,yes,none,2026-10-14\nD-0020,POS terminal,LTE Cat-1,Site 03,yes,none,2026-10-16\nD-0021,POS terminal,LTE Cat-1,Site 04,yes,none,2026-10-29\nD-0022,POS terminal,3G,Site 09,yes,none,2026-10-16\nD-0023,POS terminal,4G,Site 04,yes,none,2026-10-18\nD-0024,POS terminal,4G,Site 07,yes,none,2026-10-25\nD-0025,POS terminal,4G,Site 04,yes,none,2026-10-20\nD-0026,POS terminal,LTE Cat-1,Site 10,yes,none,2026-10-11\nD-0027,POS terminal,3G,Site 08,yes,none,2026-10-02\nD-0028,POS terminal,3G,Site 07,yes,tested,2026-10-01\nD-0029,POS terminal,2G,Site 10,yes,none,2026-10-02\nD-0030,POS terminal,2G,Site 04,yes,none,2026-10-05\nD-0031,POS terminal,3G,Site 04,yes,none,2026-10-19\nD-0032,POS terminal,2G/3G,Site 10,yes,none,2026-10-02\nD-0033,POS terminal,LTE Cat-1,Site 01,yes,none,2026-10-04\nD-0034,POS terminal,4G,Site 10,yes,none,2026-10-14\nD-0035,POS terminal,2G/3G,Site 07,yes,ordered,2026-10-27\nD-0036,POS terminal,4G,Site 07,yes,none,2026-10-29\nD-0037,POS terminal,2G/3G,Site 08,yes,tested,2026-10-30\nD-0038,POS terminal,4G,Site 05,yes,none,2026-10-27\nD-0039,POS terminal,LTE Cat-1,Site 07,yes,none,2026-10-04\nD-0040,POS terminal,LTE Cat-1,Site 06,yes,none,2026-10-30\nD-0041,POS terminal,LTE Cat-1,Site 10,yes,none,2026-10-28\nD-0042,POS terminal,2G/3G,Site 03,yes,none,2026-10-12\nD-0043,POS terminal,4G,Site 07,yes,none,2026-10-28\nD-0044,POS terminal,3G,Site 07,yes,none,2026-10-13\nD-0045,POS terminal,LTE Cat-1,Site 07,yes,none,2026-10-23\nD-0046,POS terminal,LTE Cat-1,Site 06,yes,none,2026-10-11\nD-0047,POS terminal,3G,Site 05,yes,none,2026-10-11\nD-0048,POS terminal,2G/3G,Site 05,yes,none,2026-10-04\nD-0049,POS terminal,3G,Site 04,yes,none,2026-10-07\nD-0050,POS terminal,4G,Site 01,yes,none,2026-10-03\nD-0051,POS terminal,2G,Site 08,yes,ordered,2026-10-29\nD-0052,POS terminal,LTE Cat-1,Site 02,yes,none,2026-10-17\nD-0053,POS terminal,LTE Cat-1,Site 01,yes,none,2026-10-28\nD-0054,POS terminal,LTE Cat-1,Site 09,yes,none,2026-10-15\nD-0055,POS terminal,LTE Cat-1,Site 04,yes,none,2026-10-07\nD-0056,POS terminal,4G,Site 07,yes,none,2026-10-22\nD-0057,POS terminal,4G,Site 10,yes,none,2026-10-13\nD-0058,POS terminal,3G,Site 06,yes,ordered,2026-05-14\nD-0059,POS terminal,4G,Site 03,yes,none,2026-10-09\nD-0060,POS terminal,4G,Site 03,yes,none,2026-10-10\nD-0061,POS terminal,3G,Site 04,yes,none,2026-10-30\nD-0062,POS terminal,4G,Site 08,yes,none,2026-10-29\nD-0063,POS terminal,LTE Cat-1,Site 02,yes,none,2026-10-28\nD-0064,POS terminal,4G,Site 01,yes,none,2026-10-14\nD-0065,POS terminal,LTE Cat-1,Site 05,yes,none,2026-10-06\nD-0066,POS terminal,4G,Site 08,yes,none,2026-10-11\nD-0067,POS terminal,2G,Site 05,yes,ordered,2026-10-26\nD-0068,POS terminal,3G,Site 09,yes,none,2026-10-10\nD-0069,POS terminal,LTE Cat-1,Site 01,yes,none,2026-10-09\nD-0070,POS terminal,3G,Site 07,yes,installed,2026-10-20\nD-0071,POS terminal,2G,Site 01,yes,none,2026-10-05\nD-0072,POS terminal,4G,Site 06,yes,none,2026-10-10\nD-0073,POS terminal,4G,Site 06,yes,none,2026-10-10\nD-0074,POS terminal,2G/3G,Site 07,yes,none,2026-05-08\nD-0075,POS terminal,2G/3G,Site 05,yes,none,2026-10-29\nD-0076,POS terminal,4G,Site 02,yes,none,2026-10-23\nD-0077,POS terminal,3G,Site 04,yes,none,2026-10-08\nD-0078,POS terminal,2G/3G,Site 05,yes,none,2026-10-20\nD-0079,POS terminal,2G/3G,Site 09,yes,none,2026-10-03\nD-0080,POS terminal,LTE Cat-1,Site 03,yes,none,2026-10-16\nD-0081,POS terminal,2G,Site 04,yes,none,2026-10-10\nD-0082,POS terminal,LTE Cat-1,Site 02,yes,none,2026-10-27\nD-0083,POS terminal,3G,Site 10,yes,tested,2026-10-09\nD-0084,POS terminal,LTE Cat-1,Site 01,yes,none,2026-10-27\nD-0085,POS terminal,2G/3G,Site 09,yes,none,2026-10-04\nD-0086,POS terminal,2G/3G,Site 09,yes,installed,2026-10-26\nD-0087,POS terminal,LTE Cat-1,Site 07,yes,none,2026-10-30\nD-0088,POS terminal,2G,Site 01,yes,none,2026-10-25\nD-0089,POS terminal,4G,Site 05,yes,none,2026-10-01\nD-0090,POS terminal,2G/3G,Site 02,yes,installed,2026-10-21\nD-0091,POS terminal,3G,Site 01,yes,ordered,2026-10-17\nD-0092,POS terminal,4G,Site 07,yes,none,2026-10-20\nD-0093,POS terminal,2G,Site 02,yes,tested,2026-06-05\nD-0094,POS terminal,4G,Site 03,yes,none,2026-10-08\nD-0095,POS terminal,3G,Site 07,yes,none,2026-10-15\nD-0096,POS terminal,3G,Site 10,yes,installed,2026-10-24\nD-0097,POS terminal,LTE Cat-1,Site 01,yes,none,2026-10-14\nD-0098,POS terminal,3G,Site 06,yes,none,2026-10-28\nD-0099,POS terminal,3G,Site 08,yes,none,2026-10-01\nD-0100,POS terminal,4G,Site 06,yes,none,2026-10-13\nD-0101,POS terminal,4G,Site 07,yes,none,2026-10-29\nD-0102,POS terminal,4G,Site 07,yes,none,2026-10-05\nD-0103,POS terminal,4G,Site 10,yes,none,2026-10-13\nD-0104,POS terminal,LTE Cat-1,Site 08,yes,none,2026-10-26\nD-0105,POS terminal,4G,Site 01,yes,none,2026-10-21\nD-0106,POS terminal,2G,Site 07,yes,none,2026-10-16\nD-0107,POS terminal,3G,Site 10,yes,none,2026-10-12\nD-0108,POS terminal,3G,Site 10,yes,none,2026-10-14\nD-0109,POS terminal,4G,Site 07,yes,none,2026-10-15\nD-0110,POS terminal,3G,Site 10,yes,none,2026-10-08\nD-0111,POS terminal,2G/3G,Site 07,yes,none,2026-10-15\nD-0112,POS terminal,LTE Cat-1,Site 01,yes,none,2026-10-17\nD-0113,POS terminal,2G,Site 01,yes,none,2026-10-13\nD-0114,POS terminal,2G/3G,Site 05,yes,none,2026-10-18\nD-0115,POS terminal,2G,Site 08,yes,none,2026-10-22\nD-0116,POS terminal,3G,Site 01,yes,none,2026-06-20\nD-0117,POS terminal,4G,Site 06,yes,none,2026-10-15\nD-0118,POS terminal,4G,Site 01,yes,none,2026-10-14\nD-0119,POS terminal,3G,Site 02,yes,none,2026-10-08\nD-0120,POS terminal,4G,Site 06,yes,none,2026-10-26\nD-0121,POS terminal,LTE Cat-1,Site 06,yes,none,2026-10-05\nD-0122,POS terminal,LTE Cat-1,Site 01,yes,none,2026-10-06\nD-0123,POS terminal,2G/3G,Site 07,yes,none,2026-10-07\nD-0124,POS terminal,4G,Site 06,yes,none,2026-10-29\nD-0125,POS terminal,2G,Site 03,yes,ordered,2026-10-16\nD-0126,POS terminal,4G,Site 02,yes,none,2026-10-04\nD-0127,POS terminal,4G,Site 04,yes,none,2026-10-10\nD-0128,POS terminal,LTE Cat-1,Site 08,yes,none,2026-10-09\nD-0129,POS terminal,2G/3G,Site 07,yes,none,2026-10-12\nD-0130,POS terminal,2G/3G,Site 02,yes,installed,2026-10-19\nD-0131,POS terminal,3G,Site 07,yes,ordered,2026-10-09\nD-0132,POS terminal,3G,Site 01,yes,none,2026-10-02\nD-0133,POS terminal,2G/3G,Site 04,yes,ordered,2026-10-20\nD-0134,POS terminal,2G,Site 04,yes,none,2026-10-10\nD-0135,POS terminal,4G,Site 02,yes,none,2026-10-19\nD-0136,POS terminal,LTE Cat-1,Site 01,yes,none,2026-10-26\nD-0137,POS terminal,3G,Site 03,yes,ordered,2026-10-02\nD-0138,POS terminal,3G,Site 05,yes,none,2026-10-10\nD-0139,POS terminal,LTE Cat-1,Site 10,yes,none,2026-10-02\nD-0140,POS terminal,2G/3G,Site 10,yes,none,2026-10-25\nD-0141,POS terminal,4G,Site 01,yes,none,2026-10-11\nD-0142,POS terminal,3G,Site 04,yes,none,2026-10-19\nD-0143,POS terminal,3G,Site 10,yes,none,2026-10-28\nD-0144,POS terminal,3G,Site 10,yes,installed,2026-10-29\nD-0145,POS terminal,2G/3G,Site 04,yes,none,2026-10-06\nD-0146,POS terminal,LTE Cat-1,Site 09,yes,none,2026-10-15\nD-0147,POS terminal,4G,Site 09,yes,none,2026-10-25\nD-0148,POS terminal,LTE Cat-1,Site 08,yes,none,2026-10-28\nD-0149,POS terminal,LTE Cat-1,Site 07,yes,none,2026-10-13\nD-0150,POS terminal,3G,Site 07,yes,none,2026-10-26\nD-0151,POS terminal,4G,Site 06,yes,none,2026-10-02\nD-0152,POS terminal,4G,Site 03,yes,none,2026-10-25\nD-0153,POS terminal,4G,Site 10,yes,none,2026-10-09\nD-0154,POS terminal,4G,Site 02,yes,none,2026-10-08\nD-0155,POS terminal,4G,Site 04,yes,none,2026-10-17\nD-0156,POS terminal,2G,Site 04,yes,none,2026-10-18\nD-0157,POS terminal,2G/3G,Site 02,yes,none,2026-10-23\nD-0158,POS terminal,2G,Site 04,yes,none,2026-10-24\nD-0159,POS terminal,4G,Site 01,yes,none,2026-10-05\nD-0160,POS terminal,2G/3G,Site 04,yes,none,2026-10-22\nD-0161,POS terminal,2G/3G,Site 03,yes,none,2026-10-27\nD-0162,POS terminal,2G,Site 07,yes,none,2026-10-30\nD-0163,POS terminal,4G,Site 10,yes,none,2026-10-09\nD-0164,POS terminal,2G/3G,Site 01,yes,none,2026-10-18\nD-0165,POS terminal,LTE Cat-1,Site 07,yes,none,2026-10-09\nD-0166,POS terminal,4G,Site 07,yes,none,2026-10-14\nD-0167,POS terminal,2G/3G,Site 01,yes,none,2026-10-24\nD-0168,POS terminal,2G/3G,Site 09,yes,none,2026-10-15\nD-0169,ATM modem,4G,Site 10,yes,none,2026-10-25\nD-0170,ATM modem,4G,Site 01,yes,none,2026-10-08\nD-0171,ATM modem,4G,Site 07,yes,none,2026-10-13\nD-0172,ATM modem,4G,Site 07,yes,none,2026-10-21\nD-0173,ATM modem,3G HSPA,Site 02,yes,none,2026-10-08\nD-0174,ATM modem,4G,Site 01,yes,none,2026-10-21\nD-0175,ATM modem,3G HSPA,Site 07,yes,tested,2026-10-06\nD-0176,ATM modem,3G HSPA,Site 08,yes,none,2026-10-28\nD-0177,ATM modem,3G HSPA,Site 07,yes,none,2026-10-11\nD-0178,ATM modem,4G,Site 01,yes,none,2026-10-09\nD-0179,ATM modem,3G HSPA,Site 10,yes,none,2026-06-14\nD-0180,ATM modem,3G HSPA,Site 07,yes,tested,2026-10-15\nD-0181,ATM modem,GPRS,Site 04,yes,installed,2026-10-06\nD-0182,ATM modem,4G,Site 05,yes,none,2026-10-23\nD-0183,ATM modem,4G,Site 02,yes,none,2026-10-01\nD-0184,ATM modem,4G,Site 03,yes,none,2026-10-01\nD-0185,ATM modem,GPRS,Site 07,yes,none,2026-10-24\nD-0186,ATM modem,3G HSPA,Site 06,yes,none,2026-10-23\nD-0187,ATM modem,4G,Site 07,yes,none,2026-10-21\nD-0188,ATM modem,4G,Site 08,yes,none,2026-10-04\nD-0189,ATM modem,4G,Site 01,yes,none,2026-10-20\nD-0190,ATM modem,4G,Site 03,yes,none,2026-10-12\nD-0191,ATM modem,4G,Site 06,yes,none,2026-10-23\nD-0192,ATM modem,4G,Site 04,yes,none,2026-10-15\nD-0193,ATM modem,3G HSPA,Site 06,yes,ordered,2026-10-04\nD-0194,ATM modem,4G,Site 01,yes,none,2026-10-27\nD-0195,ATM modem,4G,Site 05,yes,none,2026-10-06\nD-0196,ATM modem,3G HSPA,Site 05,yes,none,2026-10-01\nD-0197,ATM modem,3G HSPA,Site 08,yes,none,2026-10-14\nD-0198,ATM modem,4G,Site 04,yes,none,2026-10-26\nD-0199,ATM modem,4G,Site 08,yes,none,2026-10-29\nD-0200,ATM modem,4G,Site 01,yes,none,2026-10-02\nD-0201,ATM modem,3G HSPA,Site 01,yes,ordered,2026-10-29\nD-0202,ATM modem,3G HSPA,Site 07,yes,none,2026-10-13\nD-0203,ATM modem,GPRS,Site 10,yes,none,2026-10-16\nD-0204,ATM modem,3G HSPA,Site 02,yes,none,2026-10-11\nD-0205,Alarm panel,2G,Site 10,yes,none,2026-10-18\nD-0206,Alarm panel,GSM,Site 07,yes,none,2026-10-01\nD-0207,Alarm panel,GSM,Site 08,yes,none,2026-10-30\nD-0208,Alarm panel,LTE-M,Site 01,yes,none,2026-10-23\nD-0209,Alarm panel,3G,Site 04,yes,none,2026-10-18\nD-0210,Alarm panel,3G,Site 07,yes,none,2026-10-30\nD-0211,Alarm panel,3G,Site 03,yes,ordered,2026-10-14\nD-0212,Alarm panel,3G,Site 07,yes,ordered,2026-10-14\nD-0213,Alarm panel,GSM,Site 01,yes,none,2026-10-03\nD-0214,Alarm panel,2G,Site 06,yes,none,2026-10-24\nD-0215,Alarm panel,LTE-M,Site 07,yes,none,2026-10-05\nD-0216,Alarm panel,LTE-M,Site 04,yes,none,2026-10-24\nD-0217,Alarm panel,2G,Site 02,yes,none,2026-10-28\nD-0218,Alarm panel,3G,Site 03,yes,none,2026-10-18\nD-0219,Alarm panel,3G,Site 05,yes,none,2026-10-17\nD-0220,Alarm panel,3G,Site 04,yes,none,2026-10-11\nD-0221,Alarm panel,2G,Site 06,yes,none,2026-10-24\nD-0222,Alarm panel,3G,Site 06,yes,none,2026-10-08\nD-0223,Alarm panel,GSM,Site 05,yes,none,2026-10-21\nD-0224,Alarm panel,LTE-M,Site 07,yes,none,2026-10-29\nD-0225,Alarm panel,GSM,Site 01,yes,ordered,2026-10-17\nD-0226,Alarm panel,2G,Site 02,yes,ordered,2026-10-25\nD-0227,Alarm panel,3G,Site 07,yes,none,2026-10-07\nD-0228,Alarm panel,2G,Site 03,yes,none,2026-10-03\nD-0229,Alarm panel,LTE-M,Site 02,yes,none,2026-10-26\nD-0230,Alarm panel,GSM,Site 10,yes,none,2026-10-13\nD-0231,Alarm panel,LTE-M,Site 05,yes,none,2026-10-10\nD-0232,Alarm panel,2G,Site 07,yes,none,2026-10-11\nD-0233,Alarm panel,3G,Site 06,yes,tested,2026-10-02\nD-0234,Alarm panel,2G,Site 08,yes,none,2026-06-22\nD-0235,Alarm panel,LTE-M,Site 01,yes,none,2026-10-04\nD-0236,Alarm panel,2G,Site 07,yes,tested,2026-06-04\nD-0237,Alarm panel,2G,Site 04,yes,tested,2026-10-14\nD-0238,Alarm panel,GSM,Site 10,yes,none,2026-10-19\nD-0239,Alarm panel,2G,Site 04,yes,none,2026-10-19\nD-0240,Alarm panel,LTE-M,Site 07,yes,none,2026-10-24\nD-0241,Alarm panel,2G,Site 07,yes,none,2026-10-19\nD-0242,Alarm panel,2G,Site 10,yes,none,2026-10-01\nD-0243,Alarm panel,3G,Site 01,yes,ordered,2026-10-25\nD-0244,Alarm panel,GSM,Site 10,yes,none,2026-10-05\nD-0245,Alarm panel,LTE-M,Site 01,yes,none,2026-10-13\nD-0246,Alarm panel,3G,Site 06,yes,none,2026-10-17\nD-0247,Alarm panel,LTE-M,Site 03,yes,none,2026-10-29\nD-0248,Alarm panel,3G,Site 01,yes,none,2026-06-11\nD-0249,Alarm panel,LTE-M,Site 08,yes,none,2026-10-21\nD-0250,Alarm panel,LTE-M,Site 04,yes,none,2026-10-20\nD-0251,Alarm panel,3G,Site 04,yes,none,2026-10-18\nD-0252,Alarm panel,3G,Site 02,yes,none,2026-10-04\nD-0253,Alarm panel,3G,Site 03,yes,none,2026-10-20\nD-0254,Alarm panel,LTE-M,Site 01,yes,none,2026-10-27\nD-0255,Alarm panel,LTE-M,Site 08,yes,none,2026-10-06\nD-0256,Alarm panel,3G,Site 07,yes,none,2026-10-21\nD-0257,Alarm panel,2G,Site 10,yes,tested,2026-10-23\nD-0258,Alarm panel,LTE-M,Site 02,yes,none,2026-10-02\nD-0259,Alarm panel,2G,Site 03,yes,tested,2026-10-15\nD-0260,Alarm panel,2G,Site 02,yes,none,2026-10-28\nD-0261,Alarm panel,3G,Site 03,yes,none,2026-10-16\nD-0262,Alarm panel,3G,Site 10,yes,none,2026-10-05\nD-0263,Alarm panel,2G,Site 07,yes,none,2026-05-06\nD-0264,Alarm panel,3G,Site 05,yes,installed,2026-10-04\nD-0265,Alarm panel,3G,Site 10,yes,none,2026-10-30\nD-0266,Alarm panel,GSM,Site 08,yes,tested,2026-10-04\nD-0267,Alarm panel,2G,Site 05,yes,installed,2026-10-09\nD-0268,Alarm panel,3G,Site 08,yes,none,2026-06-01\nD-0269,Alarm panel,3G,Site 08,yes,tested,2026-10-24\nD-0270,Alarm panel,LTE-M,Site 10,yes,none,2026-10-28\nD-0271,Alarm panel,2G,Site 01,yes,none,2026-10-28\nD-0272,Alarm panel,3G,Site 07,yes,none,2026-10-01\nD-0273,Alarm panel,3G,Site 04,yes,tested,2026-10-20\nD-0274,Alarm panel,LTE-M,Site 01,yes,none,2026-10-18\nD-0275,Alarm panel,LTE-M,Site 07,yes,none,2026-10-13\nD-0276,Alarm panel,3G,Site 06,yes,none,2026-10-19\nD-0277,Alarm panel,LTE-M,Site 04,yes,none,2026-10-20\nD-0278,Alarm panel,GSM,Site 07,yes,none,2026-06-05\nD-0279,Alarm panel,3G,Site 01,yes,ordered,2026-10-30\nD-0280,Alarm panel,LTE-M,Site 04,yes,none,2026-10-08\nD-0281,Alarm panel,3G,Site 07,yes,none,2026-10-05\nD-0282,Alarm panel,LTE-M,Site 03,yes,none,2026-10-24\nD-0283,Alarm panel,LTE-M,Site 01,yes,none,2026-10-26\nD-0284,Alarm panel,GSM,Site 04,yes,none,2026-10-14\nD-0285,Alarm panel,LTE-M,Site 02,yes,none,2026-10-01\nD-0286,Alarm panel,2G,Site 03,yes,none,2026-10-22\nD-0287,Alarm panel,GSM,Site 06,yes,installed,2026-10-22\nD-0288,Alarm panel,GSM,Site 05,yes,none,2026-10-01\nD-0289,Vehicle tracker,3G,Site 03,no,none,2026-10-16\nD-0290,Vehicle tracker,3G,Site 02,no,none,2026-10-22\nD-0291,Vehicle tracker,3G,Site 05,no,ordered,2026-10-19\nD-0292,Vehicle tracker,3G,Site 07,no,installed,2026-10-29\nD-0293,Vehicle tracker,3G,Site 01,no,none,2026-10-30\nD-0294,Vehicle tracker,2G,Site 07,no,none,2026-10-26\nD-0295,Vehicle tracker,3G,Site 05,no,none,2026-10-14\nD-0296,Vehicle tracker,2G,Site 03,no,none,2026-10-27\nD-0297,Vehicle tracker,3G,Site 01,no,none,2026-10-06\nD-0298,Vehicle tracker,3G,Site 01,no,ordered,2026-10-14\nD-0299,Vehicle tracker,3G,Site 05,no,none,2026-10-23\nD-0300,Vehicle tracker,3G,Site 02,no,ordered,2026-10-22\nD-0301,Vehicle tracker,LTE-M,Site 10,no,none,2026-10-15\nD-0302,Vehicle tracker,2G,Site 10,no,none,2026-06-19\nD-0303,Vehicle tracker,2G,Site 09,no,none,2026-06-21\nD-0304,Vehicle tracker,2G,Site 07,no,none,2026-06-07\nD-0305,Vehicle tracker,2G,Site 06,no,tested,2026-10-02\nD-0306,Vehicle tracker,2G,Site 06,no,none,2026-10-04\nD-0307,Vehicle tracker,4G,Site 04,no,none,2026-10-23\nD-0308,Vehicle tracker,2G,Site 09,no,tested,2026-10-11\nD-0309,Vehicle tracker,LTE-M,Site 09,no,none,2026-10-02\nD-0310,Vehicle tracker,2G,Site 05,no,none,2026-10-10\nD-0311,Vehicle tracker,LTE-M,Site 10,no,none,2026-10-01\nD-0312,Vehicle tracker,LTE-M,Site 06,no,none,2026-10-04\nD-0313,Vehicle tracker,2G,Site 09,no,ordered,2026-10-29\nD-0314,Vehicle tracker,LTE-M,Site 04,no,none,2026-10-27\nD-0315,Vehicle tracker,2G,Site 06,no,none,2026-10-30\nD-0316,Vehicle tracker,3G,Site 03,no,none,2026-10-29\nD-0317,Vehicle tracker,4G,Site 08,no,none,2026-10-26\nD-0318,Vehicle tracker,2G,Site 02,no,none,2026-10-23\nD-0319,Vehicle tracker,LTE-M,Site 05,no,none,2026-10-29\nD-0320,Vehicle tracker,2G,Site 09,no,none,2026-10-19\nD-0321,Vehicle tracker,3G,Site 08,no,installed,2026-10-12\nD-0322,Vehicle tracker,4G,Site 03,no,none,2026-10-06\nD-0323,Vehicle tracker,LTE-M,Site 08,no,none,2026-10-15\nD-0324,Vehicle tracker,3G,Site 10,no,ordered,2026-10-16\nD-0325,Vehicle tracker,LTE-M,Site 03,no,none,2026-10-06\nD-0326,Vehicle tracker,2G,Site 07,no,none,2026-10-24\nD-0327,Vehicle tracker,3G,Site 06,no,tested,2026-10-01\nD-0328,Vehicle tracker,3G,Site 07,no,none,2026-10-23\nD-0329,Vehicle tracker,3G,Site 10,no,none,2026-10-28\nD-0330,Vehicle tracker,4G,Site 01,no,none,2026-10-25\nD-0331,Vehicle tracker,2G,Site 07,no,none,2026-10-09\nD-0332,Vehicle tracker,3G,Site 08,no,tested,2026-10-30\nD-0333,Vehicle tracker,4G,Site 03,no,none,2026-10-19\nD-0334,Vehicle tracker,3G,Site 04,no,none,2026-10-21\nD-0335,Vehicle tracker,2G,Site 03,no,none,2026-10-09\nD-0336,Vehicle tracker,3G,Site 06,no,ordered,2026-10-25\nD-0337,Vehicle tracker,3G,Site 03,no,none,2026-10-07\nD-0338,Vehicle tracker,4G,Site 10,no,none,2026-10-19\nD-0339,Vehicle tracker,3G,Site 04,no,none,2026-10-10\nD-0340,Vehicle tracker,3G,Site 07,no,tested,2026-10-26\nD-0341,Vehicle tracker,3G,Site 02,no,none,2026-10-17\nD-0342,Vehicle tracker,2G,Site 05,no,none,2026-10-17\nD-0343,Vehicle tracker,3G,Site 01,no,none,2026-10-21\nD-0344,Vehicle tracker,3G,Site 10,no,none,2026-06-26\nD-0345,Vehicle tracker,4G,Site 05,no,none,2026-10-18\nD-0346,Vehicle tracker,2G,Site 07,no,none,2026-05-03\nD-0347,Vehicle tracker,3G,Site 01,no,none,2026-10-28\nD-0348,Vehicle tracker,3G,Site 01,no,none,2026-10-01\nD-0349,Vehicle tracker,2G,Site 03,no,installed,2026-10-19\nD-0350,Vehicle tracker,3G,Site 02,no,none,2026-10-08\nD-0351,Vehicle tracker,3G,Site 06,no,none,2026-10-05\nD-0352,Vehicle tracker,4G,Site 07,no,none,2026-10-09\nD-0353,Vehicle tracker,3G,Site 04,no,ordered,2026-10-24\nD-0354,Vehicle tracker,2G,Site 06,no,installed,2026-10-03\nD-0355,Vehicle tracker,2G,Site 04,no,tested,2026-10-08\nD-0356,Vehicle tracker,3G,Site 04,no,none,2026-10-05\nD-0357,Vehicle tracker,3G,Site 07,no,ordered,2026-10-09\nD-0358,Vehicle tracker,4G,Site 02,no,none,2026-10-02\nD-0359,Vehicle tracker,3G,Site 02,no,installed,2026-10-25\nD-0360,Vehicle tracker,2G,Site 07,no,ordered,2026-10-22\nD-0361,Vehicle tracker,LTE-M,Site 09,no,none,2026-10-01\nD-0362,Vehicle tracker,2G,Site 09,no,none,2026-10-26\nD-0363,Vehicle tracker,3G,Site 08,no,none,2026-05-14\nD-0364,Vehicle tracker,2G,Site 04,no,none,2026-10-26\nD-0365,Vehicle tracker,3G,Site 09,no,none,2026-10-04\nD-0366,Vehicle tracker,4G,Site 10,no,none,2026-10-01\nD-0367,Vehicle tracker,2G,Site 02,no,none,2026-10-22\nD-0368,Vehicle tracker,4G,Site 04,no,none,2026-10-27\nD-0369,Vehicle tracker,3G,Site 01,no,ordered,2026-10-24\nD-0370,Vehicle tracker,3G,Site 07,no,ordered,2026-10-19\nD-0371,Vehicle tracker,LTE-M,Site 10,no,none,2026-10-07\nD-0372,Vehicle tracker,2G,Site 02,no,none,2026-10-03\nD-0373,Vehicle tracker,2G,Site 02,no,none,2026-10-20\nD-0374,Vehicle tracker,4G,Site 01,no,none,2026-10-13\nD-0375,Vehicle tracker,3G,Site 06,no,none,2026-10-11\nD-0376,Vehicle tracker,2G,Site 04,no,none,2026-10-06\nD-0377,Vehicle tracker,2G,Site 07,no,none,2026-10-14\nD-0378,Vehicle tracker,3G,Site 06,no,none,2026-10-10\nD-0379,Vehicle tracker,4G,Site 04,no,none,2026-10-27\nD-0380,Vehicle tracker,2G,Site 10,no,none,2026-05-25\nD-0381,Vehicle tracker,4G,Site 07,no,none,2026-10-22\nD-0382,Vehicle tracker,3G,Site 01,no,none,2026-10-06\nD-0383,Vehicle tracker,LTE-M,Site 07,no,none,2026-10-10\nD-0384,Vehicle tracker,3G,Site 08,no,none,2026-10-13\nD-0385,Smart meter,2G,Site 02,no,tested,2026-10-12\nD-0386,Smart meter,3G,Site 08,no,none,2026-10-15\nD-0387,Smart meter,3G,Site 06,no,none,2026-06-21\nD-0388,Smart meter,NB-IoT,Site 07,no,none,2026-10-19\nD-0389,Smart meter,3G,Site 01,no,none,2026-10-06\nD-0390,Smart meter,GPRS,Site 09,no,installed,2026-10-15\nD-0391,Smart meter,GPRS,Site 01,no,tested,2026-10-09\nD-0392,Smart meter,GPRS,Site 06,no,none,2026-10-18\nD-0393,Smart meter,NB-IoT,Site 04,no,none,2026-10-24\nD-0394,Smart meter,GPRS,Site 08,no,none,2026-10-21\nD-0395,Smart meter,NB-IoT,Site 04,no,none,2026-10-16\nD-0396,Smart meter,NB-IoT,Site 04,no,none,2026-10-16\nD-0397,Smart meter,NB-IoT,Site 04,no,none,2026-10-22\nD-0398,Smart meter,GPRS,Site 07,no,ordered,2026-10-15\nD-0399,Smart meter,NB-IoT,Site 01,no,none,2026-10-23\nD-0400,Smart meter,NB-IoT,Site 01,no,none,2026-10-02\nD-0401,Smart meter,3G,Site 07,no,none,2026-10-07\nD-0402,Smart meter,NB-IoT,Site 07,no,none,2026-10-12\nD-0403,Smart meter,3G,Site 07,no,none,2026-10-03\nD-0404,Smart meter,NB-IoT,Site 03,no,none,2026-10-21\nD-0405,Smart meter,NB-IoT,Site 07,no,none,2026-10-30\nD-0406,Smart meter,3G,Site 07,no,none,2026-10-29\nD-0407,Smart meter,2G,Site 07,no,none,2026-10-19\nD-0408,Smart meter,NB-IoT,Site 02,no,none,2026-10-04\nD-0409,Smart meter,NB-IoT,Site 08,no,none,2026-10-17\nD-0410,Smart meter,NB-IoT,Site 02,no,none,2026-10-19\nD-0411,Smart meter,2G,Site 07,no,none,2026-10-10\nD-0412,Smart meter,2G,Site 06,no,none,2026-10-15\nD-0413,Smart meter,GPRS,Site 10,no,none,2026-10-10\nD-0414,Smart meter,NB-IoT,Site 10,no,none,2026-10-02\nD-0415,Smart meter,2G,Site 04,no,none,2026-10-04\nD-0416,Smart meter,GPRS,Site 04,no,none,2026-10-21\nD-0417,Smart meter,NB-IoT,Site 10,no,none,2026-10-18\nD-0418,Smart meter,NB-IoT,Site 01,no,none,2026-10-08\nD-0419,Smart meter,GPRS,Site 10,no,none,2026-10-16\nD-0420,Smart meter,NB-IoT,Site 10,no,none,2026-10-18\nD-0421,Smart meter,3G,Site 07,no,tested,2026-10-12\nD-0422,Smart meter,NB-IoT,Site 03,no,none,2026-10-09\nD-0423,Smart meter,NB-IoT,Site 01,no,none,2026-10-27\nD-0424,Smart meter,2G,Site 03,no,none,2026-06-14\nD-0425,Smart meter,GPRS,Site 06,no,none,2026-10-27\nD-0426,Smart meter,NB-IoT,Site 07,no,none,2026-10-14\nD-0427,Smart meter,3G,Site 06,no,tested,2026-10-28\nD-0428,Smart meter,3G,Site 10,no,none,2026-10-07\nD-0429,Smart meter,NB-IoT,Site 07,no,none,2026-10-02\nD-0430,Smart meter,NB-IoT,Site 03,no,none,2026-10-02\nD-0431,Smart meter,NB-IoT,Site 05,no,none,2026-10-21\nD-0432,Smart meter,3G,Site 03,no,none,2026-10-28\nD-0433,Smart meter,3G,Site 04,no,installed,2026-10-19\nD-0434,Smart meter,NB-IoT,Site 07,no,none,2026-10-20\nD-0435,Smart meter,2G,Site 05,no,tested,2026-10-18\nD-0436,Smart meter,2G,Site 07,no,installed,2026-10-19\nD-0437,Smart meter,NB-IoT,Site 05,no,none,2026-10-03\nD-0438,Smart meter,NB-IoT,Site 09,no,none,2026-10-18\nD-0439,Smart meter,GPRS,Site 04,no,none,2026-10-17\nD-0440,Smart meter,NB-IoT,Site 06,no,none,2026-10-08\nD-0441,Smart meter,NB-IoT,Site 02,no,none,2026-10-03\nD-0442,Smart meter,GPRS,Site 07,no,ordered,2026-10-07\nD-0443,Smart meter,2G,Site 08,no,none,2026-10-04\nD-0444,Smart meter,2G,Site 09,no,none,2026-10-18\nD-0445,Smart meter,NB-IoT,Site 07,no,none,2026-10-07\nD-0446,Smart meter,GPRS,Site 04,no,none,2026-10-02\nD-0447,Smart meter,3G,Site 07,no,ordered,2026-10-20\nD-0448,Smart meter,GPRS,Site 10,no,none,2026-10-22\nD-0449,Smart meter,NB-IoT,Site 07,no,none,2026-10-24\nD-0450,Smart meter,NB-IoT,Site 02,no,none,2026-10-22\nD-0451,Smart meter,NB-IoT,Site 01,no,none,2026-10-30\nD-0452,Smart meter,NB-IoT,Site 07,no,none,2026-10-16\nD-0453,Smart meter,2G,Site 10,no,none,2026-10-11\nD-0454,Smart meter,GPRS,Site 04,no,ordered,2026-05-27\nD-0455,Smart meter,GPRS,Site 03,no,ordered,2026-10-14\nD-0456,Smart meter,3G,Site 02,no,installed,2026-10-19\nD-0457,Smart meter,NB-IoT,Site 01,no,none,2026-10-30\nD-0458,Smart meter,NB-IoT,Site 08,no,none,2026-10-05\nD-0459,Smart meter,NB-IoT,Site 01,no,none,2026-10-04\nD-0460,Smart meter,NB-IoT,Site 06,no,none,2026-10-30\nD-0461,Smart meter,NB-IoT,Site 05,no,none,2026-10-06\nD-0462,Smart meter,2G,Site 01,no,ordered,2026-10-08\nD-0463,Smart meter,NB-IoT,Site 02,no,none,2026-10-17\nD-0464,Smart meter,NB-IoT,Site 01,no,none,2026-10-14\nD-0465,Smart meter,GPRS,Site 06,no,ordered,2026-10-15\nD-0466,Smart meter,3G,Site 07,no,none,2026-10-02\nD-0467,Smart meter,2G,Site 01,no,none,2026-10-05\nD-0468,Smart meter,3G,Site 07,no,tested,2026-10-21\nD-0469,Smart meter,3G,Site 06,no,ordered,2026-10-03\nD-0470,Smart meter,2G,Site 02,no,none,2026-10-09\nD-0471,Smart meter,NB-IoT,Site 03,no,none,2026-10-09\nD-0472,Smart meter,NB-IoT,Site 02,no,none,2026-10-14\nD-0473,Smart meter,NB-IoT,Site 10,no,none,2026-10-28\nD-0474,Smart meter,NB-IoT,Site 01,no,none,2026-10-09\nD-0475,Smart meter,NB-IoT,Site 10,no,none,2026-10-15\nD-0476,Smart meter,GPRS,Site 07,no,none,2026-10-23\nD-0477,Smart meter,2G,Site 04,no,installed,2026-10-24\nD-0478,Smart meter,GPRS,Site 09,no,none,2026-10-19\nD-0479,Smart meter,NB-IoT,Site 09,no,none,2026-10-11\nD-0480,Smart meter,NB-IoT,Site 08,no,none,2026-10-21\nD-0481,Smart meter,GPRS,Site 07,no,none,2026-10-27\nD-0482,Smart meter,2G,Site 04,no,none,2026-10-06\nD-0483,Smart meter,GPRS,Site 07,no,none,2026-10-08\nD-0484,Smart meter,GPRS,Site 03,no,ordered,2026-10-19\nD-0485,Smart meter,NB-IoT,Site 10,no,none,2026-10-01\nD-0486,Smart meter,GPRS,Site 08,no,none,2026-10-29\nD-0487,Smart meter,NB-IoT,Site 08,no,none,2026-10-06\nD-0488,Smart meter,2G,Site 01,no,none,2026-10-07\nD-0489,Smart meter,2G,Site 02,no,none,2026-10-30\nD-0490,Smart meter,2G,Site 03,no,none,2026-10-18\nD-0491,Smart meter,NB-IoT,Site 02,no,none,2026-10-16\nD-0492,Smart meter,NB-IoT,Site 04,no,none,2026-10-30\nD-0493,Smart meter,GPRS,Site 02,no,none,2026-10-21\nD-0494,Smart meter,2G,Site 07,no,installed,2026-10-18\nD-0495,Smart meter,2G,Site 10,no,ordered,2026-06-19\nD-0496,Smart meter,NB-IoT,Site 01,no,none,2026-10-16\nD-0497,Smart meter,3G,Site 02,no,installed,2026-10-04\nD-0498,Smart meter,NB-IoT,Site 07,no,none,2026-10-13\nD-0499,Smart meter,3G,Site 01,no,tested,2026-10-08\nD-0500,Smart meter,2G,Site 09,no,none,2026-10-28\nD-0501,Smart meter,NB-IoT,Site 10,no,none,2026-10-29\nD-0502,Smart meter,NB-IoT,Site 05,no,none,2026-10-06\nD-0503,Smart meter,NB-IoT,Site 09,no,none,2026-10-29\nD-0504,Smart meter,NB-IoT,Site 05,no,none,2026-10-18\nD-0505,Smart meter,NB-IoT,Site 06,no,none,2026-10-27\nD-0506,Smart meter,2G,Site 02,no,none,2026-10-29\nD-0507,Smart meter,GPRS,Site 06,no,none,2026-10-11\nD-0508,Smart meter,3G,Site 04,no,none,2026-06-18\nD-0509,Smart meter,NB-IoT,Site 02,no,none,2026-10-02\nD-0510,Smart meter,NB-IoT,Site 03,no,none,2026-10-24\nD-0511,Smart meter,NB-IoT,Site 04,no,none,2026-10-01\nD-0512,Smart meter,NB-IoT,Site 07,no,none,2026-10-13\nD-0513,Smart meter,NB-IoT,Site 04,no,none,2026-10-11\nD-0514,Smart meter,2G,Site 02,no,none,2026-05-04\nD-0515,Smart meter,2G,Site 07,no,tested,2026-10-21\nD-0516,Smart meter,2G,Site 10,no,ordered,2026-10-17\nD-0517,Backup router,4G,Site 07,no,none,2026-10-08\nD-0518,Backup router,4G,Site 01,no,none,2026-10-21\nD-0519,Backup router,4G,Site 08,no,none,2026-10-30\nD-0520,Backup router,4G,Site 01,no,none,2026-10-08\nD-0521,Backup router,4G,Site 02,no,none,2026-10-10\nD-0522,Backup router,4G,Site 01,no,none,2026-10-20\nD-0523,Backup router,3G,Site 04,no,tested,2026-10-12\nD-0524,Backup router,4G,Site 06,no,none,2026-10-23\nD-0525,Backup router,4G,Site 10,no,none,2026-10-20\nD-0526,Backup router,4G,Site 06,no,none,2026-10-19\nD-0527,Backup router,4G,Site 02,no,none,2026-10-17\nD-0528,Backup router,4G,Site 08,no,none,2026-10-04\nD-0529,Backup router,4G,Site 07,no,none,2026-10-16\nD-0530,Backup router,4G,Site 08,no,none,2026-10-11\nD-0531,Backup router,3G,Site 06,no,none,2026-10-14\nD-0532,Backup router,3G,Site 07,no,tested,2026-10-02\nD-0533,Backup router,4G,Site 09,no,none,2026-10-12\nD-0534,Backup router,4G,Site 02,no,none,2026-10-26\nD-0535,Backup router,4G,Site 01,no,none,2026-10-06\nD-0536,Backup router,3G,Site 09,no,none,2026-10-01\nD-0537,Backup router,4G,Site 01,no,none,2026-10-04\nD-0538,Backup router,4G,Site 07,no,none,2026-10-26\nD-0539,Backup router,3G,Site 03,no,none,2026-10-28\nD-0540,Backup router,2G,Site 05,no,ordered,2026-10-24\nD-0541,Backup router,4G,Site 07,no,none,2026-10-22\nD-0542,Backup router,4G,Site 02,no,none,2026-10-14\nD-0543,Backup router,3G,Site 07,no,ordered,2026-10-25\nD-0544,Backup router,3G,Site 06,no,ordered,2026-10-18\nD-0545,Backup router,3G,Site 02,no,installed,2026-06-03\nD-0546,Backup router,4G,Site 07,no,none,2026-10-17\nD-0547,Backup router,3G,Site 07,no,none,2026-10-29\nD-0548,Backup router,2G,Site 01,no,tested,2026-10-19\nD-0549,Backup router,4G,Site 04,no,none,2026-10-24\nD-0550,Backup router,4G,Site 08,no,none,2026-10-04\nD-0551,Backup router,4G,Site 10,no,none,2026-10-21\nD-0552,Backup router,4G,Site 08,no,none,2026-10-27\nD-0553,Backup router,4G,Site 07,no,none,2026-10-16\nD-0554,Backup router,4G,Site 07,no,none,2026-10-01\nD-0555,Backup router,3G,Site 04,no,none,2026-10-29\nD-0556,Backup router,4G,Site 04,no,none,2026-10-22\nD-0557,Backup router,3G,Site 08,no,none,2026-10-26\nD-0558,Backup router,2G,Site 06,no,none,2026-05-26\nD-0559,Backup router,4G,Site 01,no,none,2026-10-25\nD-0560,Backup router,3G,Site 08,no,installed,2026-10-15\nD-0561,Backup router,4G,Site 09,no,none,2026-10-24\nD-0562,Backup router,4G,Site 04,no,none,2026-10-25\nD-0563,Backup router,4G,Site 09,no,none,2026-10-23\nD-0564,Backup router,4G,Site 02,no,none,2026-10-28\nD-0565,Backup router,3G,Site 05,no,tested,2026-10-15\nD-0566,Backup router,4G,Site 10,no,none,2026-10-10\nD-0567,Backup router,4G,Site 09,no,none,2026-10-01\nD-0568,Backup router,4G,Site 03,no,none,2026-10-22\nD-0569,Backup router,3G,Site 02,no,none,2026-10-22\nD-0570,Backup router,4G,Site 06,no,none,2026-10-10\nD-0571,Backup router,3G,Site 09,no,none,2026-06-10\nD-0572,Backup router,4G,Site 03,no,none,2026-10-08\nD-0573,Backup router,4G,Site 06,no,none,2026-10-28\nD-0574,Backup router,4G,Site 10,no,none,2026-10-13\nD-0575,Backup router,3G,Site 09,no,tested,2026-05-08\nD-0576,Backup router,4G,Site 07,no,none,2026-10-08\nD-0577,Backup router,4G,Site 01,no,none,2026-10-26\nD-0578,Backup router,4G,Site 10,no,none,2026-10-21\nD-0579,Backup router,4G,Site 07,no,none,2026-10-06\nD-0580,Backup router,4G,Site 06,no,none,2026-10-30\nD-0581,Backup router,3G,Site 06,no,none,2026-10-27\nD-0582,Backup router,3G,Site 07,no,tested,2026-10-18\nD-0583,Backup router,4G,Site 07,no,none,2026-10-18\nD-0584,Backup router,4G,Site 10,no,none,2026-10-14\nD-0585,Backup router,4G,Site 07,no,none,2026-10-01\nD-0586,Backup router,3G,Site 02,no,none,2026-10-09\nD-0587,Backup router,4G,Site 05,no,none,2026-10-08\nD-0588,Backup router,4G,Site 02,no,none,2026-10-09\nD-0589,Desk phone,2G,Site 10,no,ordered,2026-10-22\nD-0590,Desk phone,2G,Site 02,no,installed,2026-10-11\nD-0591,Desk phone,3G,Site 10,no,tested,2026-05-22\nD-0592,Desk phone,4G VoLTE,Site 06,no,none,2026-10-30\nD-0593,Desk phone,4G VoLTE,Site 10,no,none,2026-10-16\nD-0594,Desk phone,2G,Site 06,no,none,2026-10-01\nD-0595,Desk phone,4G VoLTE,Site 02,no,none,2026-10-21\nD-0596,Desk phone,2G,Site 05,no,ordered,2026-10-08\nD-0597,Desk phone,4G VoLTE,Site 10,no,none,2026-10-13\nD-0598,Desk phone,3G,Site 06,no,installed,2026-10-25\nD-0599,Desk phone,2G,Site 06,no,none,2026-05-05\nD-0600,Desk phone,2G,Site 04,no,none,2026-10-07\nD-0601,Desk phone,4G VoLTE,Site 06,no,none,2026-10-14\nD-0602,Desk phone,2G,Site 02,no,ordered,2026-10-28\nD-0603,Desk phone,2G,Site 08,no,none,2026-05-16\nD-0604,Desk phone,2G,Site 07,no,none,2026-06-01\nD-0605,Desk phone,4G VoLTE,Site 01,no,none,2026-10-17\nD-0606,Desk phone,3G,Site 03,no,none,2026-10-16\nD-0607,Desk phone,2G,Site 04,no,tested,2026-10-04\nD-0608,Desk phone,3G,Site 10,no,none,2026-10-29\nD-0609,Desk phone,4G VoLTE,Site 05,no,none,2026-10-11\nD-0610,Desk phone,3G,Site 07,no,installed,2026-10-04\nD-0611,Desk phone,2G,Site 01,no,ordered,2026-10-20\nD-0612,Desk phone,4G VoLTE,Site 02,no,none,2026-10-12\nD-0613,Desk phone,2G,Site 05,no,tested,2026-10-25\nD-0614,Desk phone,4G VoLTE,Site 02,no,none,2026-10-10\nD-0615,Desk phone,2G,Site 07,no,none,2026-10-08\nD-0616,Desk phone,2G,Site 06,no,installed,2026-10-19\nD-0617,Desk phone,4G VoLTE,Site 03,no,none,2026-10-12\nD-0618,Desk phone,3G,Site 01,no,ordered,2026-10-04\nD-0619,Desk phone,2G,Site 07,no,none,2026-10-14\nD-0620,Desk phone,2G,Site 07,no,none,2026-06-14\nD-0621,Desk phone,2G,Site 02,no,ordered,2026-10-28\nD-0622,Desk phone,4G VoLTE,Site 04,no,none,2026-10-12\nD-0623,Desk phone,3G,Site 02,no,installed,2026-10-15\nD-0624,Desk phone,4G VoLTE,Site 01,no,none,2026-10-28\nD-0625,Desk phone,4G VoLTE,Site 07,no,none,2026-10-06\nD-0626,Desk phone,2G,Site 07,no,none,2026-10-26\nD-0627,Desk phone,2G,Site 09,no,none,2026-10-05\nD-0628,Desk phone,2G,Site 10,no,tested,2026-06-13\nD-0629,Desk phone,3G,Site 03,no,tested,2026-10-22\nD-0630,Desk phone,2G,Site 04,no,none,2026-10-21\nD-0631,Desk phone,2G,Site 10,no,tested,2026-10-18\nD-0632,Desk phone,4G VoLTE,Site 02,no,none,2026-10-15\nD-0633,Desk phone,2G,Site 01,no,ordered,2026-10-30\nD-0634,Desk phone,4G VoLTE,Site 04,no,none,2026-10-14\nD-0635,Desk phone,3G,Site 07,no,none,2026-10-01\nD-0636,Desk phone,2G,Site 03,no,none,2026-10-24\nD-0637,Desk phone,4G VoLTE,Site 05,no,none,2026-10-27\nD-0638,Desk phone,3G,Site 04,no,none,2026-10-22\nD-0639,Desk phone,2G,Site 10,no,ordered,2026-10-05\nD-0640,Desk phone,3G,Site 07,no,none,2026-10-06\nD-0641,Backup router,Ethernet,Site 01,no,none,2026-10-10\nD-0642,Backup router,Ethernet,Site 02,no,none,2026-10-11\nD-0643,Backup router,Ethernet,Site 03,no,none,2026-10-12\nD-0644,Backup router,Ethernet,Site 04,no,none,2026-10-13\nD-0645,Backup router,Ethernet,Site 05,no,none,2026-10-14\nD-0646,Backup router,Ethernet,Site 06,no,none,2026-10-15\n"];
+var $=function(id){return document.getElementById(id);};
+var inst=$("inst"), errEl=$("err"), isSample=false, lastParsed=null, texts=[null,null];
+var U={};
+U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
+U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
+U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.of=function(c,k,n){ return n>k ? c+" \u00b7 "+k+" of "+U.fmt(n)+" shown" : c; };
+U.MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+U.dd=function(t,noYear){ var d=new Date(t); return d.getDate()+" "+U.MON[d.getMonth()]+(noYear?"":" "+d.getFullYear()); };
+U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };
+U.pct=function(a,b){ return b? Math.round(a/b*1000)/10 : 0; };
+U.median=function(a){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; };
+U.pctl=function(a,p){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}); var i=Math.max(0,Math.ceil(p/100*s.length)-1); return s[i]; };
+U.parseCSV=function(text){
+  text=String(text).replace(/^﻿/,"");
+  var lines=text.replace(/\r\n?/g,"\n").split("\n").filter(function(l){ return l.trim().length; });
+  if(!lines.length) return null;
+  var h0=lines[0], cnt={",":0,";":0,"\t":0,"|":0}, qq=false, D=",";
+  for(var z=0;z<h0.length;z++){ var cz=h0[z]; if(cz==='"') qq=!qq; else if(!qq&&cnt.hasOwnProperty(cz)) cnt[cz]++; }
+  Object.keys(cnt).forEach(function(k){ if(cnt[k]>cnt[D]) D=k; });
+  function cells(line){ var o=[],c="",q=false; for(var i=0;i<line.length;i++){ var ch=line[i];
+    if(q){ if(ch==='"'){ if(line[i+1]==='"'){c+='"';i++;} else q=false; } else c+=ch; }
+    else { if(ch==='"') q=true; else if(ch===D){ o.push(c); c=""; } else c+=ch; } } o.push(c); return o; }
+  var H=cells(h0).map(function(h){ return h.trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,""); }), R=[];
+  for(var i=1;i<lines.length;i++){ var c=cells(lines[i]), o={}; for(var j=0;j<H.length;j++) o[H[j]]=(c[j]===undefined?"":String(c[j]).trim()); R.push(o); }
+  return {header:H, rows:R};
+};
+U.pick=function(H,al){ var a,h; for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h]===al[a]) return H[h];
+  for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h].indexOf(al[a])>=0) return H[h]; return null; };
+U.time=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim(); if(!s) return NaN;
+  if(/^\d{13}$/.test(s)) return parseInt(s,10); if(/^\d{10}$/.test(s)) return parseInt(s,10)*1000;
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?)?\s*(Z|[+-]\d{2}:?\d{2})?$/);
+  if(m){ var ms=m[7]?Math.round(parseFloat("0."+m[7])*1000):0;
+    var y=+m[1], mo=+m[2]-1, d=+m[3], hh=+(m[4]||0), mi=+(m[5]||0), se=+(m[6]||0);
+    if(m[8]){ var t=Date.UTC(y,mo,d,hh,mi,se,ms); if(m[8]!=="Z"){ var z=m[8].replace(":",""), sg=z[0]==="-"?-1:1; t-=sg*(parseInt(z.slice(1,3),10)*60+parseInt(z.slice(3,5),10))*60000; } return t; }
+    return new Date(y,mo,d,hh,mi,se,ms).getTime(); }
+  var d2=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:[T ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?)?$/);
+  if(d2){ var A1=+d2[1], A2=+d2[2], dd=A1, mm=A2; if(A2>12&&A1<=12){ dd=A2; mm=A1; } var H2=+(d2[4]||0);
+    if(d2[7]){ var pm=/p/i.test(d2[7]); if(pm&&H2<12) H2+=12; if(!pm&&H2===12) H2=0; }
+    return new Date(+d2[3],mm-1,dd,H2,+(d2[5]||0),+(d2[6]||0)).getTime(); }
+  return Date.parse(s); };
+U.hour=function(v){ if(!v) return null; var m=String(v).match(/(?:^|[T\s,])(\d{1,2}):\d{2}(?::\d{2})?(?:\.\d+)?\s*([AaPp][Mm])?/); if(m){ var h=parseInt(m[1],10);
+  if(m[2]){ var pm=/p/i.test(m[2]); if(pm&&h<12) h+=12; if(!pm&&h===12) h=0; } return (h>=0&&h<24)?h:null; } return null; };
+U.hh=function(h){ if(h===null||h===undefined) return "—"; var ap=h<12?"am":"pm", r=h%12; if(r===0) r=12; return r+ap; };
+U.mask=function(v){ var d=String(v||"").replace(/\D/g,""); if(d.length<4) return "•••"; return "••• "+d.slice(-3); };
+U.tile=function(k,v,s,cls){ var m=String(v).match(/^(.*?)\s(L|kWh|t|h|s|ms|min|days|agents|links|vehicles|km|L\/100 km|\u00d7)$/);
+  var vv=m?U.esc(m[1])+'<small class="u"> '+m[2]+'</small>':U.esc(v), m2=String(v).match(/^RWF\s(.+)$/);
+  if(m2) vv='<small class="u">RWF </small>'+U.esc(m2[1]);
+  return '<div class="tile"><div class="k">'+U.esc(k)+'</div><div class="v '+(cls||'')+'">'+vv+'</div><div class="s">'+U.esc(s||"")+'</div></div>'; };
+U.bars=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){ var w=Math.max(0,Math.min(100,r.w));
+  h+='<div class="brow"><div class="bl" title="'+U.esc(r.label)+'">'+U.esc(r.label)+'</div><div class="bb"><span class="'+(r.cls||'')+'" style="width:'+w+'%"></span></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.pairs=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){
+  h+='<div class="brow pair"><div class="bl">'+U.esc(r.label)+'</div><div class="bbs"><div class="bb"><span class="'+(r.cls1||'')+'" style="width:'+Math.min(100,r.w1)+'%"></span></div><div class="bb"><span class="'+(r.cls2||'dim')+'" style="width:'+Math.min(100,r.w2)+'%"></span></div></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.stack=function(parts){ var tot=0; parts.forEach(function(p){ tot+=p.v; }); var h='<div class="stack">';
+  parts.forEach(function(p){ if(p.v>0) h+='<span title="'+U.esc(p.label)+'" style="width:'+(tot?p.v/tot*100:0)+'%;background:'+p.color+'"></span>'; });
+  h+='</div><div class="legend">'; parts.forEach(function(p){ h+='<span><i style="background:'+p.color+'"></i>'+U.esc(p.label)+' '+U.esc(p.text)+'</span>'; }); return h+'</div>'; };
+U.heat=function(vals, mode, ref, labs){ // mode "count": raw counts, darker red = more; mode "level": ratios against a reference
+  var mx=0, i; if(mode==="count") vals.forEach(function(v){ if(v>mx) mx=v; });
+  var h='<div class="hours">';
+  for(i=0;i<24;i++){ var v=vals[i], col="var(--panel2)";
+    if(v!==null&&v!==undefined&&!isNaN(v)){
+      if(mode==="count"){ if(v>0&&mx>0) col="color-mix(in srgb, var(--bad) "+Math.round(22+78*v/mx)+"%, var(--panel2))"; }
+      else col = v>=ref-1e-9 ? "var(--accent)" : (v>=ref-0.10 ? "var(--warn)" : "var(--bad)"); }
+    h+='<div class="hcell" style="background:'+col+'"></div>'; }
+  h+='</div><div class="hlabels">'; ["12a","","","3","","","6","","","9","","","12p","","","3","","","6","","","9","",""].forEach(function(l){ h+='<span>'+l+'</span>'; });
+  h+='</div><div class="legend">';
+  if(mode==="count") h+='<span><i style="background:color-mix(in srgb, var(--bad) 22%, var(--panel2))"></i>Fewer</span><span><i style="background:var(--bad)"></i>Most</span><span><i style="background:var(--panel2)"></i>None</span>';
+  else { labs=labs||["At or above target","Up to 10 points below","More than 10 points below"];
+    h+='<span><i style="background:var(--accent)"></i>'+U.esc(labs[0])+'</span><span><i style="background:var(--warn)"></i>'+U.esc(labs[1])+'</span><span><i style="background:var(--bad)"></i>'+U.esc(labs[2])+'</span><span><i style="background:var(--panel2)"></i>No data</span>'; }
+  return h+'</div>'; };
+U.table=function(head, rows, numCols){ numCols=numCols||[]; var h='<div class="tblwrap"><table class="tbl"><thead><tr>';
+  head.forEach(function(c,i){ h+='<th class="'+(numCols.indexOf(i)>=0?'num':'')+'">'+U.esc(c)+'</th>'; }); h+='</tr></thead><tbody>';
+  rows.forEach(function(r){ h+='<tr>'; r.forEach(function(c,i){ var cls=(numCols.indexOf(i)>=0?'num':''), txt=c;
+    if(c&&typeof c==="object"){ cls+=' '+(c.cls||''); txt=c.t; } h+='<td class="'+cls+'">'+U.esc(txt)+'</td>'; }); h+='</tr>'; });
+  return h+'</tbody></table></div>'; };
+
+try{ var sv=localStorage.getItem(CFG.slug+"_theme"); if(sv) document.documentElement.setAttribute("data-theme",sv); }catch(e){}
+$("theme").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dk=window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var nx=cur?(cur==="dark"?"light":"dark"):(dk?"light":"dark");
+  document.documentElement.setAttribute("data-theme",nx);
+  try{ localStorage.setItem(CFG.slug+"_theme",nx); }catch(e){}
+});
+
+var G=(function(H){
+  var PUB={"kty": "EC", "crv": "P-256", "x": "dd_RAcn7vNcw2otkFdNpoI6U3_RyeEOu6SawgbThnho", "y": "zjKzBb8ADm1xZQ2tioXLYUyj-bstyz4fIcvI6VBocrA"}, KID="fk1-AqEPEA", LS="fk_codes", TITLE=CFG.plainTitle, mem=null, kp=null, pending=null, timer=null;
+  var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var esc=function(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+  var st={state:"locked", exp:0, org:"", code:""};
+  var hasCrypto=!!(window.crypto&&window.crypto.subtle&&window.TextEncoder&&window.TextDecoder&&window.Promise);
+  var MSG={bad:"That code isn't valid. Check it was copied in full, or ask Frutos for a new one.",
+    scope:"That code is for another tool. Ask Frutos for a code for the "+TITLE+".",
+    expired:"That code's trial has ended. Ask Frutos for a new one.",
+    early:"That code isn't active yet. Check the date and time on this device.",
+    nocrypto:"This browser cannot check trial codes; open the link in Chrome, Safari or Firefox.",
+    revoked:"That code has been withdrawn. Ask Frutos for a new one."};
+  function now(){ return Date.now()/1000; }
+  function b2u(s){ s=String(s).replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; var bin=atob(s), a=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a; }
+  function pick(raw){ var m=String(raw||"").match(/FK1\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{40,}/); return m?m[0]:null; }
+  function key(){ if(!kp) kp=crypto.subtle.importKey("jwk",PUB,{name:"ECDSA",namedCurve:"P-256"},false,["verify"]); return kp; }
+  function all(){ try{ var v=JSON.parse(localStorage.getItem(LS)||"null"); if(v&&v.c) v=[v]; return (v&&v.length)?v:(mem||[]); }catch(e){ return mem||[]; } }
+  function find(code){ var a=all(); for(var i=0;i<a.length;i++) if(a[i]&&a[i].c===code) return a[i]; return null; }
+  function put(list){ mem=list; try{ localStorage.setItem(LS,JSON.stringify(list)); }catch(e){} }
+  function save(o){ var a=all().filter(function(x){ return x&&x.c!==o.c; }); a.unshift(o); put(a.slice(0,6)); }
+  function forget(code){ put(all().filter(function(x){ return x&&x.c!==code; })); }
+  function check(code, first){
+    if(!hasCrypto) return Promise.resolve({ok:false, why:"nocrypto"});
+    var parts=String(code).split("."), p;
+    try{ p=JSON.parse(new TextDecoder().decode(b2u(parts[1]))); }catch(e){ return Promise.resolve({ok:false, why:"bad"}); }
+    return key().then(function(k){
+      return crypto.subtle.verify({name:"ECDSA",hash:{name:"SHA-256"}},k,b2u(parts[2]),new TextEncoder().encode(parts[0]+"."+parts[1]));
+    }).then(function(good){
+      if(!good||!p||p.v!==1||p.k!==KID) return {ok:false, why:"bad"};
+      var sc=p.s||[]; if(sc.indexOf("*")<0&&sc.indexOf(CFG.slug)<0) return {ok:false, why:"scope", p:p};
+      var t=now(), exp, f=first||null;
+      if(t<(p.i||0)-600) return {ok:false, why:"early", p:p};
+      if(typeof p.e==="number") exp=p.e;
+      else if(typeof p.d==="number"&&typeof p.h==="number"){ if(!f) f=Math.floor(t); exp=Math.min(f+p.d*86400,p.h); }
+      else return {ok:false, why:"bad"};
+      if(t>=exp) return {ok:false, why:"expired", p:p, exp:exp, first:f};
+      return {ok:true, p:p, exp:exp, first:f};
+    }, function(){ return {ok:false, why:"bad"}; });
+  }
+  function left(sec){ var d=Math.floor(sec/86400), h=Math.floor(sec%86400/3600), m=Math.floor(sec%3600/60);
+    if(d>0) return d+(d===1?" day ":" days ")+h+" h left"; if(h>0) return h+" h "+m+" min left"; return Math.max(1,m)+" min left"; }
+  function when(ts){ var d=new Date(ts*1000); return d.getDate()+" "+MON[d.getMonth()]+", "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2); }
+  function orgName(){ var v=inst.value.trim(); return (v&&v!==CFG.defaultFor)?v:"my organisation"; }
+  function paint(){
+    var el=$("runs"), h;
+    if(!hasCrypto) h='<span class="gdot end"></span><span>'+esc(MSG.nocrypto)+'</span>';
+    else if(st.state==="ok") h='<span class="gdot ok"></span><span>Trial unlocked for <b>'+esc(st.org||"you")+'</b> · '+left(st.exp-now())+'</span><button type="button" class="glink" id="gopen">Change code</button>';
+    else if(st.state==="expired") h='<span class="gdot end"></span><span>Your 3-day trial ended on '+when(st.exp)+'</span><button type="button" class="glink" id="gopen">Enter a new code</button>';
+    else h='<span class="gdot"></span><span>Sample: free · Your own file: trial code needed</span><button type="button" class="glink" id="gopen">Enter a code</button>';
+    el.innerHTML=h; var b=$("gopen"); if(b) b.addEventListener("click",function(){ open(""); });
+  }
+  function msgEl(m){ var e=$("uerr"); if(m){ e.textContent=m; e.hidden=false; } else e.hidden=true; }
+  function open(m){
+    var u=$("unlock"); u.hidden=false; msgEl(m);
+    $("uwa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent("Muraho Frutos. Please send a 3-day trial code for the "+TITLE+" for "+orgName()+".");
+    u.scrollIntoView({behavior:"smooth",block:"center"}); setTimeout(function(){ try{ $("ucode").focus({preventScroll:true}); }catch(e){ $("ucode").focus(); } },60);
+  }
+  function close(){ $("unlock").hidden=true; }
+  function closing(scroll){ H.closing(scroll); }
+  function sha(s){ return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){ var a=new Uint8Array(b), o="";
+    for(var i=0;i<a.length;i++) o+=("0"+a[i].toString(16)).slice(-2); return o; }); }
+  function api(ev){
+    if(!CFG.api||!st.code||!window.fetch) return;
+    try{ sha(st.code).then(function(hx){
+        return fetch(CFG.api.replace(/\/+$/,"")+"/v1/event",{method:"POST",keepalive:true,headers:{"content-type":"application/json"},
+          body:JSON.stringify({kid:KID,codeHash:hx,slug:CFG.slug,event:ev,ts:Math.floor(now())})});
+      }).then(function(r){ return (r&&r.ok)?r.json():null; }).then(function(j){
+        if(j&&j.revoked){ forget(st.code); st={state:"locked",exp:0,org:"",code:""}; paint(); open(MSG.revoked); }
+      })["catch"](function(){});
+    }catch(e){}
+  }
+  function tick(){ if(timer) clearInterval(timer); timer=setInterval(function(){
+    if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); closing(false); } else paint(); },60000); }
+  function activate(code, quiet){
+    var prev=find(code), first=prev?prev.f:null;
+    return check(code, first).then(function(r){
+      if(!r.ok){
+        if(r.why==="expired"){ st={state:"expired", exp:r.exp, org:(r.p&&r.p.o)||"", code:""}; paint(); }
+        if(!quiet) msgEl(MSG[r.why]||MSG.bad);
+        return r;
+      }
+      var fresh=!prev;
+      save({c:code, f:r.first||null});
+      st={state:"ok", exp:r.exp, org:r.p.o||"", code:code};
+      var cur=inst.value.trim();
+      if(r.p.o&&(cur===""||cur===CFG.defaultFor)){ inst.value=r.p.o; $("gate-inst").textContent=H.name(); }
+      paint(); close(); $("gate").hidden=true; tick();
+      if(fresh) api("activate");
+      if(pending!==null){ var a=pending; pending=null; H.run(a); }
+      return r;
+    });
+  }
+  function init(){
+    paint();
+    if(!hasCrypto) return;
+    var qs=null, qc=null; try{ qs=new URLSearchParams(location.search); qc=qs.get("code"); }catch(e){}
+    if(qc!==null&&qs){ try{ qs["delete"]("code"); var rest=qs.toString(); history.replaceState(null,"",location.pathname+(rest?"?"+rest:"")+location.hash); }catch(e){} }
+    var list=[], fromLink=pick(qc);
+    if(qc!==null&&!fromLink){ open(MSG.bad); }
+    [fromLink].concat(all().map(function(x){ return x&&x.c; }), [CFG.preset||null]).forEach(function(c){ if(c&&list.indexOf(c)<0) list.push(c); });
+    var i=0, last=null;
+    (function next(){
+      if(i>=list.length){
+        if(last&&last.why==="expired"&&st.state==="expired") closing(false);
+        if(fromLink&&last&&!last.ok) open(MSG[last.why]||MSG.bad);
+        return; }
+      var c=list[i++];
+      activate(c, true).then(function(r){ last=r; if(!r.ok) next(); });
+    })();
+  }
+  $("uform").addEventListener("submit",function(e){ e.preventDefault(); var c=pick($("ucode").value);
+    if(!hasCrypto){ msgEl(MSG.nocrypto); return; } if(!c){ msgEl(MSG.bad); return; } activate(c,false); });
+  $("ucode").addEventListener("keydown",function(e){ if(e.key==="Escape"||e.keyCode===27) close(); });
+  $("uclose").addEventListener("click",close);
+  return {
+    ok:function(){ if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); } return st.state==="ok"; },
+    ask:function(arr){ pending=arr;
+      if(st.state==="expired"){ open("Your 3-day trial ended on "+when(st.exp)+". Enter a new code, or ask Frutos for one."); closing(false); }
+      else open(""); },
+    ran:function(){ api("run"); },
+    init:init
+  };
+})({
+  name:function(){ return name(); },
+  run:function(a){ isSample=false; go(a); },
+  closing:function(scroll){ var v=name(); $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+    $("gate-inst").textContent=v; $("gate").hidden=false; if(scroll) $("gate").scrollIntoView({behavior:"smooth",block:"center"}); }
+});
+
+function name(){ return inst.value.trim()||CFG.defaultFor; }
+try{ var qf=new URLSearchParams(location.search).get("for"); if(qf){ inst.value=qf.slice(0,60); } }catch(e){}
+$("gate-inst").textContent=name();
+inst.addEventListener("input",function(){ $("gate-inst").textContent=name(); });
+function inputs(){ var o={}; document.querySelectorAll("[data-in]").forEach(function(el){ o[el.getAttribute("data-in")]=el.value; }); return o; }
+function showErr(m){ errEl.textContent=m; errEl.hidden=false; }
+
+function readInto(i,f){ var r=new FileReader();
+  r.onload=function(){ texts[i]=String(r.result); var fn=$("fn"+i); if(fn) fn.textContent=f.name;
+    if(CFG.files===1){ isSample=false; go([texts[0]]); } else { $("runbtn").disabled=!(texts[0]&&texts[1]); } };
+  r.onerror=function(){ showErr("Could not read that file."); }; r.readAsText(f); }
+for(var i=0;i<CFG.files;i++)(function(i){
+  var d=$("drop"+i), p=$("pick"+i), fi=$("file"+i);
+  p.addEventListener("click",function(){ fi.click(); });
+  fi.addEventListener("change",function(e){ var f=e.target.files&&e.target.files[0]; if(f) readInto(i,f); });
+  ["dragenter","dragover"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.add("over"); }); });
+  ["dragleave","drop"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.remove("over"); }); });
+  d.addEventListener("drop",function(e){ var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) readInto(i,f); });
+})(i);
+if(CFG.files===2){ $("runbtn").addEventListener("click",function(){ isSample=false; go([texts[0],texts[1]]); }); }
+$("sample").addEventListener("click",function(){ isSample=true; go(SAMPLES); });
+
+function go(arr){
+  errEl.hidden=true;
+  if(!isSample&&!G.ok()){ G.ask(arr); return; }
+  var ps=[], R;
+  try{ arr.forEach(function(t,ix){ var p=U.parseCSV(t); if(!p||!p.rows.length) throw (CFG.files===2?(CFG.fileLabels[ix]+": "):"")+"I couldn't find any rows in that file."; ps.push(p); });
+       R=TOOL.analyse(ps, inputs(), U); }
+  catch(e){ showErr(typeof e==="string"?e:"That file couldn't be read."); return; }
+  lastParsed=ps; draw(R); if(!isSample) G.ran();
+}
+document.querySelectorAll("[data-in]").forEach(function(el){ el.addEventListener("change",function(){
+  if(!lastParsed) return; try{ draw(TOOL.analyse(lastParsed, inputs(), U)); }catch(e){} }); });
+
+function draw(R){
+  var out=TOOL.render(R, inputs(), U, {name:name(), sample:isSample});
+  var H='<div class="verdict"><p class="vh">What the data shows'+(isSample?' · illustrative sample, not your data':'')+'</p><p>'+out.verdict+'</p></div>';
+  if(out.tiles&&out.tiles.length) H+='<div class="tiles">'+out.tiles.join("")+'</div>';
+  (out.sections||[]).forEach(function(s){ H+='<div class="card"><h3>'+U.esc(s.title)+'</h3>'+(s.cap?'<p class="cap">'+U.esc(s.cap)+'</p>':'')+s.html+'</div>'; });
+  H+='<div class="summary"><div class="summary-h"><h3>'+U.esc(CFG.summaryTitle)+'</h3><span class="acts"><button class="copy pdf" id="pdf" type="button">Save PDF</button><button class="copy" id="copy" type="button">Copy</button></span></div><pre id="smtext">'+U.esc(out.summary)+'</pre></div>';
+  var rep=$("report"); rep.innerHTML=H; rep.hidden=false;
+  var cp=$("copy"); cp.addEventListener("click",function(){ var t=$("smtext").textContent;
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ cp.textContent="Copied"; cp.classList.add("done"); }); } });
+  $("pdf").addEventListener("click",function(){ window.print(); });
+  rep.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function gate(){
+  var v=name();
+  $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+  $("gate-inst").textContent=v; $("gate").hidden=false;
+  $("gate").scrollIntoView({behavior:"smooth",block:"center"});
+}
+$("foot").textContent=CFG.foot;
+G.init();
+})();
+</script>
+</body>
+</html>

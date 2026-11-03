@@ -370,6 +370,32 @@
     "url": "https://www.itu.int/rec/dologin_pub.asp?lang=e&id=T-REC-E.371-202602-I%21%21PDF-E&type=items",
     "source": "ITU-T E.371, Feb 2026"
    }
+  },
+  {
+   "slug": "device-census",
+   "name": "3G Device Census",
+   "paths": [
+    "device-census/index.html"
+   ],
+   "expect": "Of 640 connected devices, 50.3% are ready for 4G",
+   "why": {
+    "text": "The ICT ministry asks every organisation to list equipment that relies on 2G or 3G and test replacements before 3G goes off on 30 June 2027.",
+    "url": "https://minict.gov.rw/news-detail/rwanda-to-switch-off-3g-networks-on-30-june-2027",
+    "source": "MINICT, 28 Jul 2026"
+   }
+  },
+  {
+   "slug": "qos-return",
+   "name": "QoS Return Check",
+   "paths": [
+    "qos-return/index.html"
+   ],
+   "expect": "In October 2026, 2 of 6 quality KPIs fail nationally",
+   "why": {
+    "text": "RURA's Regulation 21/2026 prices each failed quality KPI at FRW 5,000,000, with the return due five working days after month end.",
+    "url": "https://www.rura.rw/fileadmin/user_upload/RURA/Documents/Sectors/ICT/Regulatory_Instruments/ICT_Regulations_and_Guidelines/Regulation_Governing_Mobile_and_Fixed_Networks_Quality_of_service_in_Rwanda.pdf",
+    "source": "RURA, 12 Aug 2026"
+   }
   }
  ]
 }
