@@ -60,6 +60,8 @@ h1{font-stretch:125%; font-weight:700; font-size:clamp(28px,5.2vw,44px); line-he
 .step:last-child{border-right:0}
 .step b{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:2px}
 .step p{margin:0; font-size:14.5px}
+.pricebar{margin:10px 0 0; padding:10px 16px; border:1.5px solid var(--accent); background:var(--panel); font-size:14.5px}
+.pricebar b{color:var(--accent)}
 .filters{display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 14px}
 .filters button{font-family:var(--mono); font-size:12px; letter-spacing:.03em; padding:7px 12px; border:1.5px solid var(--line); border-radius:999px; background:transparent; color:var(--dim); cursor:pointer}
 .filters button[aria-pressed="true"]{border-color:var(--accent); color:var(--ink); background:color-mix(in srgb, var(--accent) 16%, transparent)}
@@ -122,6 +124,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-of
     <div class="step"><b>2 · Run</b><p>The sample runs free. Your own CSV opens with a 3-day trial code: <a href="https://wa.me/250788312423?text=Muraho%20Frutos.%20Please%20send%20a%203-day%20trial%20code%20for%20your%20trial%20tools%20for%20my%20organisation." target="_blank" rel="noopener">ask for one on WhatsApp</a>.</p></div>
     <div class="step"><b>3 · Share</b><p>Copy the ready-made summary or save it as a PDF for your team or your supplier.</p></div>
   </section>
+  <p class="pricebar"><b>Full version:</b> RWF 300,000 a month per organisation, USD 200 outside Rwanda. Every tool below, unlimited runs on your own data, cancel any month. <a href="https://wa.me/250788312423?text=Muraho%20Frutos.%20We%20would%20like%20the%20full%20version%20of%20your%20tools%20for%20our%20organisation." target="_blank" rel="noopener">Start on WhatsApp</a></p>
   <p class="codebar" id="codebar" hidden>Your trial code is ready: open any tool below and your own file unlocks for 3 days.</p>
   <nav class="filters" aria-label="Filter by sector"><button type="button" data-f="all" aria-pressed="true">All<span class="n">30</span></button><button type="button" data-f="fin" aria-pressed="false">Banks &amp; fintech<span class="n">18</span></button><button type="button" data-f="ins" aria-pressed="false">Insurers<span class="n">6</span></button><button type="button" data-f="gov" aria-pressed="false">Government<span class="n">14</span></button><button type="button" data-f="util" aria-pressed="false">Utilities<span class="n">12</span></button><button type="button" data-f="ops" aria-pressed="false">Operators &amp; ISPs<span class="n">18</span></button><button type="button" data-f="cc" aria-pressed="false">Contact centres<span class="n">2</span></button><button type="button" data-f="energy" aria-pressed="false">Towers &amp; energy<span class="n">5</span></button><button type="button" data-f="fleet" aria-pressed="false">Fleets<span class="n">4</span></button></nav>
   <p class="fnote">Each card says why it matters now, with its source. Checked 17 Oct 2026.</p>
@@ -497,7 +500,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-of
       <a class="btn ghost" href="tel:+250731000163">Call +250 731 000 163</a>
     </div>
   </section>
-  <p class="foot">Sample runs use anonymous sample data (Network A, Zone K, Route 108, masked payers), not anyone's real records. Your own files open with a 3-day trial code and are read in your browser only. © 2026 Frutos · Kigali</p>
+  <p class="foot">Sample runs use anonymous sample data (Network A, Zone K, Route 108, masked payers), not anyone's real records. Your own files open with a 3-day trial code and are read in your browser only. Full version: RWF 300,000 a month per organisation (USD 200 outside Rwanda), every tool, cancel any month. © 2026 Frutos · Kigali</p>
 </main>
 <script>
 (function(){
