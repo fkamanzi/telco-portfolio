@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Payment Failure Decoder</title>
-<meta name="description" content="A self-serve trial that decodes card and ATM response codes (ISO 8583) and instant-payment status and reason codes (ISO 20022), ranks failures by cause and side, and values the technical ones. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that decodes card and ATM response codes (ISO 8583) and instant-payment status and reason codes (ISO 20022), ranks failures by cause and side, and values the technical ones. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Payment Failure Decoder · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that decodes card and ATM response codes (ISO 8583) and instant-payment status and reason codes (ISO 20022), ranks failures by cause and side, and values the technical ones. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that decodes card and ATM response codes (ISO 8583) and instant-payment status and reason codes (ISO 20022), ranks failures by cause and side, and values the technical ones. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="RwandAir" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -359,7 +359,7 @@ var TOOL={
   if(R.hasT&&tech) S.push({title:"Technical failures through the day",cap:"Technical failures by hour",html:U.heat(R.hours,"count")});
   var tk=Object.keys(R.terms).sort(function(a,b){return R.terms[b]-R.terms[a];});
   if(R.hasTe&&tk.length) S.push({title:"Terminals with the most technical failures",cap:U.of("Where to send the field team first",8,tk.length),html:U.table(["Terminal","Technical failures"],tk.slice(0,8).map(function(k){return [k,U.fmt(R.terms[k])];}),[1])});
-  var L=[]; L.push("PAYMENT FAILURES — "+ctx.name.toUpperCase()); L.push(U.fmt(T)+" attempts   |   Prepared by Frutos"); L.push("");
+  var L=[]; L.push("PAYMENT FAILURES — "+ctx.name.toUpperCase()); L.push(U.fmt(T)+" attempts   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING"); L.push("- Went through: "+U.pct(ok,T)+"%  |  failed: "+U.fmt(fail)+(pend?"  |  no final status: "+U.fmt(pend):""));
   L.push("- Technical: "+U.pct(tech,fail)+"% of failures"+(R.hasA?" ("+U.rwf(techAmt)+" not moved"+(R.hasU?"; "+U.rwf(R.recAmt)+" recovered on retry within "+R.W+" min":"")+")":""));
   L.push("- By area: "+order.filter(function(k){return k!=="ok"&&k!=="pending"&&c[k];}).map(function(k){return CAT[k][0]+" "+U.pct(c[k],fail)+"%";}).join(" · "));

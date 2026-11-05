@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>3G Switch-off Readiness</title>
-<meta name="description" content="A self-serve trial that turns device-capability snapshots into VoLTE readiness, 3G-at-best devices by area, and the weeks needed at the current pace against the 30 June 2027 switch-off. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that turns device-capability snapshots into VoLTE readiness, 3G-at-best devices by area, and the weeks needed at the current pace against the 30 June 2027 switch-off. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="3G Switch-off Readiness · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that turns device-capability snapshots into VoLTE readiness, 3G-at-best devices by area, and the weeks needed at the current pace against the 30 June 2027 switch-off. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that turns device-capability snapshots into VoLTE readiness, 3G-at-best devices by area, and the weeks needed at the current pace against the 30 June 2027 switch-off. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your network" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -341,7 +341,7 @@ var TOOL={
   if(pace!==null) Sc.push({title:"Areas behind schedule",cap:U.of("Areas that do not move all their 3G-at-best devices by 30 June 2027 at the pace of their last "+wlab+" weeks",12,nb),
     html:nb?U.table(["Area","At risk","Weekly fall","Weeks needed","Left on 30 Jun 2027"],behind.slice(0,12).map(function(a){ return [a.k,U.fmt(a.g3),a.p>0?U.fmt(a.p):"none",{t:nw(a.need),cls:"flag"},U.fmt(a.left)]; }),[1,2,3,4]):'<p class="cap">Every area moves its 3G-at-best devices before 30 June 2027 at its current pace.</p>'});
   var L=[]; L.push("3G SWITCH-OFF READINESS — "+ctx.name.toUpperCase());
-  L.push(A.length+" areas, "+U.fmt(T.s)+" active subscribers"+(R.hasW?", "+R.W.length+" snapshots to "+U.dd(last):"")+"   |   Prepared by Frutos"); L.push("");
+  L.push(A.length+" areas, "+U.fmt(T.s)+" active subscribers"+(R.hasW?", "+R.W.length+" snapshots to "+U.dd(last):"")+"   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING");
   L.push("- VoLTE-capable: "+U.pct(T.v,T.s)+"% (target "+tg+"%)"+(ready<tg?"; "+U.fmt(Math.ceil(tg/100*T.s-T.v))+" more devices needed to reach it":""));
   L.push("- 3G at best: "+U.fmt(T.g3)+" devices ("+U.pct(T.g3,T.s)+"%) lose 3G on 30 June 2027 and drop to 2G at most");

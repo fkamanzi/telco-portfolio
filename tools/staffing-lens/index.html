@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contact Centre Staffing Lens</title>
-<meta name="description" content="A self-serve trial that computes the agents needed per interval to hit a service level, and compares them with your schedule. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that computes the agents needed per interval to hit a service level, and compares them with your schedule. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Contact Centre Staffing Lens · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that computes the agents needed per interval to hit a service level, and compares them with your schedule. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that computes the agents needed per interval to hit a service level, and compares them with your schedule. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your contact centre" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -310,7 +310,7 @@ var TOOL={
   }
   var amx=Math.max.apply(null,I.map(function(x){return x.A;}));
   S.push({title:"Workload",cap:"Erlangs per interval = calls × handle time ÷ interval length",html:U.bars(I.map(function(x){return {label:x.lab,w:amx?x.A/amx*100:0,text:U.fmt(x.A,1)+" E · "+U.fmt(x.calls)+" calls"};}))});
-  var L=[]; L.push("CONTACT CENTRE STAFFING — "+ctx.name.toUpperCase()); L.push(U.fmt(calls)+" calls, "+I.length+" intervals   |   Prepared by Frutos"); L.push("");
+  var L=[]; L.push("CONTACT CENTRE STAFFING — "+ctx.name.toUpperCase()); L.push(U.fmt(calls)+" calls, "+I.length+" intervals   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("TARGET: "+Math.round(R.tgt*100)+"% answered within "+R.T+" s; handle time "+R.aht+" s; shrinkage "+Math.round(R.sh*100)+"%"); L.push("");
   L.push("FINDING"); L.push("- Rostered agents needed: "+low+" to "+peak+" per "+unit); sm.forEach(function(s){L.push(s);});
   L.push(""); L.push("NEXT STEP");

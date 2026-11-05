@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bus On-Time &amp; Headway Lens</title>
-<meta name="description" content="A self-serve trial that reads one export of scheduled and actual departures and returns on-time performance, excess wait time and bunching per route, and the worst hours of the day. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that reads one export of scheduled and actual departures and returns on-time performance, excess wait time and bunching per route, and the worst hours of the day. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Bus On-Time &amp; Headway Lens · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that reads one export of scheduled and actual departures and returns on-time performance, excess wait time and bunching per route, and the worst hours of the day. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that reads one export of scheduled and actual departures and returns on-time performance, excess wait time and bunching per route, and the worst hours of the day. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your bus operation" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -327,7 +327,7 @@ var TOOL={
   S.push({title:"Delay bands",cap:"All scheduled departures",html:U.bars(R.B.map(function(n,i){
     return {label:bl[i],w:n/bm*100,text:U.fmt(n)+" · "+U.pct(n,T.n)+"%",cls:i===1?"":(i>=3?"bad":"warn")}; }))});
   var Ls=[]; Ls.push("BUS ON-TIME & HEADWAY LENS — "+ctx.name.toUpperCase());
-  Ls.push(per+", "+N+" "+rw(N)+", "+U.fmt(T.n)+" scheduled departures"+(R.hasB&&R.nb?", "+R.nb+" buses":"")+"   |   Prepared by Frutos"); Ls.push("");
+  Ls.push(per+", "+N+" "+rw(N)+", "+U.fmt(T.n)+" scheduled departures"+(R.hasB&&R.nb?", "+R.nb+" buses":"")+"   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); Ls.push("");
   Ls.push("FINDING");
   Ls.push("- On time ("+win+"): "+U.fmt(T.ok)+" of "+U.fmt(T.n)+" ("+U.pct(T.ok,T.n)+"%)"+(T.avg!==null?"; average delay "+f1(T.avg)+" min":"")+"; "+U.fmt(T.no)+" did not run");
   Ls.push("- Delay bands: early "+U.pct(R.B[0],T.n)+"% · on time "+U.pct(R.B[1],T.n)+"% · "+U.fmt(Lt)+"-10 min late "+U.pct(R.B[2],T.n)+"% · 10-20 min "+U.pct(R.B[3],T.n)+"% · over 20 min "+U.pct(R.B[4],T.n)+"% · not operated "+U.pct(R.B[5],T.n)+"%");

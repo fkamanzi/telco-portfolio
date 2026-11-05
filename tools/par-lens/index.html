@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Portfolio at Risk Lens</title>
-<meta name="description" content="A self-serve trial that turns a loan-book export into PAR1, PAR30 and PAR90, arrears buckets, and the branches, officers and products that carry the money at risk. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that turns a loan-book export into PAR1, PAR30 and PAR90, arrears buckets, and the branches, officers and products that carry the money at risk. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Portfolio at Risk Lens · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that turns a loan-book export into PAR1, PAR30 and PAR90, arrears buckets, and the branches, officers and products that carry the money at risk. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that turns a loan-book export into PAR1, PAR30 and PAR90, arrears buckets, and the branches, officers and products that carry the money at risk. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your institution" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -334,7 +334,7 @@ var TOOL={
       S.push({title:"PAR30 by quarter of disbursement",cap:"Which batches of loans went bad; recent quarters have had less time to fall behind",
         html:U.bars(V.map(function(x){ var p=U.pct(x.p30,x.o); return {label:x.k,w:mv?(x.o?x.p30/x.o:0)/mv*100:0,text:p+"% · "+U.fmt(x.n),cls:p>tg?"bad":""}; }))}); } }
   var L=[]; L.push("PORTFOLIO AT RISK LENS — "+ctx.name.toUpperCase());
-  L.push(U.fmt(R.n)+(R.n===1?" loan, ":" loans, ")+U.rwf(R.tot)+" outstanding"+(B.length?", "+B.length+(B.length===1?" branch":" branches"):"")+(R.byDue?", as of "+U.dd(R.asof):"")+"   |   Prepared by Frutos"); L.push("");
+  L.push(U.fmt(R.n)+(R.n===1?" loan, ":" loans, ")+U.rwf(R.tot)+" outstanding"+(B.length?", "+B.length+(B.length===1?" branch":" branches"):"")+(R.byDue?", as of "+U.dd(R.asof):"")+"   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING");
   L.push("- PAR30: "+par30+"% (target "+tg+"%)  |  PAR90: "+par90+"%  |  PAR1: "+par1+"%");
   L.push("- At risk over 30 days: "+U.rwf(R.p30)+" in "+U.fmt(R.n30)+(R.n30===1?" loan":" loans"));

@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>API &amp; App Health Lens</title>
-<meta name="description" content="A self-serve trial that turns an API or web access log into server-error rates, slow endpoints and error-budget burn against your uptime target. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that turns an API or web access log into server-error rates, slow endpoints and error-budget burn against your uptime target. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="API &amp; App Health Lens · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that turns an API or web access log into server-error rates, slow endpoints and error-budget burn against your uptime target. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that turns an API or web access log into server-error rates, slow endpoints and error-budget burn against your uptime target. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your organisation" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -309,7 +309,7 @@ var TOOL={
   if(R.hasT&&e5) S.push({title:"Server errors through the day",cap:"5xx responses by hour",html:U.heat(R.h5,"count")});
   var cs=Object.keys(R.codes).sort(function(a,b){return R.codes[b]-R.codes[a];}).slice(0,10);
   S.push({title:"Status codes",cap:U.of("Meanings as defined in RFC 9110, and RFC 6585 for 429",10,Object.keys(R.codes).length),html:U.table(["Code","Meaning","Requests","Share"],cs.map(function(k){return [k,HS[k]||"—",U.fmt(R.codes[k]),U.pct(R.codes[k],R.tot)+"%"];}),[2,3])});
-  var L=[]; L.push("API AND APP HEALTH — "+ctx.name.toUpperCase()); L.push(U.fmt(R.tot)+" requests   |   Prepared by Frutos"); L.push("");
+  var L=[]; L.push("API AND APP HEALTH — "+ctx.name.toUpperCase()); L.push(U.fmt(R.tot)+" requests   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING"); L.push("- Without server error: "+U.fmt(avail,2)+"% (target "+slo+"%)  |  burn "+U.fmt(burn,1)+"x the allowed error rate");
   if(burn>1) L.push("- At this pace a 30-day error budget lasts "+U.fmt(days,1)+" days");
   if(p95!==null) L.push("- 95th-percentile time "+U.fmt(p95/1000,2)+" s; "+U.pct(R.slowN,R.durs.length||1)+"% of requests over "+U.fmt(R.slow)+" ms");

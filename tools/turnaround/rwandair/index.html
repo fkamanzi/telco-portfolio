@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Turnaround &amp; Backlog Lens</title>
-<meta name="description" content="A self-serve trial that turns a case log into time to close, on-time rate against your target, backlog age and the weekly balance of cases opened and closed. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that turns a case log into time to close, on-time rate against your target, backlog age and the weekly balance of cases opened and closed. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Turnaround &amp; Backlog Lens · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that turns a case log into time to close, on-time rate against your target, backlog age and the weekly balance of cases opened and closed. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that turns a case log into time to close, on-time rate against your target, backlog age and the weekly balance of cases opened and closed. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="RwandAir" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -303,7 +303,7 @@ var TOOL={
   S.push({title:"Opened and closed, by week",cap:"Top bar: cases opened. Bottom bar: cases closed.",html:U.pairs(wks.slice(-14).map(function(k){ var W=R.weeks[k]; return {label:"w/c "+U.dd(k,true),w1:W.o/wm*100,w2:W.c/wm*100,cls1:W.o>W.c?"bad":"",text:W.o+" / "+W.c}; }))});
   if(R.hasG){ var G=Object.keys(R.teams).map(function(k){ var g=R.teams[k]; g.med=U.median(g.tats); g.due=g.on+g.late+g.openLate; return g; }).sort(function(a,b){return b.openLate-a.openLate;});
     S.push({title:"By team",cap:"Where the late and open cases sit",html:U.table(["Team","Cases","On time","Median days","Open, past target"],G.map(function(g){return [g.k,U.fmt(g.n),(g.due?U.pct(g.on,g.due):0)+"%",g.med===null?"—":U.fmt(g.med,1),{t:U.fmt(g.openLate),cls:g.openLate?"flag":""}];}),[1,2,3,4])}); }
-  var L=[]; L.push("TURNAROUND AND BACKLOG — "+ctx.name.toUpperCase()); L.push(U.fmt(R.n)+" cases, "+dd(R.t0)+" to "+dd(R.asOf)+"   |   Prepared by Frutos"); L.push("");
+  var L=[]; L.push("TURNAROUND AND BACKLOG — "+ctx.name.toUpperCase()); L.push(U.fmt(R.n)+" cases, "+dd(R.t0)+" to "+dd(R.asOf)+"   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING"); L.push("- On time (within "+R.sla+" days): "+on+"% of "+U.fmt(due)+" closed or past-due cases");
   if(med!==null) L.push("- Days to close: median "+U.fmt(med,1)+", 90th percentile "+U.fmt(p90,1));
   L.push("- Open: "+U.fmt(R.openN)+", of which "+U.fmt(R.openLate)+" past target");

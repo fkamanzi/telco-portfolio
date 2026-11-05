@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Motor Loss Ratio Lens</title>
-<meta name="description" content="A self-serve trial that reads one export of motor policies and claims and returns the loss ratio by segment, vehicle age and use, frequency and severity, and the rate change each segment needs. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that reads one export of motor policies and claims and returns the loss ratio by segment, vehicle age and use, frequency and severity, and the rate change each segment needs. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Motor Loss Ratio Lens · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that reads one export of motor policies and claims and returns the loss ratio by segment, vehicle age and use, frequency and severity, and the rate change each segment needs. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that reads one export of motor policies and claims and returns the loss ratio by segment, vehicle age and use, frequency and severity, and the rate change each segment needs. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your insurer" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -324,7 +324,7 @@ var TOOL={
   if(R.hasT&&ty.length>1) S.push({title:"Premium against claims, by vehicle type",cap:"Top bar: earned premium. Bottom bar: incurred claims. Same scale.",
     html:U.pairs(ty.map(function(o){ return {label:o.k,w1:pm?o.P/pm*100:0,w2:pm?o.C/pm*100:0,cls2:lr(o)>tg?"bad":"dim",text:f1(lr(o))+"%"}; }))});
   var Ls=[]; Ls.push("MOTOR LOSS RATIO LENS — "+ctx.name.toUpperCase());
-  Ls.push(U.fmt(T.n)+" policies, earned premium "+U.rwf(T.P)+", incurred claims "+U.rwf(T.C)+"   |   Prepared by Frutos"); Ls.push("");
+  Ls.push(U.fmt(T.n)+" policies, earned premium "+U.rwf(T.P)+", incurred claims "+U.rwf(T.C)+"   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); Ls.push("");
   Ls.push("FINDING");
   Ls.push("- Loss ratio: "+f1(L0)+"% against a "+U.fmt(tg)+"% target"+(ch>0?"; the whole book needs "+U.fmt(ch,0)+"% more premium":""));
   Ls.push("- Frequency: "+U.fmt(freq,2)+" claims per vehicle-year; average claim "+U.rwf(sev));

@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>3G Device Census</title>
-<meta name="description" content="A self-serve trial that turns an organisation's list of connected devices into 4G readiness, the units that stop working when 3G and then 2G are switched off, and a month-by-month replacement plan. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that turns an organisation's list of connected devices into 4G readiness, the units that stop working when 3G and then 2G are switched off, and a month-by-month replacement plan. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="3G Device Census · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that turns an organisation's list of connected devices into 4G readiness, the units that stop working when 3G and then 2G are switched off, and a month-by-month replacement plan. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that turns an organisation's list of connected devices into 4G readiness, the units that stop working when 3G and then 2G are switched off, and a month-by-month replacement plan. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your organisation" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -353,7 +353,7 @@ var TOOL={
     Sc.push({title:"Devices at risk that have gone quiet",cap:"No report for 90 days or more before the latest report in the file: confirm or retire them before buying replacements",
       html:U.table(["Type","Quiet 90 days","Of devices at risk"],DT.slice(0,12).map(function(a){ return [a.k,U.fmt(a.dorm),U.fmt(a.risk)]; }),[1,2])}); }
   var L=[]; L.push("3G DEVICE CENSUS — "+ctx.name.toUpperCase());
-  L.push(U.fmt(Z.n)+" connected devices"+(R.hasS?" across "+S.length+" sites":"")+(R.hasT?", "+T.length+" device types":"")+"   |   Prepared by Frutos"); L.push("");
+  L.push(U.fmt(Z.n)+" connected devices"+(R.hasS?" across "+S.length+" sites":"")+(R.hasT?", "+T.length+" device types":"")+"   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING");
   L.push("- Ready for 4G: "+U.pct(ready,Z.n)+"% ("+U.fmt(Z.lte)+" 4G-capable"+(R.hasP?", "+U.fmt(Z.done)+" replaced and tested":"")+")");
   L.push("- 3G at best: "+U.fmt(g3)+" devices lose 3G on 30 June 2027 and fall back to 2G at most"+(R.hasC?" ("+U.fmt(Z.c3)+" critical)":"")+(R.hasP?"; "+U.fmt(Z.g3p)+" replacements under way":""));

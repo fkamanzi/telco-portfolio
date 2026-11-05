@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Power Reliability Index</title>
-<meta name="description" content="A self-serve trial that computes IEEE 1366 reliability indices (SAIFI, SAIDI, CAIDI, MAIFI, ASAI) from an outage log and ranks feeders by customer-minutes lost. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that computes IEEE 1366 reliability indices (SAIFI, SAIDI, CAIDI, MAIFI, ASAI) from an outage log and ranks feeders by customer-minutes lost. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Power Reliability Index · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that computes IEEE 1366 reliability indices (SAIFI, SAIDI, CAIDI, MAIFI, ASAI) from an outage log and ranks feeders by customer-minutes lost. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that computes IEEE 1366 reliability indices (SAIFI, SAIDI, CAIDI, MAIFI, ASAI) from an outage log and ranks feeders by customer-minutes lost. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your network" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -297,7 +297,7 @@ var TOOL={
   S.push({title:"When interruptions start",cap:"Sustained interruptions starting in each hour",html:U.heat(R.hours,"count")});
   var bl=["Up to 30 min","30 to 60 min","1 to 4 hours","Over 4 hours"], bm=Math.max.apply(null,R.bk);
   S.push({title:"How long interruptions last",cap:"Sustained interruptions by length",html:U.bars(R.bk.map(function(n,i){return {label:bl[i],w:bm?n/bm*100:0,text:U.fmt(n),cls:i===3&&n?"bad":""};}))});
-  var L=[]; L.push("POWER RELIABILITY — "+ctx.name.toUpperCase()); L.push(per+", "+U.fmt(R.NT)+" "+unit+"s served   |   Prepared by Frutos"); L.push("");
+  var L=[]; L.push("POWER RELIABILITY — "+ctx.name.toUpperCase()); L.push(per+", "+U.fmt(R.NT)+" "+unit+"s served   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("INDICES (IEEE 1366)"); L.push("- SAIFI "+U.fmt(SAIFI,2)+"  |  SAIDI "+U.fmt(SAIDI,0)+" min  |  CAIDI "+U.fmt(CAIDI,0)+" min  |  ASAI "+U.fmt(ASAI,3)+"%  |  MAIFI "+U.fmt(MAIFI,2));
   L.push(""); L.push("FINDING");
   Fs.slice(0,5).forEach(function(o){ L.push("- "+o.k+": "+U.pct(o.cmi,R.SCMI||1)+"% of "+unit+"-minutes lost, "+o.ev+" sustained interruptions, longest "+U.fmt(o.longest/60,1)+" h"); });

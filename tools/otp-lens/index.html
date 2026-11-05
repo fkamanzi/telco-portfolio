@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OTP &amp; SMS Delivery Lens</title>
-<meta name="description" content="A self-serve trial that shows how many one-time passwords and alerts reach the phone in time, network by network. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that shows how many one-time passwords and alerts reach the phone in time, network by network. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="OTP &amp; SMS Delivery Lens · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that shows how many one-time passwords and alerts reach the phone in time, network by network. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that shows how many one-time passwords and alerts reach the phone in time, network by network. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your organisation" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -309,7 +309,7 @@ var TOOL={
   if(R.hours.some(function(x){return x.n>0;})) S.push({title:"In time through the day",cap:"Share of OTPs arriving within "+R.val+" s, by hour sent, against your "+Math.round(tg*100)+"% target",html:U.heat(R.hours.map(function(x){return x.n>=10?x.ok/x.n:null;}),"level",tg)+'<p class="note-s">Hours with fewer than 10 OTPs are left grey.</p>'});
   var errs=Object.keys(R.err).map(function(k){return [k,R.err[k]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
   if(errs.length) S.push({title:"Top failure codes",cap:U.of("As reported by your SMS provider; the full version maps each one to its route",8,Object.keys(R.err).length),html:U.table(["Code","Messages","Share of failures"],errs.map(function(e){return [e[0],U.fmt(e[1]),U.pct(e[1],failed)+"%"];}),[1,2])});
-  var L=[]; L.push("OTP DELIVERY — "+ctx.name.toUpperCase()); L.push(U.fmt(tot)+" messages   |   Prepared by Frutos"); L.push("");
+  var L=[]; L.push("OTP DELIVERY — "+ctx.name.toUpperCase()); L.push(U.fmt(tot)+" messages   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING"); L.push("- In time (within "+R.val+" s): "+pIn+"%  |  delivered at all: "+pDel+"%");
   L.push("- Too late to use: "+U.fmt(R.late)+"  |  failed or unconfirmed: "+U.fmt(failed+pend));
   if(worst&&best&&worst.k!==best.k) L.push("- "+worst.k+": "+Math.round(worst.r*100)+"% in time vs "+best.k+" "+Math.round(best.r*100)+"%");

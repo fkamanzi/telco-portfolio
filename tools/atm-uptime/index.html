@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ATM Uptime Lens</title>
-<meta name="description" content="A self-serve trial that turns an ATM out-of-service log into availability per ATM against a target, lost hours by reason, and when cash-outs start. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that turns an ATM out-of-service log into availability per ATM against a target, lost hours by reason, and when cash-outs start. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ATM Uptime Lens · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that turns an ATM out-of-service log into availability per ATM against a target, lost hours by reason, and when cash-outs start. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that turns an ATM out-of-service log into availability per ATM against a target, lost hours by reason, and when cash-outs start. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your bank" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -339,7 +339,7 @@ var TOOL={
       html:U.bars(WEEK.map(function(d){ return {label:DAYS[d],w:R.wd[d]/wm*100,text:R.wd[d]+" · "+hrs(R.wdh[d]),cls:d===bd?"bad":""}; }))}); }
   S.push({title:"When downtime starts",cap:"Out-of-service episodes starting in each hour of the day",html:U.heat(R.hours,"count")});
   var L=[]; L.push("ATM UPTIME — "+ctx.name.toUpperCase());
-  L.push(R.N+(R.N===1?" ATM, ":" ATMs, ")+per+", "+U.fmt(R.nEv)+" out-of-service episodes   |   Prepared by Frutos"); L.push("");
+  L.push(R.N+(R.N===1?" ATM, ":" ATMs, ")+per+", "+U.fmt(R.nEv)+" out-of-service episodes   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING");
   L.push("- Fleet availability: "+av(fav)+" against a "+tS+"% target; "+below.length+" of "+R.N+" ATMs below target");
   if(R.D>0){ L.push("- Lost hours: "+hrs(R.D)+" out of service"+(R.plan&&R.maintN?", planned maintenance left out":"")); L.push("  by reason: "+rk.slice(0,4).map(function(l){ return l+" "+U.pct(R.reasons[l],R.D)+"%"; }).join(" · ")+(rk.length>4?" · other "+U.pct(R.D-rk.slice(0,4).reduce(function(t,l){ return t+R.reasons[l]; },0),R.D)+"%":"")); }

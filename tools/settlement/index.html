@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Settlement Checker</title>
-<meta name="description" content="A self-serve trial that reconciles your daily traffic or settlement totals with a partner's or a switch's report and values every difference over your threshold. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that reconciles your daily traffic or settlement totals with a partner's or a switch's report and values every difference over your threshold. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Settlement Checker · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that reconciles your daily traffic or settlement totals with a partner's or a switch's report and values every difference over your threshold. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that reconciles your daily traffic or settlement totals with a partner's or a switch's report and values every difference over your threshold. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your organisation" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -301,7 +301,7 @@ var TOOL={
   var top=fl.slice().sort(function(a,b){ return Math.abs(b.val!==null?b.val:b.diff)-Math.abs(a.val!==null?a.val:a.diff); }).slice(0,12);
   if(top.length){ var h2=["Date","Route","Yours","Theirs","Gap"]; if(hasV) h2.push("Value");
     S.push({title:"Route-days to dispute, largest first",cap:U.of("Over your "+R.tol+"% threshold, or missing on one side",12,fl.length),html:U.table(h2,top.map(function(p){ var r=[p.d,p.r,p.ua===null?"—":f(p.ua),p.ub===null?"—":f(p.ub),{t:p.miss?("missing on "+p.miss+" side"):U.fmt(p.pct,2)+"%",cls:"flag"}]; if(hasV) r.push(p.val===null?"—":U.rwf(p.val)); return r; }),hasV?[2,3,5]:[2,3])}); }
-  var L=[]; L.push("SETTLEMENT CHECK — "+ctx.name.toUpperCase()); L.push(nd+" days, "+rs.length+" routes   |   Prepared by Frutos"); L.push("");
+  var L=[]; L.push("SETTLEMENT CHECK — "+ctx.name.toUpperCase()); L.push(nd+" days, "+rs.length+" routes   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING"); L.push("- Yours "+f(R.UA)+" vs theirs "+f(R.UB)+": "+(gap>=0?"yours":"theirs")+" higher by "+U.fmt(Math.abs(gp),2)+"%"+(hasV?" ("+U.rwf(Math.abs(net))+")":""));
   L.push("- Route-days over "+R.tol+"% or missing: "+U.fmt(fl.length)+" of "+U.fmt(P.length)+(hasV?"; in dispute "+U.rwf(gross):""));
   rs.slice(0,5).forEach(function(o){ var g=Math.max(o.ua,o.ub)?(o.ua-o.ub)/Math.max(o.ua,o.ub)*100:0; L.push("  "+o.k+": gap "+U.fmt(g,2)+"%, "+o.flag+(o.flag===1?" day":" days")+" over threshold, theirs lower on "+o.lower+" of "+o.both+" days"); });

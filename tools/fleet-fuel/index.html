@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fleet Fuel Leak Finder</title>
-<meta name="description" content="A self-serve trial that turns fuel-card or fill-up records into litres per 100 km per vehicle, compares each with its type, and flags fill-ups that cannot be right. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that turns fuel-card or fill-up records into litres per 100 km per vehicle, compares each with its type, and flags fill-ups that cannot be right. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Fleet Fuel Leak Finder · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that turns fuel-card or fill-up records into litres per 100 km per vehicle, compares each with its type, and flags fill-ups that cannot be right. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that turns fuel-card or fill-up records into litres per 100 km per vehicle, compares each with its type, and flags fill-ups that cannot be right. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your fleet" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -300,7 +300,7 @@ var TOOL={
     S.push({title:"Litres per 100 km, by type",cap:"Median of the vehicles of each type (the norm each vehicle is compared with)",html:U.bars(ys.map(function(y){ var c=vs.filter(function(x){return x.y===y;}).length; return {label:y,w:R.norms[y]/ym*100,text:U.fmt(R.norms[y],1)+" · "+c+" vehicles"}; }))}); }
   if(R.bad.length) S.push({title:"Fill-ups that cannot be right",cap:U.of("Check these against the receipts and the vehicle's location",12,R.bad.length),html:U.table(["Vehicle","Time","Litres","Why"],R.bad.slice(0,12).map(function(b){return [b.v,b.d||"—",U.fmt(b.l,1),b.why];}),[2])});
   if(R.hasT) S.push({title:"When fill-ups happen",cap:"Fill-ups by hour of day; fills at night are worth a look",html:U.heat(R.hours,"count")});
-  var L=[]; L.push("FLEET FUEL — "+ctx.name.toUpperCase()); L.push(vs.length+" vehicles, "+U.fmt(R.n)+" fill-ups"+span+"   |   Prepared by Frutos"); L.push("");
+  var L=[]; L.push("FLEET FUEL — "+ctx.name.toUpperCase()); L.push(vs.length+" vehicles, "+U.fmt(R.n)+" fill-ups"+span+"   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING"); L.push("- Vehicles above their type norm by more than "+R.tol+"%: "+fl.length+"; about "+U.fmt(ex,0)+" litres above the norm"+(price>0?" ("+U.rwf(ex*price)+")":""));
   fl.slice(0,6).forEach(function(x){ L.push("  "+x.k+" ("+x.y+"): "+U.fmt(x.rate,1)+" L/100 km vs "+U.fmt(x.norm,1)+" norm, "+U.fmt(x.excess,0)+" L excess"); });
   L.push("- Fill-ups that cannot be right: "+R.bad.length);

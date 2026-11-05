@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Link SLA Auditor</title>
-<meta name="description" content="A self-serve trial that turns an outage log into availability per link, SLA breaches per provider and the value of service not delivered. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that turns an outage log into availability per link, SLA breaches per provider and the value of service not delivered. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Link SLA Auditor · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that turns an outage log into availability per link, SLA breaches per provider and the value of service not delivered. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that turns an outage log into availability per link, SLA breaches per provider and the value of service not delivered. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="RwandAir" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -296,7 +296,7 @@ var TOOL={
   S.push({title:"When outages start",cap:"Outages starting in each hour of the day",html:U.heat(R.hours,"count")});
   var bl=["Under 15 min","15 to 60 min","1 to 4 hours","Over 4 hours"], bm=Math.max.apply(null,R.buckets);
   S.push({title:"How long outages last",cap:"Outages by length, after merging overlaps",html:U.bars(R.buckets.map(function(n,i){return {label:bl[i],w:bm?n/bm*100:0,text:U.fmt(n),cls:i===3&&n?"bad":""};}))});
-  var T=[]; T.push("LINK SLA AUDIT — "+ctx.name.toUpperCase()); T.push(L.length+" links with outages, "+per+"   |   Prepared by Frutos"); T.push("");
+  var T=[]; T.push("LINK SLA AUDIT — "+ctx.name.toUpperCase()); T.push(L.length+" links with outages, "+per+"   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); T.push("");
   T.push("FINDING"); T.push("- "+br.length+" links below "+R.sla+"% availability; total downtime "+U.fmt(down,1)+" h");
   if(R.hasProv) PV.forEach(function(p){ T.push("- "+p.k+": "+U.fmt(p.down,1)+" h down, "+p.br+" of "+p.n+" links below SLA"); });
   br.slice(0,5).forEach(function(x){ T.push("  "+x.id+(R.hasProv?" ("+x.prov+")":"")+": "+av(x.avail)+", "+ex(x.excess)+" h over allowance"); });

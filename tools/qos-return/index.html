@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>QoS Return Check</title>
-<meta name="description" content="A self-serve trial that checks a mobile operator's monthly quality-of-service return against Regulation 21/2026 before it is filed: every KPI by nation, City of Kigali and district, the failures, the francs at stake and the filing date. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that checks a mobile operator's monthly quality-of-service return against Regulation 21/2026 before it is filed: every KPI by nation, City of Kigali and district, the failures, the francs at stake and the filing date. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="QoS Return Check · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that checks a mobile operator's monthly quality-of-service return against Regulation 21/2026 before it is filed: every KPI by nation, City of Kigali and district, the failures, the francs at stake and the filing date. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that checks a mobile operator's monthly quality-of-service return against Regulation 21/2026 before it is filed: every KPI by nation, City of Kigali and district, the failures, the francs at stake and the filing date. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your network" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -322,7 +322,7 @@ var TOOL={
   if(R.bad) chk.push(["Rows skipped",R.bad+" with an unreadable month"]);
   Sc.push({title:"Before you file",cap:"Gaps and jumps that RURA will ask about; a move of 5 points or more in one month usually means a counter or definition changed",html:U.table(["Check","Finding"],chk)});
   var L=[]; L.push("QOS RETURN CHECK — "+ctx.name.toUpperCase()+" — "+ml.toUpperCase());
-  L.push("Regulation No 21/R/ICT/RURA/2026, Annex II   |   Prepared by Frutos"); L.push("");
+  L.push("Regulation No 21/R/ICT/RURA/2026, Annex II   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING");
   L.push("- "+(N.proxy?"District average":"National")+": "+passN+" of "+K.length+" KPIs pass"+(failN.length?"; failing: "+failN.map(function(x){ return x.label+" "+f1(N.v[x.k])+"% (threshold "+(x.dir===1?"≥ ":"≤ ")+x.thr+"%)"; }).join("; "):""));
   L.push("- At stake: FRW "+U.fmt(failN.length*fine)+" at FRW "+U.fmt(fine)+" per failed KPI (Annex I item 3)");

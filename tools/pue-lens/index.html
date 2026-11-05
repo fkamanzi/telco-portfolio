@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Data Centre PUE Lens</title>
-<meta name="description" content="A self-serve trial that turns facility and IT meter readings into PUE per ISO/IEC 30134-2, by hour, day and outdoor temperature, with the overhead in kWh, RWF and CO₂. Prepared by Frutos.">
+<meta name="description" content="A self-serve trial that turns facility and IT meter readings into PUE per ISO/IEC 30134-2, by hour, day and outdoor temperature, with the overhead in kWh, RWF and CO₂. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Data Centre PUE Lens · trial by Frutos">
-<meta property="og:description" content="A self-serve trial that turns facility and IT meter readings into PUE per ISO/IEC 30134-2, by hour, day and outdoor temperature, with the overhead in kWh, RWF and CO₂. Prepared by Frutos.">
+<meta property="og:description" content="A self-serve trial that turns facility and IT meter readings into PUE per ISO/IEC 30134-2, by hour, day and outdoor temperature, with the overhead in kWh, RWF and CO₂. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -214,7 +214,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
     </div>
     <dl class="head-grid">
       <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your data centre" aria-label="Organisation name" spellcheck="false"></dd></div>
-      <div><dt>Prepared by</dt><dd>Frutos · independent network engineer</dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
     </dl>
   </header>
   <section class="intake">
@@ -402,7 +402,7 @@ var TOOL={
   S.push({title:"Where the energy went",cap:"Of "+U.fmt(R.F)+" kWh drawn. A PUE of "+tgs+" allows "+U.fmt(allow)+" kWh of overhead; "+(A>0?U.fmt(A)+" kWh more were used":"the facility stayed within it"),html:U.stack(parts)});
   var ivl=R.step>0?Math.round(R.step/60000):0, ev="";
   if(ivl) ev=ivl%1440===0?(ivl===1440?", one a day":" every "+(ivl/1440)+" days"):(ivl%60===0?(ivl===60?" every hour":" every "+(ivl/60)+" h"):" every "+ivl+" min");
-  var L=[]; L.push("DATA CENTRE PUE LENS — "+ctx.name.toUpperCase()); L.push(per+", "+U.fmt(R.n)+" readings"+ev+"   |   Prepared by Frutos"); L.push("");
+  var L=[]; L.push("DATA CENTRE PUE LENS — "+ctx.name.toUpperCase()); L.push(per+", "+U.fmt(R.n)+" readings"+ev+"   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
   L.push("FINDING");
   L.push("- PUE "+U.fmt(P,2)+" against a target of "+tgs+": "+U.fmt(R.F)+" kWh drawn to run "+U.fmt(R.I)+" kWh of IT load");
   L.push("- Overhead "+U.fmt(O)+" kWh, "+U.pct(O,R.F)+"% of all energy"+(tar?": "+U.rwf(O*tar)+" at RWF "+nf(tar)+" per kWh":""));
