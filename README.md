@@ -1,6 +1,6 @@
 <a href="https://fkamanzi.github.io/telco-portfolio/"><img src="https://raw.githubusercontent.com/fkamanzi/fkamanzi/main/hero.svg" alt="Evidence to root cause" width="100%"></a>
 
-# Telco Portfolio — 36 browser tools for operators and the sectors that run on them
+# Telco Portfolio — 37 browser tools for operators and the sectors that run on them
 
 <p>
   <a href="https://fkamanzi.github.io/telco-portfolio/tools/"><img src="https://img.shields.io/badge/Open%20the%20tools-live-F5A623?style=for-the-badge&labelColor=0B1426" alt="Open the tools"></a>
@@ -25,6 +25,7 @@ Drop an export, get the verdict and the money at stake. Each tool reads your fil
 | [Signalling Cause Decoder](https://fkamanzi.github.io/telco-portfolio/tools/cause-decoder/) | SIP, Q.850, Diameter, GTPv2, 5GMM causes decoded and ranked |
 | [3G Switch-off Readiness](https://fkamanzi.github.io/telco-portfolio/tools/sunset-readiness/) | VoLTE readiness and 3G-only devices by area against the switch-off |
 | [3G Device Census](https://fkamanzi.github.io/telco-portfolio/tools/device-census/) | Devices that stop working at 3G/2G switch-off and a replacement plan |
+| [SIM Onboarding Decoder](https://fkamanzi.github.io/telco-portfolio/tools/onboarding-decoder/) | SMS after a SIM swap and entitlement answers decoded, the step that leaves VoLTE or Wi-Fi calling off |
 | [QoS Return Check](https://fkamanzi.github.io/telco-portfolio/tools/qos-return/) | Monthly QoS return checked before filing |
 | [OTP & SMS Delivery Lens](https://fkamanzi.github.io/telco-portfolio/tools/otp-lens/) | One-time passwords delivered in time, network by network |
 | [Channel Journey X-ray](https://fkamanzi.github.io/telco-portfolio/tools/channel-xray/) | Where customers drop in a USSD or app journey |

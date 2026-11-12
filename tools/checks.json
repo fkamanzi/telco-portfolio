@@ -396,6 +396,19 @@
     "url": "https://www.rura.rw/fileadmin/user_upload/RURA/Documents/Sectors/ICT/Regulatory_Instruments/ICT_Regulations_and_Guidelines/Regulation_Governing_Mobile_and_Fixed_Networks_Quality_of_service_in_Rwanda.pdf",
     "source": "RURA, 12 Aug 2026"
    }
+  },
+  {
+   "slug": "onboarding-decoder",
+   "name": "SIM Onboarding Decoder",
+   "paths": [
+    "onboarding-decoder/index.html"
+   ],
+   "expect": "Of 17 messages from 3 SIM swaps",
+   "why": {
+    "text": "Rwanda's plan has operators spend the rest of 2026 improving VoLTE reliability and finding the devices that still depend on 2G and 3G, before 3G goes off on 30 June 2027.",
+    "url": "https://www.newtimes.co.rw/article/37861/news/rwanda/inside-rwandas-roadmap-for-2g-3g-switch-off/amp",
+    "source": "The New Times, 2 Aug 2026"
+   }
   }
  ]
 }

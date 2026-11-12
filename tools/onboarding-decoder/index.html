@@ -1,0 +1,1168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIM Onboarding Decoder</title>
+<meta name="description" content="A self-serve trial that decodes the SMS a SIM swap triggers and the entitlement server's answers: each message decoded to the standard, placed in the onboarding loop, and checked for the step that leaves VoLTE or Wi-Fi calling off. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SIM Onboarding Decoder · trial by Frutos">
+<meta property="og:description" content="A self-serve trial that decodes the SMS a SIM swap triggers and the entitlement server's answers: each message decoded to the standard, placed in the onboarding loop, and checked for the step that leaves VoLTE or Wi-Fi calling off. Prepared by Frutos Kamanzi, CEO &amp; Founder, SAANO AI NETWORKS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1512; --panel:#14201B; --panel2:#0B130F; --ink:#E8F0EA; --dim:#8BA596; --line:#27372F;
+  --grid:rgba(190,242,100,.07); --accent:#BEF264; --accent2:#A3E635; --warn:#F2B134; --bad:#FF6B5E; --good:#39D98A;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+    --grid:rgba(20,80,50,.06); --accent:#4D7C0F; --accent2:#3F6212; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EDF2EE; --panel:#FFFFFF; --panel2:#F3F7F3; --ink:#102018; --dim:#5A6E62; --line:#D3E0D7;
+  --grid:rgba(20,80,50,.06); --accent:#4D7C0F; --accent2:#3F6212; --warn:#B5790C; --bad:#C23A2E; --good:#15935A;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+.wrap{max-width:860px; margin:0 auto; padding-inline:16px; padding-block:22px 40px}
+.exp{font-family:"Archivo",sans-serif; font-stretch:125%}
+.mono{font-family:var(--mono)}
+
+/* Header / title block */
+.head{border:1.5px solid var(--ink); background:var(--panel)}
+.head-top{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:14px 16px}
+.brandline{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 6px}
+.title{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:26px; line-height:1.05; margin:0; letter-spacing:-.01em}
+.subtitle{margin:6px 0 0; font-size:14.5px; color:var(--dim); max-width:46ch}
+.theme{flex:none; border:1.5px solid var(--line); background:transparent; color:var(--dim); font:inherit; font-size:13px; padding:6px 10px; cursor:pointer; border-radius:8px}
+.head-grid{display:grid; grid-template-columns:1fr 1fr; border-top:1.5px solid var(--ink)}
+.head-grid>div{padding:9px 16px; min-width:0}
+.head-grid>div:first-child{border-right:1px solid var(--line)}
+.head-grid dt{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim)}
+.head-grid dd{margin:3px 0 0; font-weight:600; font-size:14.5px}
+.inst-field{display:inline-block; min-width:12ch; border:0; border-bottom:1.5px dashed var(--line); background:transparent; color:var(--ink); font:inherit; font-weight:600; font-size:14.5px; padding:0 2px}
+.inst-field:focus{outline:0; border-bottom-color:var(--accent)}
+
+/* Intake */
+.intake{margin-top:16px; border:1.5px solid var(--line); background:var(--panel); border-radius:0}
+.intake-in{padding:16px}
+.drop{border:1.6px dashed var(--line); background:var(--panel2); border-radius:12px; padding:20px 16px; text-align:center; transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,var(--panel2))}
+.drop h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; margin:0 0 4px}
+.drop p{margin:0 0 14px; font-size:14px; color:var(--dim)}
+.btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+.btn{border:1.5px solid var(--ink); background:var(--ink); color:var(--bg); font:inherit; font-weight:700; font-size:15px; padding:11px 16px; border-radius:10px; cursor:pointer}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.hint{margin:12px 2px 0; font-family:var(--mono); font-size:11.5px; color:var(--dim); line-height:1.6}
+.runs{display:flex; align-items:center; gap:8px; margin-top:14px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+.pip{width:9px; height:9px; border-radius:50%; border:1.5px solid var(--line)}
+.pip.used{background:var(--accent); border-color:var(--accent)}
+
+/* Report */
+#report[hidden]{display:none}
+.report{margin-top:16px; display:flex; flex-direction:column; gap:14px}
+.verdict{border:1.5px solid var(--ink); background:var(--panel); padding:16px; border-left:5px solid var(--accent)}
+.verdict .vh{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin:0 0 6px}
+.verdict p{margin:0; font-size:16.5px; line-height:1.45}
+.verdict b{color:var(--accent)}
+.tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+.tile{border:1.5px solid var(--line); background:var(--panel); padding:12px}
+.tile .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+.tile .v{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:25px; line-height:1.1; margin-top:5px; font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px; color:var(--dim); margin-top:2px}
+.tile .v.warn{color:var(--warn)} .tile .v.bad{color:var(--bad)} .tile .v.good{color:var(--good)}
+.card{border:1.5px solid var(--line); background:var(--panel); padding:14px 16px}
+.card h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:15px; margin:0 0 2px}
+.card .cap{font-size:12.5px; color:var(--dim); margin:0 0 12px}
+.funnel{display:flex; flex-direction:column; gap:7px}
+.frow{display:grid; grid-template-columns:92px 1fr auto; align-items:center; gap:10px}
+.frow .fl{font-size:13px; color:var(--dim)}
+.fbar{height:26px; background:var(--panel2); border:1px solid var(--line); position:relative; overflow:hidden}
+.fbar>span{position:absolute; inset:0 auto 0 0; background:linear-gradient(90deg,var(--accent2),var(--accent)); opacity:.9}
+.frow .fv{font-family:var(--mono); font-size:12.5px; font-variant-numeric:tabular-nums; min-width:68px; text-align:right}
+.drop-tag{display:inline-block; font-family:var(--mono); font-size:10.5px; color:var(--bad); margin-left:6px}
+.net{display:flex; flex-direction:column; gap:9px}
+.nrow{display:grid; grid-template-columns:70px 1fr auto; align-items:center; gap:10px}
+.nrow .nl{font-size:13.5px; font-weight:600}
+.nbar{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.nbar>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.nbar>span.low{background:var(--bad)}
+.nrow .nv{font-family:var(--mono); font-size:12.5px; min-width:48px; text-align:right}
+.hours{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:4px}
+.hcell{aspect-ratio:1/2.2; border:1px solid var(--line); position:relative}
+.hlabels{display:grid; grid-template-columns:repeat(24,1fr); gap:3px; margin-top:5px; font-family:var(--mono); font-size:8.5px; color:var(--dim)}
+.hlabels span{text-align:center}
+.lat{display:flex; gap:10px}
+.lat .lc{flex:1; border:1px solid var(--line); background:var(--panel2); padding:10px; text-align:center}
+.lat .lk{font-family:var(--mono); font-size:10.5px; color:var(--dim); text-transform:uppercase}
+.lat .lv{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:20px; margin-top:3px; font-variant-numeric:tabular-nums}
+.legend{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:12px; color:var(--dim)}
+.legend i{display:inline-block; width:11px; height:11px; margin-right:5px; vertical-align:-1px}
+.summary{border:1.5px solid var(--ink); background:var(--panel2)}
+.summary-h{display:flex; justify-content:space-between; align-items:center; padding:11px 16px; border-bottom:1.5px solid var(--line)}
+.summary-h h3{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:14px; margin:0}
+.copy{border:1.5px solid var(--line); background:transparent; color:var(--ink); font:inherit; font-size:13px; font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer}
+.copy.done{border-color:var(--accent); color:var(--accent)}
+.summary pre{margin:0; padding:16px; font-family:var(--mono); font-size:12.5px; line-height:1.65; white-space:pre-wrap; color:var(--ink)}
+
+/* Gate */
+.gate{margin-top:16px; border:1.5px solid var(--accent); background:var(--panel); padding:20px 16px; text-align:center}
+.gate h2{font-family:"Archivo",sans-serif; font-stretch:125%; font-size:19px; margin:0 0 6px}
+.gate p{margin:0 auto 14px; font-size:14.5px; color:var(--dim); max-width:48ch}
+.gate .btn{background:var(--accent); border-color:var(--accent); color:#06140D; text-decoration:none; display:inline-block}
+
+.foot{margin-top:20px; font-family:var(--mono); font-size:11px; color:var(--dim); line-height:1.7}
+.err{color:var(--bad); font-family:var(--mono); font-size:12.5px; margin-top:10px}
+@media (max-width:560px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .title{font-size:22px}
+  .frow{grid-template-columns:70px 1fr auto}
+  .lat{flex-wrap:wrap}
+}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+
+.drops{display:grid; grid-template-columns:1fr; gap:12px}
+.drops.two{grid-template-columns:1fr 1fr}
+.fname{margin:10px 0 0; font-family:var(--mono); font-size:12px; color:var(--accent); min-height:1.3em; overflow-wrap:anywhere}
+.runrow{display:flex; justify-content:center; gap:10px; margin-top:12px; flex-wrap:wrap}
+.assume{display:flex; flex-wrap:wrap; gap:12px; margin-top:14px}
+.assume label{font-family:var(--mono); font-size:11.5px; color:var(--dim); display:flex; flex-direction:column; gap:4px}
+.assume input{width:140px; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font:inherit; font-family:var(--mono); font-size:13px; padding:7px 8px; border-radius:8px}
+.bars{display:flex; flex-direction:column; gap:9px}
+.brow{display:grid; grid-template-columns:minmax(70px,24%) 1fr auto; align-items:center; gap:10px}
+.brow .bl{font-size:13px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.brow .bb{height:16px; background:var(--panel2); border:1px solid var(--line); position:relative}
+.brow .bb>span{position:absolute; inset:0 auto 0 0; background:var(--accent)}
+.brow .bb>span.bad{background:var(--bad)}
+.brow .bb>span.warn{background:var(--warn)}
+.brow .bb>span.dim{background:var(--dim); opacity:.55}
+.brow .bv{font-family:var(--mono); font-size:12.5px; text-align:right; min-width:70px; font-variant-numeric:tabular-nums}
+.brow.pair .bb{height:9px}
+.brow.pair .bbs{display:flex; flex-direction:column; gap:3px}
+.stack{display:flex; height:24px; border:1px solid var(--line); overflow:hidden}
+.stack span{display:block; height:100%}
+.tbl{width:100%; border-collapse:collapse; font-size:13px}
+.tbl th{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim); text-align:left; padding:6px 6px; border-bottom:1.5px solid var(--line)}
+.tbl td{padding:8px 6px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; vertical-align:top}
+.tbl td.num,.tbl th.num{text-align:right}
+.tbl td.flag{color:var(--bad); font-weight:700}
+.tbl td.ok{color:var(--good); font-weight:700}
+.tblwrap{overflow-x:auto}
+.tile .v .u{font-size:.56em; font-weight:600; font-stretch:100%; color:var(--dim); letter-spacing:0}
+.note-s{font-size:12px; color:var(--dim); margin:10px 0 0; line-height:1.5}
+.why{margin:10px 0 0; font-size:13px; line-height:1.5; max-width:62ch; border-left:3px solid var(--accent); padding:2px 0 2px 10px}
+.why-k{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-right:6px}
+.why a{color:var(--dim); white-space:nowrap}
+.chip{display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; padding:2px 7px; border:1px solid var(--line); border-radius:999px; color:var(--dim); white-space:nowrap}
+@media (max-width:560px){ .drops.two{grid-template-columns:1fr} .brow{grid-template-columns:minmax(60px,30%) 1fr auto} }
+
+.runs{display:block; line-height:1.65}
+.runs b{color:var(--ink); font-weight:700}
+.gdot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--warn); margin-right:8px; vertical-align:0}
+.gdot.ok{background:var(--good)} .gdot.end{background:var(--bad)}
+.glink{border:0; background:none; color:var(--accent); font:inherit; font-family:var(--mono); font-size:12px; text-decoration:underline; text-underline-offset:2px; cursor:pointer; padding:0 2px; margin-left:8px; white-space:nowrap}
+.unlock{position:relative; margin-top:14px; border:1.5px solid var(--accent); background:var(--panel); padding:16px 16px 14px; text-align:left}
+.unlock h3{margin:0 30px 4px 0; font-family:"Archivo",sans-serif; font-stretch:125%; font-size:17px; line-height:1.2}
+.unlock p{margin:0; font-size:14px; color:var(--dim); line-height:1.5}
+.unlock label{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin:12px 0 5px}
+.urow{display:flex; gap:8px; flex-wrap:wrap}
+.urow input{flex:1 1 220px; min-width:0; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font-family:var(--mono); font-size:13px; padding:10px; border-radius:9px}
+.urow input:focus{outline:0; border-color:var(--accent)}
+.urow .btn{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+.unlock .uerr{margin-top:9px; color:var(--bad); font-family:var(--mono); font-size:12.5px}
+.unlock .uask{margin-top:12px; font-size:13.5px}
+.unlock .uask a{color:var(--accent); font-weight:700}
+.uclose{position:absolute; top:6px; right:6px; border:0; background:none; color:var(--dim); font-size:24px; line-height:1; cursor:pointer; padding:4px 9px}
+.gate .btn{color:var(--bg)}
+.summary-h .acts{display:flex; gap:8px}
+@media print{
+  :root,:root[data-theme]{--bg:#fff; --panel:#fff; --panel2:#f4f4f4; --ink:#111; --dim:#555; --line:#ccc; color-scheme:light}
+  body{background:#fff!important}
+  .intake,.gate,.unlock,#theme,.copy,.pdf,.foot{display:none!important}
+  .card,.tiles,.verdict,.summary{break-inside:avoid}
+}
+
+.paste{margin-top:12px; display:flex; flex-direction:column; gap:8px}
+.paste label{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim)}
+.paste textarea{width:100%; min-height:84px; border:1.5px solid var(--line); background:var(--panel2); color:var(--ink); font-family:var(--mono); font-size:12.5px; line-height:1.5; padding:10px; border-radius:9px; resize:vertical}
+.paste textarea:focus{outline:0; border-color:var(--accent)}
+.paste .btn{align-self:flex-start}
+.loop{display:grid; grid-template-columns:repeat(5,1fr); gap:8px}
+.lstep{border:1.5px solid var(--line); background:var(--panel2); padding:10px; min-width:0}
+.lstep .ll{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim)}
+.lstep .ln{font-family:"Archivo",sans-serif; font-stretch:125%; font-weight:700; font-size:24px; line-height:1.1; margin-top:4px; font-variant-numeric:tabular-nums}
+.lstep .ls{font-size:12px; color:var(--dim); margin-top:2px; line-height:1.35}
+.lstep.good{border-color:color-mix(in srgb,var(--good) 55%,var(--line))} .lstep.good .ln{color:var(--good)}
+.lstep.warn{border-color:color-mix(in srgb,var(--warn) 55%,var(--line))} .lstep.warn .ln{color:var(--warn)}
+.lstep.bad{border-color:color-mix(in srgb,var(--bad) 55%,var(--line))} .lstep.bad .ln{color:var(--bad)}
+.msgs details{border-top:1px solid var(--line); padding:9px 0}
+.msgs details:first-child{border-top:0}
+.msgs summary{cursor:pointer; font-size:13.5px; line-height:1.45; list-style:none}
+.msgs summary::-webkit-details-marker{display:none}
+.msgs summary::before{content:"\25B8"; color:var(--dim); margin-right:6px}
+.msgs details[open] summary::before{content:"\25BE"}
+.msgs summary .chip{margin-right:6px}
+.msgs .sm{color:var(--dim); font-size:12.5px}
+.msgs .what{display:block; color:var(--dim); font-size:12.5px; margin:2px 0 0 18px; overflow-wrap:anywhere}
+.lyr{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin:12px 0 4px}
+.kv{display:grid; grid-template-columns:minmax(96px,30%) 1fr; gap:5px 12px; margin:0; font-size:12.5px}
+.kv dt{font-family:var(--mono); color:var(--dim); overflow-wrap:anywhere; white-space:pre-wrap}
+.kv dd{margin:0; overflow-wrap:anywhere; min-width:0}
+.kv .mono{font-size:12px}
+.kv .dimt{color:var(--dim)}
+.fls{margin:10px 0 0; padding-left:18px; font-size:12.5px}
+.fls li{margin:2px 0}
+.fl-bad{color:var(--bad)} .fl-warn{color:var(--warn)} .fl-info{color:var(--dim)}
+@media (max-width:560px){ .loop{grid-template-columns:repeat(2,1fr)} .kv{grid-template-columns:1fr} .kv dt{margin-top:6px} }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="head">
+    <div class="head-top">
+      <div>
+        <p class="brandline">Network migration · Trial</p>
+        <h1 class="title">SIM Onboarding Decoder</h1>
+        <p class="subtitle">See what each SMS after a SIM swap did, and what the entitlement server told the phone: every message decoded to the standard, placed in the onboarding loop, and checked for the step that leaves VoLTE or Wi-Fi calling off.</p>
+        <p class="why"><span class="why-k">Why now</span>Rwanda's plan has operators spend the rest of 2026 improving VoLTE reliability and finding the devices that still depend on 2G and 3G, before 3G goes off on 30 June 2027. <a href="https://www.newtimes.co.rw/article/37861/news/rwanda/inside-rwandas-roadmap-for-2g-3g-switch-off/amp" target="_blank" rel="noopener">The New Times, 2 Aug 2026 ↗</a></p>
+      </div>
+      <button class="theme" id="theme" type="button" aria-label="Switch light or dark">◐ Theme</button>
+    </div>
+    <dl class="head-grid">
+      <div><dt>Prepared for</dt><dd><input class="inst-field" id="inst" value="your network" aria-label="Organisation name" spellcheck="false"></dd></div>
+      <div><dt>Prepared by</dt><dd>Frutos Kamanzi · CEO &amp; Founder, SAANO AI NETWORKS</dd></div>
+    </dl>
+  </header>
+  <section class="intake">
+    <div class="intake-in">
+      <div class="drop" id="drop0"><h2>Drop in SIM-swap messages</h2><p>A CSV with one message per row: an SMS PDU in hex from the SMSC, OTA platform or a phone log, or an entitlement server answer in XML or JSON. It is read in your browser and never leaves this page.</p><div class="btns"><button class="btn" id="pick0" type="button">Choose a file</button><button class="btn ghost" id="sample" type="button">Run an illustrative sample</button></div><input id="file0" type="file" accept=".csv,.txt,.xml,.json,text/csv,text/plain,application/xml,application/json" hidden></div>
+      <div class="paste"><label for="pastebox">Or paste messages</label><textarea id="pastebox" rows="4" spellcheck="false" autocapitalize="off" placeholder="One SMS PDU in hex per line, or one entitlement server answer (XML or JSON)"></textarea><button class="btn ghost" id="pastego" type="button">Decode pasted text</button></div>
+      <p class="hint">Expected columns (any order, matched loosely): <b>payload</b> (SMS PDU in hex with or without the SMSC prefix, SMPP user data, or a TS.43 answer), optional <b>time</b>, <b>direction</b> (MO or MT), <b>subscriber</b> (masked IMSI, MSISDN or a label), <b>source</b>. Decodes 3GPP TS 23.040 SMS (PID, DCS, user data header, concatenation, ports), TS 31.115 SIM over-the-air command and proof-of-receipt packets (SPI, KIc, KID, TAR, status), OMA Client Provisioning (WBXML), OMA DM notifications, GSMA RCC.14 configuration SMS and GSMA TS.43 entitlement answers. Handset-change reports use vendor formats: IMEI and IMSI are found by pattern and checked. Method: a swap starts at a handset-change report and is stalled if no settings, SIM update or notice follows within the window.</p>
+      <div class="assume"><label>Window after detection, min<input data-in="win" type="number" step="any" value="30"></label><label>Care cost per contact, RWF<input data-in="cost" type="number" step="any" value="" placeholder="optional"></label></div>
+      <div class="runs" id="runs" aria-live="polite"></div>
+      <div class="unlock" id="unlock" hidden>
+        <button class="uclose" id="uclose" type="button" aria-label="Close">×</button>
+        <h3>Your own file needs a 3-day trial code</h3>
+        <p>The illustrative sample is free. To read your own export, enter the code Frutos sent you. Your file still never leaves this page.</p>
+        <form id="uform" autocomplete="off">
+          <label for="ucode">Trial code</label>
+          <div class="urow"><input id="ucode" name="code" spellcheck="false" autocapitalize="off" placeholder="FK1… or the full link"><button class="btn" type="submit">Unlock</button></div>
+        </form>
+        <p class="uerr" id="uerr" role="alert" hidden></p>
+        <p class="uask">No code yet? <a id="uwa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a> · or call +250 731 000 163</p>
+      </div>
+      <p class="err" id="err" hidden></p>
+    </div>
+  </section>
+  <section id="report" class="report" hidden aria-live="polite"></section>
+  <section id="gate" class="gate" hidden>
+    <h2>Your 3-day trial has ended</h2>
+    <p>The full version reads a day of SMSC, OTA and entitlement logs, follows every SIM swap from detection to the phone's last answer, and returns the root cause of each failing swap with the fix and the check that proves it. Let's set it up for <b id="gate-inst">your network</b>.</p>
+    <p class="price" style="margin-top:-4px"><b>Full version: RWF 300,000 a month</b> for your organisation, USD 200 outside Rwanda. Every tool in the kit, unlimited runs on your own data, cancel any month.</p>
+    <a class="btn" id="gate-wa" href="#" target="_blank" rel="noopener">Message Frutos on WhatsApp</a>
+    <p class="hint" style="margin-top:12px">Or call +250 731 000 163</p>
+  </section>
+  <p class="foot" id="foot"></p>
+</main>
+<script>
+/* SIM Onboarding Decoder: SMS after a SIM swap (3GPP TS 23.040, TS 31.115, OMA CP/DM) and entitlement answers (GSMA TS.43). */
+var OB=(function(){
+"use strict";
+function hx(b){ return ("0"+(b&255).toString(16)).slice(-2).toUpperCase(); }
+function hexs(a,i,j){ var o=""; for(var k=i;k<j&&k<a.length;k++) o+=hx(a[k]); return o; }
+function bytesOf(s){ var h=String(s||"").replace(/0x/gi,"").replace(/[\s:,\-]/g,""); if(!/^[0-9a-fA-F]+$/.test(h)||h.length<4||h.length%2) return null;
+  var a=new Array(h.length/2); for(var i=0;i<a.length;i++) a[i]=parseInt(h.substr(2*i,2),16); return a; }
+var TB="0123456789*#abc";
+function tbcd(a,i,n){ var d=""; for(var k=0;k<n;k++){ var b=a[i+k]; if(b===undefined) break; var lo=b&15, hi=b>>4;
+  if(lo===15) break; d+=TB.charAt(lo); if(hi===15) break; d+=TB.charAt(hi); } return d; }
+var G7="@\u00a3$\u00a5\u00e8\u00e9\u00f9\u00ec\u00f2\u00c7\n\u00d8\u00f8\r\u00c5\u00e5\u0394_\u03a6\u0393\u039b\u03a9\u03a0\u03a8\u03a3\u0398\u039e\u001b\u00c6\u00e6\u00df\u00c9 !\"#\u00a4%&'()*+,-./0123456789:;<=>?\u00a1ABCDEFGHIJKLMNOPQRSTUVWXYZ\u00c4\u00d6\u00d1\u00dc\u00a7\u00bfabcdefghijklmnopqrstuvwxyz\u00e4\u00f6\u00f1\u00fc\u00e0";
+var G7X={10:"\f",20:"^",40:"{",41:"}",47:"\\",60:"[",61:"~",62:"]",64:"|",101:"\u20ac"};
+function unpack7(ud,udl,start){ var out=[]; for(var s=start;s<udl;s++){ var bit=s*7, by=bit>>3, sh=bit&7; if(by>=ud.length) break;
+  var v=ud[by]>>sh; if(sh>1) v|=((ud[by+1]||0)<<(8-sh)); out.push(v&127); } return out; }
+function g7str(sep){ var o=""; for(var i=0;i<sep.length;i++){ var c=sep[i]; if(c===27&&i+1<sep.length){ i++; o+=(G7X[sep[i]]!==undefined?G7X[sep[i]]:" "); } else o+=G7.charAt(c); } return o; }
+function ucs2(a,i,j){ var o=""; for(var k=i;k+1<j;k+=2) o+=String.fromCharCode((a[k]<<8)|a[k+1]); return o; }
+function ascii(a,i,j){ var o=""; for(var k=i;k<j;k++){ var c=a[k]; o+=(c>=32&&c<127)?String.fromCharCode(c):"."; } return o; }
+function printable(a,i,j){ var n=0,t=0; for(var k=i;k<j;k++){ t++; if((a[k]>=32&&a[k]<127)||a[k]===10||a[k]===13) n++; } return t?n/t:0; }
+function luhn(d){ var s=0; for(var i=0;i<d.length;i++){ var v=+d.charAt(d.length-1-i); if(i%2){ v*=2; if(v>9) v-=9; } s+=v; } return s%10===0; }
+function maskNum(d){ d=String(d||"").replace(/\D/g,""); if(d.length<4) return "\u2022\u2022\u2022"; return "\u2022\u2022\u2022 "+d.slice(-3); }
+function maskImei(d){ return d.slice(0,8)+" \u2022\u2022\u2022\u2022\u2022\u2022"+(d.length>15?"\u2022\u2022":"\u2022"); }
+function maskImsi(d){ return d.slice(0,3)+"-"+d.slice(3,5)+" "+maskNum(d); }
+function maskText(t){ return String(t).replace(/\d{7,}/g,function(m){ return maskNum(m); }); }
+
+/* ---------- 3GPP TS 23.040 TPDU ---------- */
+function address(a,i,isSca){ var L=a[i]; if(L===undefined) return null; var toa=a[i+1]; if(toa===undefined) return null;
+  var octs=isSca?L-1:Math.ceil(L/2), ton=(toa>>4)&7, npi=toa&15, v;
+  if(i+2+octs>a.length||octs<0) return null;
+  if(!isSca&&ton===5){ v=g7str(unpack7(a.slice(i+2,i+2+octs),Math.floor(L*4/7),0)).replace(/@+$/,""); }
+  else { v=tbcd(a,i+2,octs); if(!isSca) v=v.slice(0,L); if(ton===1) v="+"+v; }
+  return {v:v, ton:ton, npi:npi, alpha:ton===5, next:i+2+octs}; }
+function scts(a,i){ if(i+7>a.length) return null; function bc(b){ return (b&15)*10+(b>>4); }
+  var tz=a[i+6], q=(tz&7)*10+(tz>>4), sg=(tz&8)?-1:1;
+  var yy=bc(a[i]); return (yy>=90?"19":"20")+("0"+yy).slice(-2)+"-"+("0"+bc(a[i+1])).slice(-2)+"-"+("0"+bc(a[i+2])).slice(-2)+" "+("0"+bc(a[i+3])).slice(-2)+":"+("0"+bc(a[i+4])).slice(-2)+":"+("0"+bc(a[i+5])).slice(-2)+" UTC"+(sg<0?"-":"+")+(q/4); }
+function sctsOk(a,i){ if(i+7>a.length) return false; function bc(b){ var lo=b&15, hi=b>>4; return (lo>9||hi>9)?-1:lo*10+hi; }
+  var y=bc(a[i]), mo=bc(a[i+1]), d=bc(a[i+2]), h=bc(a[i+3]), mi=bc(a[i+4]), se=bc(a[i+5]);
+  return y>=0&&mo>=1&&mo<=12&&d>=1&&d<=31&&h>=0&&h<=23&&mi>=0&&mi<=59&&se>=0&&se<=59&&(a[i+6]>>4)<=9; }
+function dcsInfo(d){ var o={cs:"7bit", cls:null, mwi:false, comp:false, txt:""};
+  if((d&0xC0)===0x00||(d&0xC0)===0x40){ o.comp=!!(d&0x20); var c=(d>>2)&3; o.cs=c===0?"7bit":(c===1?"8bit":(c===2?"ucs2":"rsv")); if(d&0x10) o.cls=d&3; }
+  else if((d&0xF0)===0xF0){ o.cs=(d&4)?"8bit":"7bit"; o.cls=d&3; }
+  else if((d&0xF0)===0xC0||(d&0xF0)===0xD0){ o.cs="7bit"; o.mwi=true; }
+  else if((d&0xF0)===0xE0){ o.cs="ucs2"; o.mwi=true; }
+  else o.cs="rsv";
+  var cl=["class 0 (flash)","class 1 (phone)","class 2 (SIM)","class 3 (terminal equipment)"];
+  o.txt=(o.cs==="7bit"?"GSM 7-bit":(o.cs==="8bit"?"8-bit data":(o.cs==="ucs2"?"UCS2":"reserved coding")))+(o.cls!==null?", "+cl[o.cls]:"")+(o.mwi?", message waiting indication":"")+(o.comp?", compressed":"");
+  return o; }
+var PIDN={0x40:"Short Message Type 0",0x41:"Replace Short Message Type 1",0x42:"Replace Short Message Type 2",0x43:"Replace Short Message Type 3",0x44:"Replace Short Message Type 4",0x45:"Replace Short Message Type 5",0x46:"Replace Short Message Type 6",0x47:"Replace Short Message Type 7",0x48:"Device Triggering Short Message",0x5F:"Return Call Message",0x7C:"ANSI-136 R-DATA",0x7D:"ME Data download",0x7E:"ME De-personalization Short Message",0x7F:"(U)SIM Data download"};
+function pidTxt(p){ if(p===0) return "normal (0x00)"; return (PIDN[p]||((p&0xC0)===0&&(p&0x20)?"telematic interworking":"0x"+hx(p)))+" (0x"+hx(p)+")"; }
+function udLen(udl,cs){ return cs==="7bit"?Math.ceil(udl*7/8):udl; }
+
+function parseTP(a,off,hint){
+  var i=off, r={f:[], off:off}; if(i>=a.length) return null;
+  var fo=a[i++], mti=fo&3; r.fo=fo; r.udhi=!!(fo&0x40);
+  if(mti===3) return null;
+  if(mti===0){ r.kind="SMS-DELIVER"; r.dir="MT";
+    var oa=address(a,i,false); if(!oa) return null; r.oa=oa; i=oa.next;
+    if(i+9>a.length) return null; r.pid=a[i++]; r.dcs=a[i++]; r.tsOk=sctsOk(a,i); r.ts=scts(a,i); i+=7; }
+  else if(mti===1){ r.kind="SMS-SUBMIT"; r.dir="MO"; r.mr=a[i++]; var vpf=(fo>>3)&3;
+    var da=address(a,i,false); if(!da) return null; r.da=da; i=da.next;
+    if(i+2>a.length) return null; r.pid=a[i++]; r.dcs=a[i++]; i+= vpf===2?1:(vpf===0?0:7); r.vpf=vpf; }
+  else { r.kind="SMS-STATUS-REPORT"; r.dir="MT"; r.mr=a[i++]; var ra=address(a,i,false); if(!ra) return null; r.ra=ra; i=ra.next;
+    if(i+15>a.length||ra.v.length<1||!sctsOk(a,i)) return null; r.ts=scts(a,i); i+=7; r.dt=scts(a,i); i+=7; r.st=a[i++]; r.score=(i<=a.length)?2:0; r.end=i; return r; }
+  if(i>=a.length) return null;
+  r.udl=a[i++]; r.di=dcsInfo(r.dcs); r.udStart=i;
+  var need=udLen(r.udl,r.di.cs), have=a.length-i;
+  r.score = have===need?3:(have>need?1:-1);
+  if(hint&&hint!==r.dir) r.score-=1;
+  if(r.kind==="SMS-DELIVER"&&!r.tsOk) r.score-=1.5;
+  r.ud=a.slice(i,i+Math.min(need,have)); r.trailing=Math.max(0,have-need);
+  return r.score<0?null:r;
+}
+function parseUDH(ud){ if(!ud.length) return null; var L=ud[0]; if(L+1>ud.length) return {bad:true, len:L, ies:[]}; var ies=[], i=1, ok=true;
+  while(i<L+1){ var id=ud[i], l=ud[i+1]; if(l===undefined||i+2+l>L+1){ ok=false; break; } ies.push({id:id, d:ud.slice(i+2,i+2+l)}); i+=2+l; }
+  return {len:L, ies:ies, bad:!ok}; }
+var IEN={0:"Concatenated message, 8-bit reference",1:"Special SMS message indication",4:"Application port, 8-bit",5:"Application port, 16-bit",6:"SMSC control parameters",7:"UDH source indicator",8:"Concatenated message, 16-bit reference",0x24:"National language single shift",0x25:"National language locking shift",0x70:"Command packet identifier, (U)SIM toolkit security header",0x71:"Response packet identifier, (U)SIM toolkit security header"};
+function ieName(id){ if(IEN[id]) return IEN[id]; if(id>=0x0A&&id<=0x1F) return "EMS element"; if(id>=0x70&&id<=0x7F) return "(U)SIM toolkit security header"; if(id>=0x80&&id<=0x9F) return "SME to SME specific use"; if(id>=0xC0&&id<=0xDF) return "SC specific use"; return "reserved"; }
+var PORTS={2948:"WAP Push (connectionless)",2949:"WAP Push, secure (WTLS)",9200:"WAP connectionless session",37273:"RCS client configuration (GSMA RCC.14)"};
+
+/* ---------- WSP push + WBXML (OMA Client Provisioning 1.0) ---------- */
+function uintvar(a,i){ var v=0,n=0; while(i<a.length&&n<5){ var b=a[i++]; v=(v*128)+(b&127); n++; if(!(b&128)) return {v:v,next:i}; } return null; }
+function cstr(a,i){ var s=""; while(i<a.length&&a[i]!==0){ s+=String.fromCharCode(a[i]); i++; } return {v:s,next:Math.min(a.length,i+1)}; }
+var CT={0x03:"text/plain",0x2D:"text/vnd.wap.si",0x2E:"application/vnd.wap.sic",0x2F:"text/vnd.wap.sl",0x30:"application/vnd.wap.slc",0x34:"application/vnd.wap.sia",0x35:"text/vnd.wap.connectivity-xml",0x36:"application/vnd.wap.connectivity-wbxml",0x3E:"application/vnd.wap.mms-message",0x42:"application/vnd.syncml.dm+wbxml",0x43:"application/vnd.syncml.dm+xml",0x44:"application/vnd.syncml.notification",0x29:"application/vnd.wap.wbxml",0x27:"application/xml",0x28:"text/xml"};
+var APPS={0:"x-wap-application:*",1:"push.sia",2:"wml.ua",3:"wta.ua",4:"mms.ua",5:"push.syncml",6:"loc.ua",7:"syncml.dm",8:"drm.ua",9:"emn.ua",10:"wv.ua",0x1A:"lwm2m.dm"};
+var SEC={0:"NETWPIN",1:"USERPIN",2:"USERNETWPIN",3:"USERPINMAC"};
+var HN={0x0D:"Content-Length",0x0E:"Content-Location",0x2F:"X-Wap-Application-Id",0x31:"X-Wap-Initiator-URI",0x34:"Push-Flag"};
+function wsp(a){ if(a.length<4) return null; var tid=a[0], pt=a[1]; if(pt!==6&&pt!==7) return null;
+  var hl=uintvar(a,2); if(!hl) return null; var hs=hl.next, he=hs+hl.v; if(he>a.length) return null;
+  var r={tid:tid, type:pt===6?"Push":"ConfirmedPush", ct:null, ctName:"", params:{}, headers:[], body:a.slice(he)}, i=hs, b=a[i];
+  if(b>=0x80){ r.ct=b&127; i++; }
+  else if(b<=0x1F){ var L, s; if(b===0x1F){ var u=uintvar(a,i+1); L=u.v; s=u.next; } else { L=b; s=i+1; } var e=s+L, j=s;
+    if(a[j]>=0x80){ r.ct=a[j]&127; j++; } else if(a[j]<=0x1E&&a[j]>0){ var n=a[j], v=0; for(var k=1;k<=n;k++) v=v*256+a[j+k]; r.ct=v; j+=n+1; } else { var t=cstr(a,j); r.ctName=t.v; j=t.next; }
+    while(j<e){ var p=a[j]; if(p===0x91){ r.params.SEC=SEC[(a[j+1]&127)]||("0x"+hx(a[j+1])); j+=2; }
+      else if(p===0x92){ var m=cstr(a,j+1); r.params.MAC=m.v.replace(/^"/,""); j=m.next; }
+      else if(p>=0x80){ var q=a[j+1]; if(q>=0x80) j+=2; else if(q<=0x1E){ j+=2+q; } else { j=cstr(a,j+1).next; } }
+      else { var nm=cstr(a,j); var vl=cstr(a,nm.next); r.params[nm.v]=vl.v; j=vl.next; } }
+    i=e; }
+  else { var t2=cstr(a,i); r.ctName=t2.v; i=t2.next; }
+  if(r.ct!==null&&!r.ctName) r.ctName=CT[r.ct]||("well-known type 0x"+r.ct.toString(16));
+  while(i<he){ var f=a[i++]; if(f>=0x80){ var code=f&127, v2=a[i], val;
+      if(v2>=0x80){ val=v2&127; i++; } else if(v2<=0x1E){ val=hexs(a,i+1,i+1+v2); i+=1+v2; } else if(v2===0x1F){ var u2=uintvar(a,i+1); val=hexs(a,u2.next,u2.next+u2.v); i=u2.next+u2.v; } else { var t3=cstr(a,i); val=t3.v; i=t3.next; }
+      if(code===0x2F&&typeof val==="number") val=(APPS[val]||("0x"+val.toString(16)))+" (0x"+hx(val)+")";
+      r.headers.push({n:HN[code]||("header 0x"+hx(code)), v:String(val)}); }
+    else { var hn=cstr(a,i-1), hv=cstr(a,hn.next); r.headers.push({n:hn.v, v:hv.v}); i=hv.next; } }
+  return r; }
+var PT0={5:"wap-provisioningdoc",6:"characteristic",7:"parm"}, PT1={6:"characteristic",7:"parm"};
+var AS0={5:"name=",6:"value=",7:"name='NAME'",8:"name='NAP-ADDRESS'",9:"name='NAP-ADDRTYPE'",0x0A:"name='CALLTYPE'",0x0B:"name='VALIDUNTIL'",0x0C:"name='AUTHTYPE'",0x0D:"name='AUTHNAME'",0x0E:"name='AUTHSECRET'",0x0F:"name='LINGER'",0x10:"name='BEARER'",0x11:"name='NAPID'",0x12:"name='COUNTRY'",0x13:"name='NETWORK'",0x14:"name='INTERNET'",0x15:"name='PROXY-ID'",0x16:"name='PROXY-PROVIDER-ID'",0x17:"name='DOMAIN'",0x18:"name='PROVURL'",0x19:"name='PXAUTH-TYPE'",0x1A:"name='PXAUTH-ID'",0x1B:"name='PXAUTH-PW'",0x1C:"name='STARTPAGE'",0x1D:"name='BASAUTH-ID'",0x1E:"name='BASAUTH-PW'",0x1F:"name='PUSHENABLED'",0x20:"name='PXADDR'",0x21:"name='PXADDRTYPE'",0x22:"name='TO-NAPID'",0x23:"name='PORTNBR'",0x24:"name='SERVICE'",0x25:"name='LINKSPEED'",0x26:"name='DNLINKSPEED'",0x27:"name='LOCAL-ADDR'",0x28:"name='LOCAL-ADDRTYPE'",0x29:"name='CONTEXT-ALLOW'",0x2A:"name='TRUST'",0x2B:"name='MASTER'",0x2C:"name='SID'",0x2D:"name='SOC'",0x2E:"name='WSP-VERSION'",0x2F:"name='PHYSICAL-PROXY-ID'",0x30:"name='CLIENT-ID'",0x31:"name='DELIVERY-ERR-SDU'",0x32:"name='DELIVERY-ORDER'",0x33:"name='TRAFFIC-CLASS'",0x34:"name='MAX-SDU-SIZE'",0x35:"name='MAX-BITRATE-UPLINK'",0x36:"name='MAX-BITRATE-DNLINK'",0x37:"name='RESIDUAL-BER'",0x38:"name='SDU-ERROR-RATIO'",0x39:"name='TRAFFIC-HANDL-PRIO'",0x3A:"name='TRANSFER-DELAY'",0x3B:"name='GUARANTEED-BITRATE-UPLINK'",0x3C:"name='GUARANTEED-BITRATE-DNLINK'",0x3D:"name='PXADDR-FQDN'",0x3E:"name='PROXY-PW'",0x3F:"name='PPGAUTH-TYPE'",0x45:"version=",0x46:"version='1.0'",0x47:"name='PULLENABLED'",0x48:"name='DNS-ADDR'",0x49:"name='MAX-NUM-RETRY'",0x4A:"name='FIRST-RETRY-TIMEOUT'",0x4B:"name='REREG-THRESHOLD'",0x4C:"name='T-BIT'",0x4E:"name='AUTH-ENTITY'",0x4F:"name='SPI'",0x50:"type=",0x51:"type='PXLOGICAL'",0x52:"type='PXPHYSICAL'",0x53:"type='PORT'",0x54:"type='VALIDITY'",0x55:"type='NAPDEF'",0x56:"type='BOOTSTRAP'",0x57:"type='VENDORCONFIG'",0x58:"type='CLIENTIDENTITY'",0x59:"type='PXAUTHINFO'",0x5A:"type='NAPAUTHINFO'",0x5B:"type='ACCESS'"};
+var AS1={7:"name='NAME'",0x14:"name='INTERNET'",0x1C:"name='STARTPAGE'",0x22:"name='TO-NAPID'",0x23:"name='PORTNBR'",0x24:"name='SERVICE'",0x2E:"name='AACCEPT'",0x2F:"name='AAUTHDATA'",0x30:"name='AAUTHLEVEL'",0x31:"name='AAUTHNAME'",0x32:"name='AAUTHSECRET'",0x33:"name='AAUTHTYPE'",0x34:"name='ADDR'",0x35:"name='ADDRTYPE'",0x36:"name='APPID'",0x37:"name='APROTOCOL'",0x38:"name='PROVIDER-ID'",0x39:"name='TO-PROXY'",0x3A:"name='URI'",0x3B:"name='RULE'",0x50:"type=",0x53:"type='PORT'",0x55:"type='APPLICATION'",0x56:"type='APPADDR'",0x57:"type='APPAUTH'",0x58:"type='CLIENTIDENTITY'",0x59:"type='RESOURCE'"};
+var AV0={0x85:"IPV4",0x86:"IPV6",0x87:"E164",0x88:"ALPHA",0x89:"APN",0x8A:"SCODE",0x8B:"TETRA-ITSI",0x8C:"MAN",0x90:"ANALOG-MODEM",0x91:"V.120",0x92:"V.110",0x93:"X.31",0x94:"BIT-TRANSPARENT",0x95:"DIRECT-ASYNCHRONOUS-DATA-SERVICE",0x9A:"PAP",0x9B:"CHAP",0x9C:"HTTP-BASIC",0x9D:"HTTP-DIGEST",0x9E:"WTLS-SS",0x9F:"MD5",0xA2:"GSM-USSD",0xA3:"GSM-SMS",0xA4:"ANSI-136-GUTS",0xA5:"IS-95-CDMA-SMS",0xA6:"IS-95-CDMA-CSD",0xA7:"IS-95-CDMA-PACKET",0xA8:"ANSI-136-CSD",0xA9:"ANSI-136-GPRS",0xAA:"GSM-CSD",0xAB:"GSM-GPRS",0xAC:"AMPS-CDPD",0xAD:"PDC-CSD",0xAE:"PDC-PACKET",0xAF:"IDEN-SMS",0xB0:"IDEN-CSD",0xB1:"IDEN-PACKET",0xB2:"FLEX/REFLEX",0xB3:"PHS-SMS",0xB4:"PHS-CSD",0xB5:"TETRA-SDS",0xB6:"TETRA-PACKET",0xB7:"ANSI-136-GHOST",0xB8:"MOBITEX-MPAK",0xB9:"CDMA2000-IX-SIMPLE-IP",0xBA:"CDMA2000-IX-MOBILE-IP",0xC5:"AUTOBAUDING",0xCA:"CL-WSP",0xCB:"CO-WSP",0xCC:"CL-SEC-WSP",0xCD:"CO-SEC-WSP",0xCE:"CL-SEC-WTA",0xCF:"CO-SEC-WTA",0xD0:"OTA-HTTP-TO",0xD1:"OTA-HTTP-TLS-TO",0xD2:"OTA-HTTP-PO",0xD3:"OTA-HTTP-TLS-PO"};
+var AV1={0x86:"IPV6",0x87:"E164",0x88:"ALPHA",0x8D:"APPSRV",0x8E:"OBEX",0xE0:"AAA",0xE1:"HA"};
+function wbxmlProv(a){
+  var i=0, r={ver:null, pub:null, chars:[], err:null}; if(a.length<4) { r.err="too short"; return r; }
+  r.ver=(a[0]>>4)+1+"."+(a[0]&15); i=1; var p=uintvar(a,i); if(!p) { r.err="bad header"; return r; } r.pub=p.v; i=p.next;
+  if(r.pub===0){ var si=uintvar(a,i); i=si.next; }
+  var cs=uintvar(a,i); i=cs.next; var sl=uintvar(a,i); i=sl.next; var st=a.slice(i,i+sl.v); i+=sl.v;
+  function strt(o){ var s=""; for(var k=o;k<st.length&&st[k]!==0;k++) s+=String.fromCharCode(st[k]); return s; }
+  if(r.pub!==0x0B){ r.err="not a Client Provisioning 1.0 document (public id 0x"+r.pub.toString(16)+")"; }
+  var tp=0, ap=0, stack=[], root={type:"(root)", parms:[], kids:[]}, cur=root, guard=0;
+  function utf8(s){ try{ return decodeURIComponent(escape(s)); }catch(e){ return s; } }
+  while(i<a.length&&guard++<5000){
+    var t=a[i++];
+    if(t===0x00){ tp=a[i++]; continue; }
+    if(t===0x01){ cur=stack.length?stack.pop():root; continue; }
+    var id=t&0x3F, hasA=!!(t&0x80), hasC=!!(t&0x40), name=(tp===1?PT1:PT0)[id]||("tag 0x"+hx(id));
+    var attrs={}, an=null, av="";
+    if(hasA){ while(i<a.length){ var x=a[i++];
+        if(x===0x01) break;
+        if(x===0x00){ ap=a[i++]; continue; }
+        if(x===0x03){ var s1=cstr(a,i); av+=utf8(s1.v); i=s1.next; continue; }
+        if(x===0x83){ var o=uintvar(a,i); av+=utf8(strt(o.v)); i=o.next; continue; }
+        if(x===0xC3){ var ol=uintvar(a,i); av+=hexs(a,ol.next,ol.next+ol.v); i=ol.next+ol.v; continue; }
+        if(x<0x80){ if(an!==null) attrs[an]=av; var tok=(ap===1?AS1:AS0)[x]||("attr 0x"+hx(x)+"=");
+          var m=tok.match(/^(\w+)=(?:'(.*)')?$/); an=m?m[1]:tok; av=m&&m[2]!==undefined?m[2]:""; continue; }
+        av+=((ap===1?AV1:AV0)[x]||("0x"+hx(x))); }
+      if(an!==null) attrs[an]=av; }
+    if(name==="characteristic"){ var c={type:attrs.type||"", parms:[], kids:[]}; cur.kids.push(c); if(hasC){ stack.push(cur); cur=c; } }
+    else if(name==="parm"){ cur.parms.push({name:attrs.name||"", value:attrs.value===undefined?"":attrs.value}); if(hasC){ stack.push(cur); } }
+    else if(hasC){ stack.push(cur); }
+  }
+  r.chars=root.kids; return r; }
+var APPID={w2:"WAP browser",w4:"MMS",w7:"OMA device management"};
+function dmNia(a){ if(a.length<24) return null; var b16=a[16], b17=a[17], ver=(b16<<2)|(b17>>6), ui=(b17>>4)&3, ini=(b17>>3)&1, sid=(a[21]<<8)|a[22], L=a[23];
+  if(24+L>a.length) return null; var s=""; for(var k=24;k<24+L;k++) s+=String.fromCharCode(a[k]);
+  return {digest:hexs(a,0,16), version:(ver/10).toFixed(1).replace(/\.0$/,".0"), verRaw:ver, ui:["not specified","background","informative","user interaction"][ui], init:ini?"user-initiated":"server-initiated", session:sid, server:s, vendor:a.length-24-L}; }
+
+/* ---------- OTA secured packets, 3GPP TS 31.115 / ETSI TS 102 225 ---------- */
+function spiTxt(s0,s1){ var o={rc:s0&3, ciph:(s0>>2)&1, cntr:(s0>>3)&3, por:s1&3, porSec:(s1>>2)&3, porCiph:(s1>>4)&1, porSubmit:(s1>>5)&1};
+  o.rcT=["no RC/CC/DS","redundancy check (RC)","cryptographic checksum (CC)","digital signature (DS)"][o.rc];
+  o.cntrT=["no counter","counter, no replay check","process only if counter is higher","process only if counter is one higher"][o.cntr];
+  o.porT=["no proof of receipt","proof of receipt required","proof of receipt on error only","reserved"][o.por];
+  o.porSecT=["no RC/CC/DS","RC","CC","DS"][o.porSec]; return o; }
+function algTxt(k,isKid,rc){ var v=k>>4, a=k&15, b=a&3, m=(a>>2)&3, t;
+  if(isKid&&rc===1){ t=b===0?"implicit":(b===1?(m===0?"CRC16":(m===1?"CRC32":"CRC (reserved mode)")):(b===3?"proprietary":"reserved")); }
+  else if(b===0) t="implicit"; else if(b===1) t=["DES-CBC","3DES outer-CBC, 2 keys","3DES outer-CBC, 3 keys","DES-ECB"][m]+(isKid?" MAC":"");
+  else if(b===2) t=m===0?(isKid?"AES-CMAC":"AES-CBC"):"AES (reserved mode)"; else t="proprietary";
+  return t+", key version "+v; }
+function tarTxt(h){ var v=parseInt(h,16);
+  if(h==="000000") return "Issuer Security Domain (TS 102 226 compact)";
+  if(h==="B20100") return "Issuer Security Domain (TS 102 226 expanded)";
+  if(v===0xB00000||(v>=0xB00002&&v<=0xB0000F)) return "UICC shared file system, remote file management (TS 102 226)";
+  if(v>=0xB00010&&v<=0xB0001F) return "SIM file system, remote file management (TS 31.116)";
+  if(v===0xB00001||(v>=0xB00020&&v<=0xB0011F)) return "ADF (USIM/ISIM), remote file management (TS 31.116, compact)";
+  if(v>=0xB00120&&v<=0xB0012F) return "UICC shared file system, remote file management (expanded)";
+  if(v>=0xB00130&&v<=0xB0013F) return "SIM file system, remote file management (expanded)";
+  if(v>=0xB00140&&v<=0xB001FF) return "ADF, remote file management (TS 31.116, expanded)";
+  if(v>=0xB20000&&v<=0xB200FF) return "USAT Interpreter (TS 31.114)";
+  if(v===0xB20101) return "Smartcard Web Server"; if(v===0xB20102) return "Smartcard Web Server administrative agent";
+  if(v===0xB20200) return "Multiplexing application"; if(v===0xB20201) return "Controlling Authority Security Domain";
+  if(v===0xB20203) return "LwM2M UICC application"; if(v>=0xBFFF00&&v<=0xBFFFFF) return "proprietary toolkit application";
+  if((v>=0x000001&&v<=0xAFFFFF)||v>=0xC00000) return "issuer-specific application (for example the operator's own applet)";
+  return "reserved range"; }
+var FID={"6F07":"EF IMSI (USIM) / EF IST (ISIM)","6F7B":"EF FPLMN, forbidden networks","6F60":"EF PLMNwAcT, user network list","6F61":"EF OPLMNwAcT, operator network list","6F62":"EF HPLMNwAcT, home network list","6FD9":"EF EHPLMN, equivalent home networks","6F38":"EF UST, USIM service table","6F31":"EF HPPLMN, home network search period","6F7E":"EF LOCI","6F73":"EF PSLOCI","6FE3":"EF EPSLOCI","6FAD":"EF AD, administrative data","6F46":"EF SPN, service provider name","6F42":"EF SMSP, SMS parameters","6F40":"EF MSISDN","6F02":"EF IMPI (ISIM)","6F03":"EF DOMAIN (ISIM)","6F04":"EF IMPU (ISIM)","6F09":"EF P-CSCF (ISIM) / EF KeysPS (USIM)","3F00":"MF","7FFF":"current ADF"};
+var INS={0xA4:"SELECT",0xD6:"UPDATE BINARY",0xDC:"UPDATE RECORD",0xB0:"READ BINARY",0xB2:"READ RECORD",0xC0:"GET RESPONSE",0xF2:"STATUS / GET STATUS",0xE6:"INSTALL",0xE8:"LOAD",0xE4:"DELETE",0xD8:"PUT KEY",0xF0:"SET STATUS",0x20:"VERIFY PIN",0x2C:"UNBLOCK PIN",0x44:"ACTIVATE FILE",0x04:"DEACTIVATE FILE",0xE0:"CREATE FILE",0xDA:"PUT DATA"};
+var DATA_INS={0xA4:1,0xD6:1,0xDC:1,0xE6:1,0xE8:1,0xE4:1,0xD8:1,0xF0:1,0x20:1,0x2C:1,0xE0:1,0xDA:1};
+function apdus(a){ var out=[], i=0, g=0; while(i+5<=a.length&&g++<40){ var cla=a[i], ins=a[i+1], p1=a[i+2], p2=a[i+3], p3=a[i+4], d=[];
+    var hasData=DATA_INS[ins]||(ins===0xF2&&(cla&0x80));
+    if(hasData){ if(i+5+p3>a.length){ out.push({t:"truncated command"}); break; } d=a.slice(i+5,i+5+p3); i+=5+p3; } else i+=5;
+    var t=(INS[ins]||("INS 0x"+hx(ins)))+" (CLA "+hx(cla)+" P1 "+hx(p1)+" P2 "+hx(p2)+(hasData?", "+d.length+" bytes":", Le "+p3)+")";
+    if(ins===0xA4&&d.length===2){ var f=hx(d[0])+hx(d[1]); t+=" → "+f+(FID[f]?" "+FID[f]:""); }
+    else if((ins===0xD6||ins===0xDC)&&d.length){ var allF=d.every(function(x){return x===0xFF;}); t+=allF?" → all FF (clears the file)":" → "+hexs(d,0,Math.min(d.length,16))+(d.length>16?"…":""); }
+    out.push({t:t}); }
+  if(i<a.length&&out.length) out.push({t:(a.length-i)+" bytes not parsed"}); return out; }
+function otaCmd(ud){ if(ud.length<10) return null; var cpl=(ud[0]<<8)|ud[1], chl=ud[2]; if(chl<13) return null;
+  var r={cpl:cpl, cplOk:cpl===ud.length-2, chl:chl, spi:spiTxt(ud[3],ud[4]), spiHex:hx(ud[3])+hx(ud[4]), kic:ud[5], kid:ud[6], tar:hexs(ud,7,10)};
+  r.kicT=algTxt(r.kic,false); r.kidT=algTxt(r.kid,true,r.spi.rc); r.tarT=tarTxt(r.tar);
+  if(r.spi.ciph){ r.ciphered=ud.length-10; }
+  else { r.cntr=hexs(ud,10,15); r.pcntr=ud[15]; var sl=chl-13; r.sig=hexs(ud,16,16+sl); var data=ud.slice(16+sl, ud.length-(ud[15]||0)); r.data=hexs(data,0,data.length); r.apdus=apdus(data); }
+  return r; }
+var POR=["PoR OK","RC/CC/DS failed","counter too low","counter too high","counter blocked","ciphering error","unidentified security error","insufficient memory","more time needed","TAR unknown","insufficient security level","response data sent in an SMS-SUBMIT","response data sent by USSD"];
+function otaPor(ud){ if(ud.length<13) return null; var rpl=(ud[0]<<8)|ud[1], rhl=ud[2];
+  var r={rpl:rpl, rplOk:rpl===ud.length-2, rhl:rhl, tar:hexs(ud,3,6), cntr:hexs(ud,6,11), pcntr:ud[11], st:ud[12]};
+  r.tarT=tarTxt(r.tar); r.stT=r.st<POR.length?POR[r.st]:null; var cc=rhl-10; r.sig=cc>0?hexs(ud,13,13+cc):"";
+  var d=ud.slice(13+Math.max(0,cc)); if(d.length>=3) r.resp={n:d[0], sw:hx(d[1])+hx(d[2]), data:hexs(d,3,d.length)};
+  return r; }
+
+/* ---------- handset-change report heuristics (vendor formats) ---------- */
+function findIds(a){ var ids={imei:null, imsi:null, how:[]}, i, d;
+  for(i=0;i+9<=a.length;i++){ if((a[i]===0x14||a[i]===0x94)&&a[i+1]===8&&(a[i+2]&7)===2&&(a[i+2]&8)){ d=(a[i+2]>>4)+tbcd(a,i+3,7);
+      if(/^\d{15}$/.test(d)&&luhn(d)){ ids.imei=d; ids.how.push("IMEI data object (tag "+hx(a[i])+", TS 31.111)"); break; } } }
+  if(!ids.imei) for(i=0;i+8<=a.length;i++){ if((a[i]&15)===0x0A){ d=(a[i]>>4)+tbcd(a,i+1,7); if(/^\d{15}$/.test(d)&&luhn(d)&&d.slice(0,2)!=="00"){ ids.imei=d; ids.how.push("IMEI as a TS 24.008 identity"); break; } } }
+  if(!ids.imei) for(i=0;i+8<=a.length;i++){ d=tbcd(a,i,8); if(/^\d{15}$/.test(d)&&((a[i+7]>>4)===15)&&luhn(d)&&d.slice(0,2)!=="00"){ ids.imei=d; ids.how.push("IMEI in semi-octets"); break; } }
+  for(i=0;i+9<=a.length;i++){ if(a[i]===8&&(a[i+1]&15)===9){ d=(a[i+1]>>4)+tbcd(a,i+2,7); if(/^\d{15}$/.test(d)){ ids.imsi=d; ids.how.push("IMSI as stored in EF IMSI"); break; } } }
+  var s=ascii(a,0,a.length), m=s.match(/IMEI(?:SV)?\D{0,3}(\d{14,16})/i); if(!ids.imei&&m&&(m[1].length!==15||luhn(m[1]))){ ids.imei=m[1]; ids.how.push("IMEI in text"); }
+  var m2=s.match(/IMSI\D{0,3}(\d{14,15})/i); if(!ids.imsi&&m2){ ids.imsi=m2[1]; ids.how.push("IMSI in text"); }
+  return ids; }
+
+/* ---------- GSMA TS.43 entitlement answers ---------- */
+function unesc(s){ return String(s).replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&"); }
+function xmlDoc(s){ var re=/<(\/?)([A-Za-z_][\w\-.:]*)((?:\s+[\w\-.:]+\s*=\s*(?:"[^"]*"|'[^']*'))*)\s*(\/?)>/g, m, root={type:"(root)",parms:[],kids:[]}, st=[root], n=0;
+  while((m=re.exec(s))&&n++<4000){ var close=m[1]==="/", tag=m[2].toLowerCase(), self=m[4]==="/", at={}, am, ar=/([\w\-.:]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g;
+    while((am=ar.exec(m[3]))) at[am[1].toLowerCase()]=unesc(am[2]!==undefined?am[2]:am[3]);
+    if(tag==="characteristic"){ if(close){ if(st.length>1) st.pop(); } else { var c={type:at.type||"",parms:[],kids:[]}; st[st.length-1].kids.push(c); if(!self) st.push(c); } }
+    else if(tag==="parm"&&!close) st[st.length-1].parms.push({name:at.name||"", value:at.value===undefined?"":at.value}); }
+  return root; }
+function jsonDoc(o,type){ var c={type:type||"(root)",parms:[],kids:[]};
+  if(Array.isArray(o)){ o.forEach(function(x){ var k=jsonDoc(x,type); c.kids.push(k); }); return c; }
+  Object.keys(o||{}).forEach(function(k){ var v=o[k]; if(v!==null&&typeof v==="object"){ if(Array.isArray(v)) v.forEach(function(x){ c.kids.push(typeof x==="object"?jsonDoc(x,k):{type:k,parms:[{name:k,value:String(x)}],kids:[]}); }); else c.kids.push(jsonDoc(v,k)); }
+    else c.parms.push({name:k, value:String(v)}); });
+  return c; }
+var ESAPP={ap2003:"Voice-over-Cellular (VoLTE / VoNR)",ap2004:"VoWiFi (Wi-Fi calling)",ap2005:"SMS over IP",ap2006:"ODSA, companion device (eSIM)",ap2009:"ODSA, primary device (eSIM)",ap2010:"Data plan information",ap2011:"ODSA, server-initiated requests",ap2012:"Direct carrier billing",ap2013:"Private user identity",ap2014:"Device and user information",ap2015:"App authentication",ap2016:"Satellite mode"};
+var ENT=["DISABLED","ENABLED","INCOMPATIBLE","PROVISIONING"];
+var ENTM={0:"allowed, but not yet provisioned and activated on the network",1:"allowed, provisioned and activated",2:"cannot be offered",3:"being provisioned on the network"};
+var GATE={TC_Status:["T&Cs not yet accepted","T&Cs accepted","T&Cs not required","T&C capture in progress"],AddrStatus:["emergency address not yet captured","emergency address entered","address not required","address capture in progress"],ProvStatus:["not provisioned on the network yet","fully provisioned","provisioning not tracked","provisioning in progress"]};
+var OPRES={1:"SUCCESS",100:"ERROR, GENERAL",101:"ERROR, INVALID OPERATION",102:"ERROR, INVALID PARAMETER",103:"WARNING, NOT SUPPORTED OPERATION",104:"ERROR, INVALID MSG RESPONSE"};
+var SUBRES={1:"CONTINUE TO WEBSHEET",2:"DOWNLOAD PROFILE",3:"DONE",4:"DELAYED DOWNLOAD",5:"DISMISS",6:"DELETE PROFILE IN USE",7:"REDOWNLOADABLE PROFILE IS MANDATORY",8:"REQUIRES USER INPUT"};
+var SVCST={1:"ACTIVATED",2:"ACTIVATING",3:"DEACTIVATED",4:"DEACTIVATED, NO REUSE"};
+var ELIG=["DISABLED","ENABLED","INCOMPATIBLE"];
+function allParms(c,acc,path){ acc=acc||[]; c.parms.forEach(function(p){ acc.push({name:p.name, value:p.value, path:path||c.type}); }); c.kids.forEach(function(k){ allParms(k,acc,k.type); }); return acc; }
+function findAll(c,pred,acc){ acc=acc||[]; if(pred(c)) acc.push(c); c.kids.forEach(function(k){ findAll(k,pred,acc); }); return acc; }
+function secs(v){ v=+v; if(!isFinite(v)) return String(v); if(v>=86400&&v%3600===0) return v+" s ("+(v/86400).toFixed(v%86400?1:0)+" days)"; if(v>=3600) return v+" s ("+(v/3600).toFixed(1)+" h)"; return v+" s"; }
+function esParse(text){ var t=String(text).trim(), root;
+  if(t.charAt(0)==="<") root=xmlDoc(t); else { try{ root=jsonDoc(JSON.parse(t)); }catch(e){ return null; } }
+  var r={vers:null, token:null, apps:[], raw:root};
+  findAll(root,function(c){ return /^vers$/i.test(c.type); }).forEach(function(c){ var o={}; c.parms.forEach(function(p){ o[p.name.toLowerCase()]=p.value; }); r.vers=o; });
+  findAll(root,function(c){ return /^token$/i.test(c.type); }).forEach(function(c){ var o={}; c.parms.forEach(function(p){ o[p.name.toLowerCase()]=p.value; }); r.token=o; });
+  findAll(root,function(c){ return /^application$/i.test(c.type)||/^ap\d{4}$/i.test(c.type); }).forEach(function(c){
+    var ps=allParms(c), id=null; ps.forEach(function(p){ if(/^appid$/i.test(p.name)) id=p.value; }); if(!id&&/^ap\d{4}$/i.test(c.type)) id=c.type.toLowerCase();
+    if(!id) return; var a={id:id, name:ESAPP[id]||("application "+id), parms:ps, status:null, rats:[], gates:[], msg:null, flow:false, odsa:[]};
+    var rd=findAll(c,function(k){ return /^RATVoiceEntitleInfoDetails$/i.test(k.type); });
+    rd.forEach(function(k){ var o={}; k.parms.forEach(function(p){ o[p.name]=p.value; }); a.rats.push(o); });
+    c.parms.forEach(function(p){ if(p.name==="EntitlementStatus") a.status=+p.value; });
+    if(a.status===null&&a.rats.length){ var best=null; a.rats.forEach(function(o){ var s=+o.EntitlementStatus; if(best===null||s===1) best=s; }); a.status=best; }
+    ps.forEach(function(p){ if(GATE[p.name]) a.gates.push({k:p.name, v:+p.value, t:GATE[p.name][+p.value]||("value "+p.value)});
+      if(p.name==="MessageForIncompatible"&&!a.msg) a.msg=p.value; if(p.name==="ServiceFlow_URL") a.flow=true;
+      if(p.name==="OperationResult") a.odsa.push({k:p.name, v:+p.value, t:OPRES[+p.value]||("value "+p.value)});
+      if(p.name==="SubscriptionResult") a.odsa.push({k:p.name, v:+p.value, t:SUBRES[+p.value]||("value "+p.value)});
+      if(p.name==="ServiceStatus") a.odsa.push({k:p.name, v:+p.value, t:SVCST[+p.value]||("value "+p.value)});
+      if(/AppEligibility$/.test(p.name)) a.odsa.push({k:p.name, v:+p.value, t:ELIG[+p.value]||("value "+p.value)}); });
+    r.apps.push(a); });
+  return r; }
+
+/* ---------- decode one payload ---------- */
+function decode(payload, hint, opt){ opt=opt||{};
+  var s=String(payload||"").trim(), o={layers:[], flags:[], ids:null, leg:"other", kind:"", what:"", facts:[], raw:s};
+  function L(title,rows){ o.layers.push({t:title, rows:rows}); }
+  function F(sev,t){ o.flags.push({sev:sev,t:t}); }
+  if(!s){ o.kind="Empty row"; o.what="No payload in this row"; F("bad","Empty payload"); return o; }
+  if(s.charAt(0)==="<"||s.charAt(0)==="{"||s.charAt(0)==="["){
+    var es=esParse(s); if(!es||!es.apps.length&&!es.vers){ o.kind="Unreadable XML/JSON"; o.what="Not a recognisable entitlement or provisioning document"; F("bad","Could not read the document"); return o; }
+    o.leg="entitlement"; o.kind="Entitlement answer (GSMA TS.43)"; o.es=es; o.dir="MT";
+    var rows=[]; if(es.vers) rows.push(["VERS version", es.vers.version, "configuration version the phone stores"],["VERS validity", es.vers.validity!==undefined?secs(es.vers.validity):"—", "how long before the phone asks again"]);
+    if(es.token) rows.push(["TOKEN", es.token.token?"present (masked)":"—", "lets the phone re-ask without full EAP-AKA"]);
+    L("Entitlement document", rows);
+    es.apps.forEach(function(a){ var rr=[["AppID", a.id, a.name]];
+      if(a.status!==null) rr.push(["EntitlementStatus", a.status+" "+(ENT[a.status]||""), ENTM[a.status]||""]);
+      a.rats.forEach(function(d,ix){ rr.push(["RAT entry "+(ix+1), (d.AccessType==="1"?"4G (LTE)":(d.AccessType==="2"?"5G NG-RAN":"access "+(d.AccessType||"?")))+", "+(d.HomeRoamingNWType==="1"?"home and roaming":(d.HomeRoamingNWType==="2"?"home only":(d.HomeRoamingNWType==="3"?"roaming only":"network type "+(d.HomeRoamingNWType||"?")))), (d.EntitlementStatus!==undefined?(ENT[+d.EntitlementStatus]||d.EntitlementStatus):"")+(d.NetworkVoiceIRATCapability?", "+d.NetworkVoiceIRATCapability:"")]); });
+      a.gates.forEach(function(g){ rr.push([g.k, g.v+"", g.t]); });
+      a.odsa.forEach(function(g){ rr.push([g.k, g.v+"", g.t]); });
+      if(a.msg) rr.push(["MessageForIncompatible", a.msg, "shown to the user"]);
+      if(a.flow) rr.push(["ServiceFlow_URL", "present", "web sheet the phone opens for T&Cs or the emergency address"]);
+      L(a.name, rr);
+      if(a.status===2) F("bad", a.name+": refused (INCOMPATIBLE)"+(a.msg?" — \u201c"+a.msg+"\u201d":""));
+      else if(a.status===0) F("warn", a.name+": DISABLED, allowed but not provisioned yet");
+      else if(a.status===3) F("warn", a.name+": still PROVISIONING on the network");
+      a.gates.forEach(function(g){ if(g.v===0||g.v===3) F("warn", a.name+": "+g.t); });
+      a.odsa.forEach(function(g){ if(g.k==="OperationResult"&&g.v>=100) F("bad", a.name+": "+g.t); });
+      o.facts.push(a.id+" "+(a.status!==null?(ENT[a.status]||a.status):"—")); });
+    o.what=es.apps.map(function(a){ return a.name.split(" (")[0]+": "+(a.status!==null?(ENT[a.status]||a.status):"no status"); }).join("; ")||"Configuration version only";
+    return o; }
+  var a=bytesOf(s); if(!a){ o.kind="Not hex"; o.what="The payload is neither hex nor XML/JSON"; F("bad","Could not read the payload"); return o; }
+  var cands=[], c0=a[0];
+  if(c0===0) cands.push(1); else if(c0<=12&&(a[1]&0x80)&&1+c0<a.length) cands.push(1+c0);
+  cands.push(0);
+  var best=null; cands.forEach(function(off){ var r=parseTP(a,off,hint); if(r&&(!best||r.score>best.score)) best=r; });
+  var u0=parseUDH(a);
+  if(u0&&!u0.bad&&u0.ies.length&&u0.ies.every(function(ie){ return IEN[ie.id]; })){ var us=2+(u0.ies.some(function(ie){ return ie.id===0x70||ie.id===0x71||ie.id===5||ie.id===0; })?0.5:0);
+    if(!best||us>best.score) best={kind:"User data only", dir:hint||(u0.ies.some(function(ie){ return ie.id===0x71; })?"MO":"MT"), udhi:true, ud:a, udl:a.length, di:{cs:"8bit",txt:"assumed 8-bit"}, pid:null, dcs:null, score:us, udOnly:true}; }
+  if(!best){ o.kind="Could not decode"; o.what="Not a valid SMS TPDU (checked with and without the SMSC prefix)"; F("bad","Not a valid SMS PDU"); return o; }
+  var tp=best; o.tp=tp; o.dir=tp.dir;
+  var r1=[];
+  if(tp.off) r1.push(["SMSC address", "present ("+tp.off+" bytes)", "added by the phone or modem log"]);
+  if(!tp.udOnly){
+    r1.push(["Message type", tp.kind, tp.dir==="MO"?"sent by the phone or SIM":"delivered to the phone"]);
+    if(tp.oa) r1.push(["Sender (TP-OA)", tp.oa.alpha||tp.oa.v.replace(/\D/g,"").length<7?tp.oa.v:maskNum(tp.oa.v), tp.oa.alpha?"alphanumeric":"number"]);
+    if(tp.da) r1.push(["Destination (TP-DA)", tp.da.v.replace(/\D/g,"").length<7?tp.da.v:maskNum(tp.da.v), tp.da.v.replace(/\D/g,"").length<7?"short code":"number"]);
+    if(tp.ra) r1.push(["Recipient (TP-RA)", maskNum(tp.ra.v), "delivery report for this number"]);
+    if(tp.pid!==null&&tp.pid!==undefined) r1.push(["TP-PID", pidTxt(tp.pid), ""]);
+    if(tp.dcs!==null&&tp.dcs!==undefined) r1.push(["TP-DCS", "0x"+hx(tp.dcs), tp.di.txt]);
+    if(tp.ts) r1.push(["SC time stamp", tp.ts, ""]);
+    if(tp.kind==="SMS-STATUS-REPORT"){ r1.push(["Status", "0x"+hx(tp.st), tp.st===0?"delivered":(tp.st<0x20?"completed":(tp.st<0x40?"still trying":"failed"))]); }
+    if(tp.udl!==undefined) r1.push(["TP-UDL", tp.udl+"", tp.di.cs==="7bit"?"septets":"octets"]);
+    if(tp.trailing) F("warn", tp.trailing+" extra bytes after the user data");
+  } else r1.push(["Format", "user data only (no TPDU header)", "as found in SMPP or SMSC logs"]);
+  L("SMS layer, 3GPP TS 23.040", r1);
+  if(tp.kind==="SMS-STATUS-REPORT"){ o.kind="Delivery report"; o.what="Status report for an earlier message"; return o; }
+  var ud=tp.ud||[], udh=null, body=ud, port=null, concat=null, cpi=false, rpi=false, mwi=false;
+  if(tp.udhi){ udh=parseUDH(ud); if(!udh||udh.bad){ F("bad","User data header is malformed"); } else { body=ud.slice(udh.len+1);
+      var r2=[]; udh.ies.forEach(function(ie){ var v=hexs(ie.d,0,ie.d.length), m=ieName(ie.id);
+        if(ie.id===0&&ie.d.length===3){ concat={ref:ie.d[0], n:ie.d[1], k:ie.d[2]}; v="ref "+ie.d[0]+", part "+ie.d[2]+" of "+ie.d[1]; }
+        if(ie.id===8&&ie.d.length===4){ concat={ref:(ie.d[0]<<8)|ie.d[1], n:ie.d[2], k:ie.d[3]}; v="ref "+concat.ref+", part "+concat.k+" of "+concat.n; }
+        if(ie.id===5&&ie.d.length===4){ port=(ie.d[0]<<8)|ie.d[1]; var sp=(ie.d[2]<<8)|ie.d[3]; v="to "+port+" from "+sp+(PORTS[port]?" · "+PORTS[port]:""); }
+        if(ie.id===4&&ie.d.length===2){ port=ie.d[0]; v="to "+ie.d[0]+" from "+ie.d[1]; }
+        if(ie.id===0x70) cpi=true; if(ie.id===0x71) rpi=true; if(ie.id===1) mwi=true;
+        r2.push(["IEI 0x"+hx(ie.id), v||"—", m]); });
+      L("User data header", r2); } }
+  if(opt.joined) body=opt.joined;
+  o.concat=concat; o.port=port; o.body=body;
+  var pid=tp.pid, di=tp.di||{cs:"8bit"};
+  var text=null; if(!tp.udOnly){ if(di.cs==="7bit"){ var hs=udh&&!udh.bad?Math.ceil((udh.len+1)*8/7):0; text=g7str(unpack7(ud,tp.udl,hs)); } else if(di.cs==="ucs2") text=ucs2(body,0,body.length); }
+  if(opt.joinedText!==undefined&&opt.joinedText!==null) text=opt.joinedText;
+  o.text=text;
+  if(concat&&concat.n>1&&!(concat.k===1)&&!opt.joined){ o.kind="Settings push, continued"; o.leg="part"; o.what="Part "+concat.k+" of "+concat.n+" (joined with part 1)"; return o; }
+  // classification
+  if(rpi){ var p=otaPor(body); o.leg="por"; o.kind="SIM proof of receipt";
+    if(p){ var r3=[["TAR", p.tar, p.tarT],["Counter", p.cntr, "echo of the command counter"],["Status", "0x"+hx(p.st), p.stT||"unreadable (proof of receipt may be ciphered)"]]; if(p.sig) r3.push(["RC/CC/DS", p.sig, "integrity check on the answer"]);
+      if(p.resp) r3.push(["Response", p.resp.n+" command(s), last status word "+p.resp.sw, p.resp.sw==="9000"?"executed OK":"check the status word"]);
+      L("Response packet, 3GPP TS 31.115", r3); o.por=p;
+      if(p.stT===null) F("warn","Proof of receipt status unreadable (ciphered or not a response packet)");
+      else if(p.st!==0&&p.st!==0x0B&&p.st!==0x0C) F(p.st===8?"warn":"bad","SIM refused the update: "+p.stT);
+      if(p.resp&&p.resp.sw!=="9000"&&!/^9[01]/.test(p.resp.sw)&&!/^61/.test(p.resp.sw)) F("warn","Last command answered "+p.resp.sw);
+      o.what=(p.stT||"status unreadable")+" for TAR "+p.tar; o.facts.push("TAR "+p.tar, p.stT||"?"); }
+    else { o.what="Response packet too short"; F("bad","Response packet too short"); }
+    return o; }
+  if(pid===0x7F||cpi){ if(o.dir==="MO"){ o.leg="detect"; o.kind="Secured message from the SIM"; o.what="Sealed SIM-originated message (TS 31.115); often a handset-change report"; F("info","Content is protected; the report itself cannot be read"); return o; }
+    var c=otaCmd(body); o.leg="simupdate"; o.kind="SIM update over the air";
+    if(c){ var r4=[["SPI", c.spiHex, c.spi.rcT+" · "+(c.spi.ciph?"ciphered":"not ciphered")+" · "+c.spi.cntrT],["Proof of receipt", c.spi.porT, (c.spi.por?"via "+(c.spi.porSubmit?"SMS-SUBMIT":"SMS-DELIVER-REPORT")+", "+c.spi.porSecT+(c.spi.porCiph?", ciphered":""):"")],["KIc", "0x"+hx(c.kic), c.kicT],["KID", "0x"+hx(c.kid), c.kidT],["TAR", c.tar, c.tarT]];
+      if(c.ciphered!==undefined) r4.push(["Secured data", c.ciphered+" bytes, ciphered", "counter, checksum and commands are encrypted"]);
+      else { r4.push(["Counter", c.cntr, ""],["Padding", c.pcntr+"", ""]); if(c.sig) r4.push(["RC/CC/DS", c.sig, c.spi.rcT]); c.apdus.forEach(function(x,ix){ r4.push(["Command "+(ix+1), x.t, ""]); }); }
+      if(!c.cplOk) F("warn","Command packet length does not match the SMS (multi-part or truncated)");
+      L("Command packet, 3GPP TS 31.115", r4); o.ota=c;
+      if(c.spi.rc===0) F("bad","No integrity check on the SIM update (SPI: no RC/CC/DS)"); else if(c.spi.rc===1) F("warn","Only a redundancy check protects the SIM update, no cryptographic checksum");
+      if(!c.spi.ciph) F("warn","SIM update not ciphered: the commands are readable on the air interface");
+      if(c.spi.cntr===0) F("warn","No replay protection (counter not used)");
+      o.what="TAR "+c.tar+" · "+(c.spi.ciph?"ciphered":(c.apdus&&c.apdus.length?c.apdus[0].t.split(" (")[0]+(c.apdus.length>1?" + "+(c.apdus.length-1)+" more":""):"plain"))+" · "+c.spi.porT;
+      o.facts.push("TAR "+c.tar, c.spi.porT); }
+    else { o.what="Command packet too short"; F("bad","Command packet too short"); }
+    return o; }
+  if(pid===0x40){ o.kind="Silent reachability check (Type 0)"; o.what="The phone acknowledges it and discards it; nothing is shown"; return o; }
+  if(pid===0x48){ o.kind="Device trigger (IoT wake-up)"; o.what="Asks an application on the device to contact its server"; return o; }
+  if(pid>=0x41&&pid<=0x47){ o.kind="Replace short message"; o.what=PIDN[pid]+": replaces an earlier message of the same type"; }
+  if(port===2948||port===2949||port===9200){
+    if(port===2949){ o.leg="configure"; o.kind="Secure WAP push"; o.what="WTLS-protected push; content not readable"; return o; }
+    var w=wsp(body); if(!w){ o.kind="WAP push (unreadable)"; o.what="WSP header could not be read"; F("warn","WAP push header unreadable"); return o; }
+    var r5=[["WSP PDU", w.type+", transaction "+w.tid, ""],["Content type", w.ctName, ""]]; Object.keys(w.params).forEach(function(k){ r5.push([k, k==="MAC"?w.params[k].slice(0,8)+"… ("+w.params[k].length+" hex)":w.params[k], k==="SEC"?"security method for the settings":(k==="MAC"?"message authentication code":"")]); });
+    w.headers.forEach(function(h){ r5.push([h.n, h.v, ""]); }); L("WAP push, WSP", r5); o.wsp=w;
+    if(w.ct===0x36){ o.leg="configure"; o.kind="Handset settings (OMA Client Provisioning)";
+      var doc=wbxmlProv(w.body), r6=[], apn=[], appl=[];
+      (function walk(list,depth){ list.forEach(function(ch){ r6.push([" ".repeat(depth*2)+"characteristic", ch.type, ""]);
+        ch.parms.forEach(function(pm){ var v=pm.value; if(/SECRET|PW$/i.test(pm.name)) v=v?"\u2022\u2022\u2022 (masked)":v; if(/AUTHNAME/i.test(pm.name)&&v) v="\u2022\u2022\u2022 (masked)";
+          var note=""; if(pm.name==="APPID") note=APPID[pm.value]||""; if(pm.name==="NAP-ADDRESS") note="access point name when NAP-ADDRTYPE = APN";
+          r6.push([" ".repeat(depth*2+2)+pm.name, v, note]); if(pm.name==="NAP-ADDRESS") apn.push(pm.value); if(pm.name==="APPID") appl.push(APPID[pm.value]||pm.value); });
+        walk(ch.kids,depth+1); }); })(doc.chars,0);
+      if(doc.err) F("warn","Provisioning document: "+doc.err);
+      L("Provisioning document, OMA CP 1.0 (WBXML "+(doc.ver||"?")+")", r6); o.cp=doc;
+      if(!w.params.SEC) F("warn","Unsigned settings push (no SEC/MAC): many handsets reject it or ask the user first");
+      else if(w.params.SEC!=="NETWPIN") F("info","The user must type a PIN to install these settings ("+w.params.SEC+")");
+      if(w.params.SEC&&!w.params.MAC) F("warn","SEC is set but no MAC is present");
+      o.what=(apn.length?"APN "+apn.join(", "):"settings")+(appl.length?" · "+appl.join(", "):"")+" · "+(w.params.SEC?"signed ("+w.params.SEC+")":"unsigned");
+      o.facts.push(apn.length?"APN "+apn.join(","):"no APN"); return o; }
+    if(w.ct===0x44){ o.leg="configure"; o.kind="Device-management wake-up (OMA DM)"; var n=dmNia(w.body);
+      if(n){ L("DM notification (package 0)", [["Digest", n.digest.slice(0,8)+"…", "server proves it knows the DM credentials"],["Version", n.version, ""],["UI mode", n.ui, ""],["Initiator", n.init, ""],["Session ID", n.session+"", ""],["Server ID", n.server, "the phone opens a DM session to this server"]]);
+        o.what="Opens a DM session with "+n.server+" ("+n.ui+")"; o.facts.push("server "+n.server); if(n.verRaw!==12&&n.verRaw!==13) F("warn","Unusual notification version "+n.verRaw); }
+      else { o.what="Notification body unreadable"; F("warn","DM notification body unreadable"); }
+      return o; }
+    if(w.ct===0x42||w.ct===0x43){ o.leg="configure"; o.kind="Device-management bootstrap (OMA DM)"; o.what="Installs a DM server account on the handset"+(w.params.SEC?" (signed "+w.params.SEC+")":" (unsigned)"); if(!w.params.SEC) F("warn","Unsigned DM bootstrap"); return o; }
+    if(w.ct===0x3E){ o.kind="MMS notification"; o.what="Tells the phone to fetch an MMS"; return o; }
+    if(w.ct===0x2E||w.ct===0x30||w.ct===0x2D||w.ct===0x2F){ o.kind="Link push (service indication or loading)"; o.what="Pushes a link to the browser"; return o; }
+    o.kind="WAP push"; o.what=w.ctName; return o; }
+  if(port===37273){ o.leg="configure"; var tt=text||ascii(body,0,body.length);
+    if(/-rcscfg/.test(tt)){ o.kind="RCS configuration request (GSMA RCC.14)"; var uid=tt.split("-rcscfg")[0]; o.what="Network asks the messaging client to fetch its configuration again"; L("RCS request", [["User ID", /^\d{14,15}$/.test(uid)?maskImsi(uid):maskText(uid), /^\d{14,15}$/.test(uid)?"IMSI-based":""],["Body", "\u2026-rcscfg"+(tt.split("-rcscfg")[1]||""), "RCC.14 network-requested configuration"]]); }
+    else { o.kind="RCS sign-in code (GSMA RCC.14)"; o.what="One-time code for the messaging client, read by the client and not shown"; }
+    return o; }
+  if(mwi||(di&&di.mwi)){ o.kind="Voicemail indicator"; o.what="Message waiting indication"; return o; }
+  if(o.dir==="MO"){
+    var ids=findIds(body); o.ids=ids;
+    if(ids.imei||ids.imsi){ o.leg="detect"; o.kind="Handset-change report from the SIM"; var r7=[];
+      if(ids.imei) r7.push(["IMEI", maskImei(ids.imei), "the first 8 digits (TAC) identify the handset model: look them up in your device list"]);
+      if(ids.imsi) r7.push(["IMSI", maskImsi(ids.imsi), "MCC-MNC "+ids.imsi.slice(0,3)+"-"+ids.imsi.slice(3,5)]);
+      r7.push(["Found as", ids.how.join("; "), "payload layout is vendor-specific; the identifiers are checked (IMEI Luhn)"]);
+      L("Handset-change report", r7); o.what=(ids.imei?"IMEI TAC "+ids.imei.slice(0,8):"")+(ids.imei&&ids.imsi?" · ":"")+(ids.imsi?"IMSI "+ids.imsi.slice(0,3)+"-"+ids.imsi.slice(3,5):"");
+      o.facts.push(ids.imei?"TAC "+ids.imei.slice(0,8):"no IMEI"); return o; }
+    if(text!==null){ var mach=/^[A-Za-z0-9+\/=_\-?;:.]{20,}$/.test(text.replace(/\s/g,""))&&!/\s{2,}/.test(text);
+      if(mach){ o.kind="Machine message from the phone"; o.what="Likely a handset vendor or app activation message, not the operator's loop"; F("info","Sent by the phone software; check the destination before blaming the network"); }
+      else { o.kind="Text sent from the phone"; o.what=maskText(text).slice(0,90); } return o; }
+    o.kind="Binary message from the SIM or phone"; o.what="Vendor format, no identifiers found"; return o; }
+  if(text!==null){ var tx=maskText(text);
+    if(/\b(volte|4g call|hd voice|wi-?fi call|vowifi|settings|configur|activat|enabled|welcome|apn|internet set|mms set)/i.test(text)){ o.leg="notice"; o.kind="Customer notice"; o.what=tx.slice(0,110); return o; }
+    if(/\b(code|otp|verif|password|pin)\b/i.test(text)&&/\b\d{4,8}\b/.test(text)){ o.kind="One-time code"; o.what=text.replace(/\b\d{4,8}\b/g,"\u2022\u2022\u2022\u2022").slice(0,90); return o; }
+    o.kind=di.cls===0?"Flash message":"Text message"; o.what=tx.slice(0,110); return o; }
+  o.kind="Binary message"; o.what=body.length+" bytes"+(port!==null?" to port "+port:""); return o;
+}
+
+/* ---------- multi-part join ---------- */
+function joinParts(msgs){ var groups={};
+  msgs.forEach(function(m){ var d=m.d; if(d.concat&&d.concat.n>1&&d.tp&&!d.tp.udOnly){ var k=m.sub+"|"+(d.tp.oa?d.tp.oa.v:(d.tp.da?d.tp.da.v:""))+"|"+d.concat.ref+"|"+d.concat.n; (groups[k]=groups[k]||[]).push(m); } });
+  Object.keys(groups).forEach(function(k){ var g=groups[k], n=g[0].d.concat.n, parts=[], have=0;
+    g.forEach(function(m){ var i=m.d.concat.k; if(i>=1&&i<=n&&!parts[i]){ parts[i]=m; have++; } });
+    var first=parts[1];
+    if(!first){ g.forEach(function(m){ m.d.flags.push({sev:"bad", t:"Part 1 of "+n+" missing: the handset cannot install a partial message"}); }); return; }
+    if(have<n){ first.d.flags.push({sev:"bad", t:(n-have)+" of "+n+" parts missing: the handset cannot install a partial message"}); return; }
+    var body=[], txt="", hasTxt=first.d.text!==null&&first.d.text!==undefined;
+    for(var i=1;i<=n;i++){ body=body.concat(parts[i].d.body||[]); if(hasTxt) txt+=(parts[i].d.text||""); }
+    var re=decode(first.d.raw, first.d.dir, {joined:body, joinedText:hasTxt?txt:null});
+    re.layers.unshift({t:"Joined "+n+" parts", rows:[["Parts", n+" (reference "+first.d.concat.ref+")", "reassembled before decoding"]]});
+    first.d=re; for(var j=2;j<=n;j++){ parts[j].d.leg="part"; parts[j].d.kind="Part "+j+" of "+n; parts[j].d.what="Joined with part 1"; } });
+}
+/* ---------- swaps ---------- */
+function buildSwaps(msgs, winMin){
+  var bySub={}, order=[];
+  msgs.forEach(function(m){ if(!bySub[m.sub]){ bySub[m.sub]=[]; order.push(m.sub); } bySub[m.sub].push(m); });
+  var swaps=[];
+  order.forEach(function(sub){ var list=bySub[sub].slice().sort(function(x,y){ return (isNaN(x.t)||isNaN(y.t))?x.ix-y.ix:(x.t-y.t)||(x.ix-y.ix); });
+    var cur=null;
+    list.forEach(function(m){ if(m.d.leg==="detect"){ cur={sub:sub, start:m, msgs:[m], detect:true}; swaps.push(cur); }
+      else { if(!cur){ cur={sub:sub, start:m, msgs:[], detect:false}; swaps.push(cur); } cur.msgs.push(m); } }); });
+  swaps.forEach(function(s){ var t0=s.start.t, W=(winMin>0?winMin:30)*60000;
+    s.legs={detect:0, configure:0, simupdate:0, por:0, notice:0, entitlement:0, other:0};
+    s.msgs.forEach(function(m){ if(m.d.leg!=="part") s.legs[m.d.leg]=(s.legs[m.d.leg]||0)+1; });
+    s.actions=s.msgs.filter(function(m){ return /configure|simupdate|notice/.test(m.d.leg)&&m!==s.start; });
+    s.timely=s.actions.filter(function(m){ return isNaN(t0)||isNaN(m.t)||(m.t-t0<=W&&m.t>=t0); });
+    s.flags=[]; s.msgs.forEach(function(m){ m.d.flags.forEach(function(f){ if(f.sev!=="info") s.flags.push({sev:f.sev, t:f.t, m:m}); }); });
+    var cmds=s.msgs.filter(function(m){ return m.d.leg==="simupdate"&&m.d.ota&&m.d.ota.spi.por===1; });
+    cmds.forEach(function(cm){ var got=s.msgs.some(function(m){ return m.d.leg==="por"&&m.d.por&&m.d.por.tar===cm.d.ota.tar&&(isNaN(m.t)||isNaN(cm.t)||m.t>=cm.t); });
+      if(!got){ var f={sev:"warn", t:"Proof of receipt requested for TAR "+cm.d.ota.tar+" but none seen", m:cm}; s.flags.push(f); cm.d.flags.push({sev:"warn", t:f.t}); } });
+    var seen={}; s.msgs.forEach(function(m){ if(m.d.leg==="part"||m.d.leg==="entitlement") return; var k=m.d.raw.replace(/\s/g,"").toUpperCase(); if(seen[k]){ seen[k].n++; } else seen[k]={n:1,m:m}; });
+    Object.keys(seen).forEach(function(k){ if(seen[k].n>1){ var f={sev:"warn", t:seen[k].m.d.kind+" sent "+seen[k].n+" times", m:seen[k].m}; s.flags.push(f); } });
+    var pings=s.msgs.filter(function(m){ return m.d.kind.indexOf("Type 0")>=0; }).length; if(pings>2) s.flags.push({sev:"warn", t:pings+" silent reachability checks", m:s.start});
+    var ents={}; s.msgs.forEach(function(m){ if(m.d.es) m.d.es.apps.forEach(function(ap){ ents[ap.id]={a:ap, m:m}; }); }); s.ents=ents;
+    var entBad=Object.keys(ents).some(function(k){ return ents[k].a.status!==1; });
+    var bad=s.flags.some(function(f){ return f.sev==="bad"; }), warn=s.flags.some(function(f){ return f.sev==="warn"; });
+    if(s.detect&&!s.timely.length) s.outcome="stalled";
+    else if(s.detect) s.outcome=(bad||warn||entBad)?"faults":"clean";
+    else s.outcome=s.actions.length?"nodetect":"other";
+    s.entBad=entBad; });
+  return swaps;
+}
+return {decode:decode, joinParts:joinParts, buildSwaps:buildSwaps, esParse:esParse, wsp:wsp, wbxmlProv:wbxmlProv, otaCmd:otaCmd, otaPor:otaPor, findIds:findIds, parseTP:parseTP, bytesOf:bytesOf, maskNum:maskNum, maskImsi:maskImsi, ENT:ENT, ESAPP:ESAPP, hexs:hexs};
+})();
+
+var LEGS=[["detect","Detect","SIM reports a new handset"],["configure","Configure","settings pushed to the handset"],["simupdate","SIM update","files or applets changed over the air"],["notice","Notice","customer told what changed"],["entitlement","Entitlement","what the phone is allowed to switch on"]];
+var TOOL={
+ analyse:function(ps,inp,U){
+  var P=ps[0], H=P.header, used=[];
+  function pk(al){ var c=U.pick(H.filter(function(h){ return used.indexOf(h)<0; }),al); if(c) used.push(c); return c; }
+  var cP=pk(["payload","pdu","tpdu","sms_pdu","hex","raw","rp_data","user_data","data","message_hex","response","xml","json","body","message","content"]);
+  var cT=pk(["time","timestamp","datetime","date_time","date","ts","received","sent"]);
+  var cD=pk(["direction","dir","mo_mt","flow","leg"]);
+  var cS=pk(["subscriber","imsi","msisdn","iccid","sim","sub","customer","account","line"]);
+  var cO=pk(["source","node","system","platform","interface","origin"]);
+  if(!cP){ H.forEach(function(h){ if(cP) return; var n=0; P.rows.slice(0,20).forEach(function(r){ var v=String(r[h]||"").trim(); if(/^[0-9a-fA-F\s]{20,}$/.test(v)||/^</.test(v)) n++; }); if(n>=Math.min(3,P.rows.length)) cP=h; }); }
+  if(!cP) throw "I need a column with each message: an SMS PDU in hex, or an entitlement answer in XML or JSON (for example 'payload').";
+  var msgs=[], subsAuto=!cS;
+  P.rows.forEach(function(r,ix){ var raw=String(r[cP]||"").trim(); if(!raw) return;
+    var dh=cD?String(r[cD]||"").toUpperCase():""; dh=/MO|UP|OUT|SUBMIT|FROM.?SIM|SENT/.test(dh)?"MO":(/MT|DOWN|IN|DELIVER|TO.?SIM|RECEIVED/.test(dh)?"MT":null);
+    var d=OB.decode(raw, dh), t=cT?U.time(r[cT]):NaN;
+    msgs.push({ix:ix, t:t, tr:cT?String(r[cT]||""):"", sub:cS?(String(r[cS]||"").trim()||"(blank)"):null, src:cO?String(r[cO]||"").trim():"", d:d, dirCol:dh}); });
+  if(!msgs.length) throw "No messages found in the payload column.";
+  if(subsAuto){ var cur="All messages"; msgs.forEach(function(m){ if(m.d.ids&&m.d.ids.imsi) cur="IMSI "+OB.maskImsi(m.d.ids.imsi); m.sub=cur; }); }
+  OB.joinParts(msgs);
+  return {msgs:msgs, hasT:!!cT, hasS:!!cS, hasO:!!cO};
+ },
+ render:function(R,inp,U,ctx){
+  var win=U.num(inp.win); if(!(win>0)) win=30; var cost=U.num(inp.cost);
+  var M=R.msgs, S=OB.buildSwaps(M, win);
+  var real=M.filter(function(m){ return m.d.leg!=="part"; });
+  var swaps=S.filter(function(s){ return s.detect||s.actions.length||Object.keys(s.ents).length; });
+  var n={clean:0, faults:0, stalled:0, nodetect:0}; swaps.forEach(function(s){ if(n[s.outcome]!==undefined) n[s.outcome]++; });
+  var cnt={unsigned:0, refused:0, noPor:0, weakOta:0, partial:0, undecoded:0};
+  M.forEach(function(m){ m.d.flags.forEach(function(f){ if(/^Unsigned settings push/.test(f.t)) cnt.unsigned++; if(/^SIM refused the update/.test(f.t)) cnt.refused++; if(/none seen$/.test(f.t)) cnt.noPor++; if(/No integrity check|Only a redundancy check/.test(f.t)) cnt.weakOta++; if(/parts? missing|missing: the handset/.test(f.t)) cnt.partial++; if(/^(Could not|Not a valid|Not hex|Empty payload)/.test(f.t)) cnt.undecoded++; }); });
+  var entRef=0, entHold=0, entOn=0, holdWhy={};
+  swaps.forEach(function(s){ Object.keys(s.ents).forEach(function(k){ var a=s.ents[k].a; if(a.status===2) entRef++; else if(a.status===1) entOn++; else { entHold++; a.gates.forEach(function(g){ if(g.v===0||g.v===3) holdWhy[g.k]=1; }); } }); });
+  var nS=swaps.length, legs={detect:0, configure:0, simupdate:0, por:0, notice:0, entitlement:0, other:0};
+  real.forEach(function(m){ legs[m.d.leg]=(legs[m.d.leg]||0)+1; });
+  function pl(k,one,many){ return k===1?one:many; }
+  function andList(a){ return a.length<2?(a[0]||""):a.slice(0,-1).join(", ")+" and "+a[a.length-1]; }
+  var v="Of <b>"+U.fmt(real.length)+"</b> messages"+(nS?" from <b>"+U.fmt(nS)+"</b> SIM swap"+(nS===1?"":"s"):"")+", ";
+  var parts=[]; if(n.clean) parts.push("<b>"+n.clean+"</b> onboarding "+pl(n.clean,"loop","loops")+" closed cleanly"); if(n.faults) parts.push("<b>"+n.faults+"</b> closed with faults"); if(n.stalled) parts.push("<b>"+n.stalled+"</b> stalled after detection"); if(n.nodetect) parts.push("<b>"+n.nodetect+"</b> had network actions with no detection report seen");
+  if(!parts.length) parts.push("none forms an onboarding loop (no handset-change report, settings push, SIM update or entitlement answer)");
+  v+=parts.length>1?parts.slice(0,-1).join(", ")+" and "+parts[parts.length-1]:parts[0]; v+=". ";
+  if(cnt.unsigned) v+="<b>"+cnt.unsigned+"</b> settings "+pl(cnt.unsigned,"push is","pushes are")+" unsigned (no SEC/MAC): handsets may reject "+pl(cnt.unsigned,"it","them")+" or ask the user, leaving data, MMS or VoLTE unset. ";
+  if(cnt.refused) v+="<b>"+cnt.refused+"</b> SIM "+pl(cnt.refused,"update was","updates were")+" refused by the card. ";
+  if(cnt.noPor) v+="<b>"+cnt.noPor+"</b> SIM "+pl(cnt.noPor,"update has","updates have")+" no proof of receipt. ";
+  if(cnt.weakOta) v+="<b>"+cnt.weakOta+"</b> SIM "+pl(cnt.weakOta,"update has","updates have")+" no cryptographic checksum. ";
+  if(cnt.partial) v+="<b>"+cnt.partial+"</b> multi-part "+pl(cnt.partial,"message is","messages are")+" incomplete. ";
+  if(entRef||entHold){ var hw=[]; if(holdWhy.TC_Status) hw.push("T&Cs"); if(holdWhy.AddrStatus) hw.push("the emergency address"); if(holdWhy.ProvStatus) hw.push("network provisioning");
+    v+="The entitlement server "+(entRef?"refused <b>"+entRef+"</b> "+pl(entRef,"service","services"):"")+(entRef&&entHold?" and ":"")+(entHold?"holds <b>"+entHold+"</b> "+pl(entHold,"service","services")+(hw.length?" until "+andList(hw)+" "+pl(hw.length,"is","are")+" done":" back"):"")+", so the phone keeps "+pl(entRef+entHold,"that toggle","those toggles")+" off. "; }
+  var atRisk=n.stalled+n.faults;
+  if(atRisk) v+="Each stalled or faulty swap is a phone that may stay on circuit-switched voice, at risk when 2G and 3G are switched off, and a likely care call";
+  if(atRisk&&cost>0) v+=": at RWF "+U.fmt(cost)+" a contact, <b>"+U.rwf(atRisk*cost)+"</b> for these swaps";
+  if(atRisk) v+=".";
+  if(cnt.undecoded) v=v.replace(/\s+$/,"")+" <b>"+cnt.undecoded+"</b> "+pl(cnt.undecoded,"row","rows")+" could not be decoded.";
+  v=v.replace(/\s+$/,"");
+  var tiles=[U.tile("Clean swaps", n.clean+" of "+nS, "loop closed, no fault", nS&&n.clean===nS?"good":(n.clean?"warn":"bad")),
+    U.tile("Stalled", U.fmt(n.stalled), "detected, nothing sent", n.stalled?"bad":"good"),
+    U.tile("Faults", U.fmt(cnt.unsigned+cnt.refused+cnt.noPor+cnt.weakOta+cnt.partial), "unsigned, refused, missing", (cnt.unsigned+cnt.refused+cnt.noPor+cnt.weakOta+cnt.partial)?"warn":"good"),
+    U.tile("Entitlement on", entOn+" of "+(entOn+entRef+entHold), "services the phone may use", (entRef+entHold)?"warn":"good")];
+  var Sc=[];
+  // loop map
+  var lm='<div class="loop">';
+  LEGS.forEach(function(l){ var k=l[0], c=legs[k]||0, cls="";
+    if(k==="detect") cls=n.stalled?"warn":(c?"good":"");
+    if(k==="configure") cls=cnt.unsigned||cnt.partial?"warn":(c?"good":"");
+    if(k==="simupdate") cls=cnt.refused?"bad":((cnt.noPor||cnt.weakOta)?"warn":(c?"good":""));
+    if(k==="notice") cls=c?"good":"";
+    if(k==="entitlement") cls=entRef?"bad":(entHold?"warn":(c?"good":""));
+    var sub=l[2]; if(k==="simupdate"&&legs.por) sub+=" · "+legs.por+" proof"+(legs.por>1?"s":"")+" of receipt";
+    lm+='<div class="lstep '+cls+'"><div class="ll">'+U.esc(l[1])+'</div><div class="ln">'+c+'</div><div class="ls">'+U.esc(sub)+'</div></div>'; });
+  lm+='</div><p class="note-s">Detection feeds the network side (HSS/UDM, settings by SMS). The entitlement server answers the phone itself, per subscription. Other messages: '+(legs.other||0)+'.</p>';
+  Sc.push({title:"Onboarding loop", cap:"Messages counted by the step they play after a SIM swap", html:lm});
+  // swaps table
+  var oc={clean:{t:"Clean",cls:"ok"}, faults:{t:"Faults",cls:"flag"}, stalled:{t:"Stalled",cls:"flag"}, nodetect:{t:"No detection seen",cls:""}, other:{t:"—",cls:""}};
+  function yn(c){ return c?String(c):"—"; }
+  var rowsS=swaps.map(function(s){ var es=Object.keys(s.ents).map(function(k){ var a=s.ents[k].a; return (k==="ap2003"?"VoLTE":(k==="ap2004"?"VoWiFi":k))+" "+(OB.ENT[a.status]||"?").toLowerCase(); }).join(", ")||"—";
+    var who=s.sub&&/^\d{7,}$/.test(s.sub)?U.mask(s.sub):String(s.sub).replace(/-/g,"\u2011");
+    return [who+(s.start.tr?" · "+s.start.tr.replace(/^\d{4}-\d{2}-\d{2}[ T]/,""):""), yn(s.legs.detect), yn(s.legs.configure), yn(s.legs.simupdate)+(s.legs.por?" + "+s.legs.por+" PoR":""), yn(s.legs.notice), es, {t:oc[s.outcome].t, cls:oc[s.outcome].cls}]; });
+  Sc.push({title:"Each SIM swap", cap:U.of("Stalled = handset-change report with no settings, SIM update or notice within "+win+" minutes",30,rowsS.length), html:U.table(["Swap","Detect","Configure","SIM update","Notice","Entitlement","Outcome"], rowsS.slice(0,30), [])});
+  // faults list
+  var fl=[]; swaps.forEach(function(s){ s.flags.forEach(function(f){ fl.push([s.sub&&/^\d{7,}$/.test(s.sub)?U.mask(s.sub):String(s.sub).replace(/-/g,"\u2011"), f.m.tr.replace(/^\d{4}-\d{2}-\d{2}[ T]/,"")||"row "+(f.m.ix+2), {t:f.t, cls:f.sev==="bad"?"flag":""}]); }); });
+  if(fl.length) Sc.push({title:"What to fix", cap:U.of("Red = the step failed; others = risk or friction",25,fl.length), html:U.table(["Swap","Time","Finding"], fl.slice(0,25), [])});
+  // timeline
+  var tl=real.map(function(m){ var top=m.d.flags.filter(function(f){ return f.sev!=="info"; })[0];
+    return [m.tr.replace(/^\d{4}-\d{2}-\d{2}[ T]/,"")||"row "+(m.ix+2), m.d.dir||m.dirCol||"?", (LEGS.filter(function(l){ return l[0]===m.d.leg; })[0]||[0,m.d.leg==="por"?"SIM update":"Other"])[1], m.d.kind, top?{t:top.t, cls:top.sev==="bad"?"flag":""}:{t:"—",cls:""}]; });
+  Sc.push({title:"Message timeline", cap:U.of("In file order within each swap; multi-part messages are joined",40,tl.length), html:U.table(["Time","Dir","Step","What it is","First finding"], tl.slice(0,40), [])});
+  // decoded detail
+  var dh='<div class="msgs">';
+  real.slice(0,40).forEach(function(m,ix){ var d=m.d;
+    dh+='<details'+(ix===0?' open':'')+'><summary><span class="chip">'+U.esc(d.dir||"?")+'</span><b>'+U.esc(d.kind)+'</b> <span class="sm">· '+U.esc(m.tr.replace(/^\d{4}-\d{2}-\d{2}[ T]/,"")||("row "+(m.ix+2)))+(m.sub?' · '+U.esc(m.sub):'')+'</span><span class="what">'+U.esc(d.what||"")+'</span></summary>';
+    d.layers.forEach(function(L){ dh+='<p class="lyr">'+U.esc(L.t)+'</p><dl class="kv">'; L.rows.forEach(function(r){ dh+='<dt>'+U.esc(r[0])+'</dt><dd><span class="mono">'+U.esc(r[1])+'</span>'+(r[2]?' <span class="dimt">'+U.esc(r[2])+'</span>':'')+'</dd>'; }); dh+='</dl>'; });
+    if(d.flags.length){ dh+='<ul class="fls">'; d.flags.forEach(function(f){ dh+='<li class="fl-'+(f.sev==="bad"?"bad":(f.sev==="warn"?"warn":"info"))+'">'+U.esc(f.t)+'</li>'; }); dh+='</ul>'; }
+    dh+='</details>'; });
+  dh+='</div>';
+  Sc.push({title:"Decoded messages", cap:U.of("Layer by layer; personal numbers masked, TAC kept for the device lookup",40,real.length), html:dh});
+  // why
+  Sc.push({title:"Why the network sends each one", cap:"The standard behind each step", html:U.table(["Step","What it does","Standard"],[
+    ["Detect","The SIM sees a new IMEI and reports it, so the platform can look up the model (TAC) and decide what to switch on","3GPP TS 31.111 (toolkit: local information, send SMS); payload is vendor-specific"],
+    ["Configure","Pushes APN, MMS or device-management settings the handset does not carry built in; a DM wake-up opens a session where IMS settings are written","OMA Client Provisioning over WAP Push (port 2948); OMA DM notification; 3GPP TS 24.167"],
+    ["SIM update","Changes files or applets on the SIM; the card answers with a proof of receipt","3GPP TS 31.115, ETSI TS 102 225 / 102 226, TS 31.116"],
+    ["Notice","Tells the customer what changed, so they do not call care","Operator text"],
+    ["Entitlement","The phone asks, per subscription, whether it may switch VoLTE, Wi-Fi calling or eSIM services on; plan, T&Cs and emergency address are checked","GSMA TS.43 (EAP-AKA over HTTPS)"],
+    ["Other","Silent reachability check (Type 0), device trigger, RCS configuration request, MMS notification","3GPP TS 23.040; GSMA RCC.14"]],[])});
+  // summary
+  var L=[]; L.push("SIM ONBOARDING DECODER — "+ctx.name.toUpperCase());
+  L.push(U.fmt(real.length)+" messages, "+nS+" SIM swaps"+(R.hasS?"":" (grouped without a subscriber column)")+"   |   Prepared by Frutos Kamanzi, CEO & Founder, SAANO AI NETWORKS"); L.push("");
+  L.push("FINDING");
+  L.push("- Onboarding loops: "+n.clean+" clean, "+n.faults+" with faults, "+n.stalled+" stalled after detection"+(n.nodetect?", "+n.nodetect+" without a detection report":""));
+  if(cnt.unsigned) L.push("- Unsigned settings pushes (no SEC/MAC): "+cnt.unsigned+"; handsets may reject them or prompt the user");
+  if(cnt.refused) L.push("- SIM updates refused by the card: "+cnt.refused);
+  if(cnt.noPor) L.push("- SIM updates without a proof of receipt: "+cnt.noPor);
+  if(cnt.weakOta) L.push("- SIM updates without a cryptographic checksum: "+cnt.weakOta);
+  if(cnt.partial) L.push("- Incomplete multi-part messages: "+cnt.partial);
+  if(entOn+entRef+entHold) L.push("- Entitlement: "+entOn+" services enabled, "+entRef+" refused, "+entHold+" on hold");
+  if(atRisk&&cost>0) L.push("- Care cost at RWF "+U.fmt(cost)+" a contact: "+U.rwf(atRisk*cost)+" for "+atRisk+" swaps");
+  L.push(""); L.push("FIX FIRST");
+  var fx=[];
+  if(n.stalled) fx.push("- Stalled swaps: check the TAC against the approved-device list and the platform rule that should fire after detection");
+  if(cnt.refused) fx.push("- Refused SIM updates: resend with the counter the card expects (see the proof-of-receipt status) and align the OTA platform's counter");
+  if(cnt.unsigned) fx.push("- Sign settings pushes with NETWPIN and a MAC so handsets install them without a prompt");
+  if(cnt.noPor) fx.push("- Missing proofs of receipt: confirm delivery on the SMSC and the PoR route (SMS-SUBMIT or delivery report)");
+  if(entHold) fx.push("- Entitlement on hold: drive users through the web sheet (T&Cs, emergency address) and finish network provisioning");
+  if(entRef) fx.push("- Entitlement refused: confirm the device is meant to be excluded, or update the eligibility rule");
+  if(!fx.length) fx.push("- No fault found in this file");
+  L=L.concat(fx);
+  L.push(""); L.push("NEXT STEP");
+  L.push("- Send one day of SIM-swap SMS and entitlement logs; I return the root cause of each failing swap");
+  L.push("  with the fix, in 3 working days, at a fixed price.");
+  L.push(""); L.push("Method: each row is decoded to 3GPP TS 23.040 (SMS), TS 31.115 (SIM over the air), OMA CP/DM and GSMA TS.43;");
+  L.push("a swap starts at a handset-change report; it is stalled if no settings, SIM update or notice follows within "+win+" minutes.");
+  L.push("Handset-change payloads are vendor formats: identifiers are found by pattern and checked (IMEI Luhn). Personal numbers are masked.");
+  L.push("Note: a trial read. Figures are indicative until run on your full logs.");
+  return {verdict:v, tiles:tiles, sections:Sc, summary:L.join("\n")};
+ }
+};
+
+/* ---------- page glue: paste box and non-CSV files go through the same trial gate ---------- */
+(function(){
+  if(typeof document==="undefined") return;
+  var fi=document.getElementById("file0"), dz=document.getElementById("drop0"), pass=false, err=document.getElementById("err");
+  if(!fi||!dz) return;
+  function toCSV(t){ t=String(t).replace(/^\ufeff/,"").trim(); if(!t) return null;
+    if(/^[<\[{]/.test(t)) return 'payload\n"'+t.replace(/\r?\n\s*/g," ").replace(/"/g,'""')+'"\n';
+    var lines=t.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(function(l){ return l; });
+    if(lines.every(function(l){ return /^[0-9a-fA-F\s:x]+$/.test(l)&&l.replace(/[^0-9a-fA-F]/g,"").length>=8; })) return "payload\n"+lines.join("\n")+"\n";
+    return t; }
+  function feed(f){ var rd=new FileReader(); rd.onload=function(){ var c=toCSV(rd.result); if(c===null){ return; }
+      var nf; try{ nf=new File([c],"messages.csv",{type:"text/csv"}); var dt=new DataTransfer(); dt.items.add(nf); fi.files=dt.files; }
+      catch(e){ if(err){ err.textContent="This browser cannot read pasted text here; save it as a CSV with a 'payload' column and drop the file."; err.hidden=false; } return; }
+      pass=true; try{ fi.dispatchEvent(new Event("change")); } finally { pass=false; } };
+    rd.readAsText(f); }
+  fi.addEventListener("change",function(e){ if(pass) return; var f=fi.files&&fi.files[0]; if(!f) return; e.stopImmediatePropagation(); feed(f); });
+  dz.addEventListener("drop",function(e){ var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(!f) return; e.preventDefault(); e.stopImmediatePropagation(); dz.classList.remove("over"); feed(f); });
+  var pb=document.getElementById("pastego"), pt=document.getElementById("pastebox");
+  if(pb&&pt) pb.addEventListener("click",function(){ if(!pt.value.trim()) return; feed(new Blob([pt.value],{type:"text/plain"})); });
+})();
+
+</script>
+<script>
+(function(){
+"use strict";
+var CFG={"slug": "onboarding-decoder", "wa": "250788312423", "defaultFor": "your network", "files": 1, "fileLabels": [], "summaryTitle": "CTO-ready summary", "waMsg": "Muraho Frutos. I tried the SIM Onboarding Decoder for {name} and I'd like the full version.", "foot": "Read entirely in your browser \u00b7 nothing is uploaded \u00b7 personal numbers are masked on sight. 3-day trial with a code. \u00a9 2026 Frutos.", "plainTitle": "SIM Onboarding Decoder", "preset": "", "api": ""}, SAMPLES=["time,direction,subscriber,source,payload\n2026-11-10 08:02:11,MO,SIM-A,Handset (SIM applet),11210481214300F6A71B48440114084A095124303257810209080910100000103254030101\n2026-11-10 08:02:40,MT,SIM-A,Device platform,440ED0CE32FDFE96AF8300F5621101802004808C0B05040B8423F000035A020101062F1F2DB69180923143453033364234363330413144383232434344314435413438323833454546323532303843443900030B6A00C54601C65501870706034E6574776F726B20412064617461000187080603696E7465726E657400018709068901871006AB01871106034E415031000101C6000155018736000006037734\n2026-11-10 08:02:41,MT,SIM-A,Device platform,440ED0CE32FDFE96AF8300F562110180201480470B05040B8423F000035A02020001870706034D4D5300018700013400000603687474703A2F2F6D6D732E6578616D706C652E6E6574000187000122000006034E41503100010101\n2026-11-10 08:02:48,MT,SIM-A,Device platform,0791527008000000440ED0CE32FDFE96AF8300F562110180208480330605040B8423F0020603C4AF873CA2F4207805237A558E19742F13353103100000001A2B0E646D2E6578616D706C652E6E6574\n2026-11-10 08:02:55,MT,SIM-A,OTA platform,440ED0CE32FDFE96AF837FF6621101802055802D02700000281516211515B000201F341845C5D999C08561667CEDF5E86BD6119549ED586725AB4BD3709877142F\n2026-11-10 08:03:01,MO,SIM-A,Handset (SIM),5122048121537FF6A713027100000E0AB00020000000002A0000019000\n2026-11-10 08:03:20,MT,SIM-A,Device platform,040ED0CE32FDFE96AF8300006211018030028068CE32FDFE96AF41411D28FFAECB4170F4DB5D06A5E720F7FB0E9A97E9A03A1C647ECB41B423681C66B3D3EE3308657D33A9C51428EC2683AEE996310D1A87D9ECB4FBEC0249CB737A584E07A5E9A0B77B5C06D1DF2073DA9D9EA35D\n2026-11-10 08:04:10,MT,SIM-A,RCS configuration server,440ED0CE32FDFE96AF830000621101804001801E0605049199000030580C1683C16030584C36A3D55AF2F17C6C3E03\n2026-11-10 08:05:02,MT,SIM-A,Entitlement server,\"<?xml version=\"\"1.0\"\"?><wap-provisioningdoc version=\"\"1.1\"\"><characteristic type=\"\"VERS\"\"><parm name=\"\"version\"\" value=\"\"3\"\"/><parm name=\"\"validity\"\" value=\"\"172800\"\"/></characteristic><characteristic type=\"\"TOKEN\"\"><parm name=\"\"token\"\" value=\"\"kZYfCEpSsMr88KZVmab5UsZVzl\"\"/></characteristic><characteristic type=\"\"APPLICATION\"\"><parm name=\"\"AppID\"\" value=\"\"ap2004\"\"/><parm name=\"\"EntitlementStatus\"\" value=\"\"1\"\"/><parm name=\"\"AddrStatus\"\" value=\"\"1\"\"/><parm name=\"\"TC_Status\"\" value=\"\"1\"\"/><parm name=\"\"ProvStatus\"\" value=\"\"1\"\"/><parm name=\"\"ServiceFlow_URL\"\" value=\"\"https://es.example.net/vowifi\"\"/><parm name=\"\"ServiceFlow_UserData\"\" value=\"\"token=sample\"\"/></characteristic><characteristic type=\"\"APPLICATION\"\"><parm name=\"\"AppID\"\" value=\"\"ap2003\"\"/><characteristic type=\"\"VoiceOverCellularEntitleInfo\"\"><characteristic type=\"\"RATVoiceEntitleInfoDetails\"\"><parm name=\"\"AccessType\"\" value=\"\"1\"\"/><parm name=\"\"HomeRoamingNWType\"\" value=\"\"1\"\"/><parm name=\"\"EntitlementStatus\"\" value=\"\"1\"\"/></characteristic></characteristic></characteristic></wap-provisioningdoc>\"\n2026-11-10 09:14:05,MO,SIM-B,Handset (SIM applet),0011050481214300F6A71B48440114083A259009106741180209080910100000608709030101\n2026-11-10 10:02:00,MT,SIM-B,Device platform,040481050040006211010120008000\n2026-11-10 10:30:00,MT,SIM-B,Entitlement server,\"<?xml version=\"\"1.0\"\"?><wap-provisioningdoc version=\"\"1.1\"\"><characteristic type=\"\"VERS\"\"><parm name=\"\"version\"\" value=\"\"2\"\"/><parm name=\"\"validity\"\" value=\"\"86400\"\"/></characteristic><characteristic type=\"\"TOKEN\"\"><parm name=\"\"token\"\" value=\"\"Qm9yWlpvU2FtcGxlVG9rZW4\"\"/></characteristic><characteristic type=\"\"APPLICATION\"\"><parm name=\"\"AppID\"\" value=\"\"ap2004\"\"/><parm name=\"\"EntitlementStatus\"\" value=\"\"2\"\"/><parm name=\"\"MessageForIncompatible\"\" value=\"\"Wi-Fi Calling is not available on this device.\"\"/></characteristic><characteristic type=\"\"APPLICATION\"\"><parm name=\"\"AppID\"\" value=\"\"ap2003\"\"/><characteristic type=\"\"VoiceOverCellularEntitleInfo\"\"><characteristic type=\"\"RATVoiceEntitleInfoDetails\"\"><parm name=\"\"AccessType\"\" value=\"\"1\"\"/><parm name=\"\"HomeRoamingNWType\"\" value=\"\"1\"\"/><parm name=\"\"EntitlementStatus\"\" value=\"\"2\"\"/><parm name=\"\"MessageForIncompatible\"\" value=\"\"4G calling is not available on this device.\"\"/></characteristic></characteristic></characteristic></wap-provisioningdoc>\"\n2026-11-10 11:20:10,MO,SIM-C,Handset (SIM applet),11410481214300F6A71B48440114088A764805032143950209080910100000206408030101\n2026-11-10 11:20:30,MT,SIM-C,Device platform,440ED0CE32FDFE96AF8300F5621101110203804D0605040B8423F0030601B6030B6A00C54601C65501870706034E6574776F726B20412064617461000187080603696E7465726E657400018709068901871006AB01871106034E41503100010101\n2026-11-10 11:20:41,MT,SIM-C,OTA platform,440ED0CE32FDFE96AF837FF66211011102148033027000002E1512211515B000200000000011007B668BF0088DEC9600A40004026F7B00D600000CFFFFFFFFFFFFFFFFFFFFFFFF\n2026-11-10 11:20:47,MO,SIM-C,Handset (SIM),5142048121537FF6A710027100000B0AB0002000000000110002\n2026-11-10 11:21:05,MT,SIM-C,Device platform,040ED0CE32FDFE96AF8300006211011112508051CE32FDFE96AF41411D28FFAECB416937BD2C7797E9A079994E4FBBCF73103A6C2F83C4E5B21B342FBBE92ED0346C2F83E8E8721B744797DDA0FCBB2E07C1D16F7719149EAFE72E\n2026-11-10 11:40:00,MT,SIM-C,Entitlement server,\"<?xml version=\"\"1.0\"\"?><wap-provisioningdoc version=\"\"1.1\"\"><characteristic type=\"\"VERS\"\"><parm name=\"\"version\"\" value=\"\"5\"\"/><parm name=\"\"validity\"\" value=\"\"172800\"\"/></characteristic><characteristic type=\"\"TOKEN\"\"><parm name=\"\"token\"\" value=\"\"U2FtcGxlVG9rZW5TSU1D\"\"/></characteristic><characteristic type=\"\"APPLICATION\"\"><parm name=\"\"AppID\"\" value=\"\"ap2003\"\"/><characteristic type=\"\"VoiceOverCellularEntitleInfo\"\"><characteristic type=\"\"RATVoiceEntitleInfoDetails\"\"><parm name=\"\"AccessType\"\" value=\"\"1\"\"/><parm name=\"\"HomeRoamingNWType\"\" value=\"\"1\"\"/><parm name=\"\"EntitlementStatus\"\" value=\"\"3\"\"/></characteristic></characteristic></characteristic><characteristic type=\"\"APPLICATION\"\"><parm name=\"\"AppID\"\" value=\"\"ap2004\"\"/><parm name=\"\"EntitlementStatus\"\" value=\"\"0\"\"/><parm name=\"\"TC_Status\"\" value=\"\"0\"\"/><parm name=\"\"AddrStatus\"\" value=\"\"0\"\"/><parm name=\"\"ProvStatus\"\" value=\"\"3\"\"/><parm name=\"\"ServiceFlow_URL\"\" value=\"\"https://es.example.net/vowifi\"\"/><parm name=\"\"ServiceFlow_UserData\"\" value=\"\"token=sample\"\"/></characteristic></wap-provisioningdoc>\"\n"];
+var $=function(id){return document.getElementById(id);};
+var inst=$("inst"), errEl=$("err"), isSample=false, lastParsed=null, texts=[null,null];
+var U={};
+U.esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
+U.num=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim().replace(/^RWF\s*/i,"").replace(/[,\s]/g,""); if(s==="") return NaN; return parseFloat(s); };
+U.fmt=function(n,d){ d=d||0; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); };
+U.of=function(c,k,n){ return n>k ? c+" \u00b7 "+k+" of "+U.fmt(n)+" shown" : c; };
+U.MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+U.dd=function(t,noYear){ var d=new Date(t); return d.getDate()+" "+U.MON[d.getMonth()]+(noYear?"":" "+d.getFullYear()); };
+U.rwf=function(n){ n=Number(n)||0; if(Math.abs(n)>=1e9) return "RWF "+U.fmt(n/1e9,2)+"bn"; if(Math.abs(n)>=1e6) return "RWF "+U.fmt(n/1e6,1)+"M"; return "RWF "+U.fmt(n); };
+U.pct=function(a,b){ return b? Math.round(a/b*1000)/10 : 0; };
+U.median=function(a){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; };
+U.pctl=function(a,p){ if(!a.length) return null; var s=a.slice().sort(function(x,y){return x-y;}); var i=Math.max(0,Math.ceil(p/100*s.length)-1); return s[i]; };
+U.parseCSV=function(text){
+  text=String(text).replace(/^﻿/,"");
+  var lines=text.replace(/\r\n?/g,"\n").split("\n").filter(function(l){ return l.trim().length; });
+  if(!lines.length) return null;
+  var h0=lines[0], cnt={",":0,";":0,"\t":0,"|":0}, qq=false, D=",";
+  for(var z=0;z<h0.length;z++){ var cz=h0[z]; if(cz==='"') qq=!qq; else if(!qq&&cnt.hasOwnProperty(cz)) cnt[cz]++; }
+  Object.keys(cnt).forEach(function(k){ if(cnt[k]>cnt[D]) D=k; });
+  function cells(line){ var o=[],c="",q=false; for(var i=0;i<line.length;i++){ var ch=line[i];
+    if(q){ if(ch==='"'){ if(line[i+1]==='"'){c+='"';i++;} else q=false; } else c+=ch; }
+    else { if(ch==='"') q=true; else if(ch===D){ o.push(c); c=""; } else c+=ch; } } o.push(c); return o; }
+  var H=cells(h0).map(function(h){ return h.trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,""); }), R=[];
+  for(var i=1;i<lines.length;i++){ var c=cells(lines[i]), o={}; for(var j=0;j<H.length;j++) o[H[j]]=(c[j]===undefined?"":String(c[j]).trim()); R.push(o); }
+  return {header:H, rows:R};
+};
+U.pick=function(H,al){ var a,h; for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h]===al[a]) return H[h];
+  for(a=0;a<al.length;a++) for(h=0;h<H.length;h++) if(H[h].indexOf(al[a])>=0) return H[h]; return null; };
+U.time=function(v){ if(v===null||v===undefined) return NaN; var s=String(v).trim(); if(!s) return NaN;
+  if(/^\d{13}$/.test(s)) return parseInt(s,10); if(/^\d{10}$/.test(s)) return parseInt(s,10)*1000;
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?)?\s*(Z|[+-]\d{2}:?\d{2})?$/);
+  if(m){ var ms=m[7]?Math.round(parseFloat("0."+m[7])*1000):0;
+    var y=+m[1], mo=+m[2]-1, d=+m[3], hh=+(m[4]||0), mi=+(m[5]||0), se=+(m[6]||0);
+    if(m[8]){ var t=Date.UTC(y,mo,d,hh,mi,se,ms); if(m[8]!=="Z"){ var z=m[8].replace(":",""), sg=z[0]==="-"?-1:1; t-=sg*(parseInt(z.slice(1,3),10)*60+parseInt(z.slice(3,5),10))*60000; } return t; }
+    return new Date(y,mo,d,hh,mi,se,ms).getTime(); }
+  var d2=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})(?:[T ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?)?$/);
+  if(d2){ var A1=+d2[1], A2=+d2[2], dd=A1, mm=A2; if(A2>12&&A1<=12){ dd=A2; mm=A1; } var H2=+(d2[4]||0);
+    if(d2[7]){ var pm=/p/i.test(d2[7]); if(pm&&H2<12) H2+=12; if(!pm&&H2===12) H2=0; }
+    return new Date(+d2[3],mm-1,dd,H2,+(d2[5]||0),+(d2[6]||0)).getTime(); }
+  return Date.parse(s); };
+U.hour=function(v){ if(!v) return null; var m=String(v).match(/(?:^|[T\s,])(\d{1,2}):\d{2}(?::\d{2})?(?:\.\d+)?\s*([AaPp][Mm])?/); if(m){ var h=parseInt(m[1],10);
+  if(m[2]){ var pm=/p/i.test(m[2]); if(pm&&h<12) h+=12; if(!pm&&h===12) h=0; } return (h>=0&&h<24)?h:null; } return null; };
+U.hh=function(h){ if(h===null||h===undefined) return "—"; var ap=h<12?"am":"pm", r=h%12; if(r===0) r=12; return r+ap; };
+U.mask=function(v){ var d=String(v||"").replace(/\D/g,""); if(d.length<4) return "•••"; return "••• "+d.slice(-3); };
+U.tile=function(k,v,s,cls){ var m=String(v).match(/^(.*?)\s(L|kWh|t|h|s|ms|min|days|agents|links|vehicles|km|L\/100 km|\u00d7)$/);
+  var vv=m?U.esc(m[1])+'<small class="u"> '+m[2]+'</small>':U.esc(v), m2=String(v).match(/^RWF\s(.+)$/);
+  if(m2) vv='<small class="u">RWF </small>'+U.esc(m2[1]);
+  return '<div class="tile"><div class="k">'+U.esc(k)+'</div><div class="v '+(cls||'')+'">'+vv+'</div><div class="s">'+U.esc(s||"")+'</div></div>'; };
+U.bars=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){ var w=Math.max(0,Math.min(100,r.w));
+  h+='<div class="brow"><div class="bl" title="'+U.esc(r.label)+'">'+U.esc(r.label)+'</div><div class="bb"><span class="'+(r.cls||'')+'" style="width:'+w+'%"></span></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.pairs=function(rows){ var h='<div class="bars">'; rows.forEach(function(r){
+  h+='<div class="brow pair"><div class="bl">'+U.esc(r.label)+'</div><div class="bbs"><div class="bb"><span class="'+(r.cls1||'')+'" style="width:'+Math.min(100,r.w1)+'%"></span></div><div class="bb"><span class="'+(r.cls2||'dim')+'" style="width:'+Math.min(100,r.w2)+'%"></span></div></div><div class="bv">'+U.esc(r.text)+'</div></div>'; });
+  return h+'</div>'; };
+U.stack=function(parts){ var tot=0; parts.forEach(function(p){ tot+=p.v; }); var h='<div class="stack">';
+  parts.forEach(function(p){ if(p.v>0) h+='<span title="'+U.esc(p.label)+'" style="width:'+(tot?p.v/tot*100:0)+'%;background:'+p.color+'"></span>'; });
+  h+='</div><div class="legend">'; parts.forEach(function(p){ h+='<span><i style="background:'+p.color+'"></i>'+U.esc(p.label)+' '+U.esc(p.text)+'</span>'; }); return h+'</div>'; };
+U.heat=function(vals, mode, ref, labs){ // mode "count": raw counts, darker red = more; mode "level": ratios against a reference
+  var mx=0, i; if(mode==="count") vals.forEach(function(v){ if(v>mx) mx=v; });
+  var h='<div class="hours">';
+  for(i=0;i<24;i++){ var v=vals[i], col="var(--panel2)";
+    if(v!==null&&v!==undefined&&!isNaN(v)){
+      if(mode==="count"){ if(v>0&&mx>0) col="color-mix(in srgb, var(--bad) "+Math.round(22+78*v/mx)+"%, var(--panel2))"; }
+      else col = v>=ref-1e-9 ? "var(--accent)" : (v>=ref-0.10 ? "var(--warn)" : "var(--bad)"); }
+    h+='<div class="hcell" style="background:'+col+'"></div>'; }
+  h+='</div><div class="hlabels">'; ["12a","","","3","","","6","","","9","","","12p","","","3","","","6","","","9","",""].forEach(function(l){ h+='<span>'+l+'</span>'; });
+  h+='</div><div class="legend">';
+  if(mode==="count") h+='<span><i style="background:color-mix(in srgb, var(--bad) 22%, var(--panel2))"></i>Fewer</span><span><i style="background:var(--bad)"></i>Most</span><span><i style="background:var(--panel2)"></i>None</span>';
+  else { labs=labs||["At or above target","Up to 10 points below","More than 10 points below"];
+    h+='<span><i style="background:var(--accent)"></i>'+U.esc(labs[0])+'</span><span><i style="background:var(--warn)"></i>'+U.esc(labs[1])+'</span><span><i style="background:var(--bad)"></i>'+U.esc(labs[2])+'</span><span><i style="background:var(--panel2)"></i>No data</span>'; }
+  return h+'</div>'; };
+U.table=function(head, rows, numCols){ numCols=numCols||[]; var h='<div class="tblwrap"><table class="tbl"><thead><tr>';
+  head.forEach(function(c,i){ h+='<th class="'+(numCols.indexOf(i)>=0?'num':'')+'">'+U.esc(c)+'</th>'; }); h+='</tr></thead><tbody>';
+  rows.forEach(function(r){ h+='<tr>'; r.forEach(function(c,i){ var cls=(numCols.indexOf(i)>=0?'num':''), txt=c;
+    if(c&&typeof c==="object"){ cls+=' '+(c.cls||''); txt=c.t; } h+='<td class="'+cls+'">'+U.esc(txt)+'</td>'; }); h+='</tr>'; });
+  return h+'</tbody></table></div>'; };
+
+try{ var sv=localStorage.getItem(CFG.slug+"_theme"); if(sv) document.documentElement.setAttribute("data-theme",sv); }catch(e){}
+$("theme").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dk=window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var nx=cur?(cur==="dark"?"light":"dark"):(dk?"light":"dark");
+  document.documentElement.setAttribute("data-theme",nx);
+  try{ localStorage.setItem(CFG.slug+"_theme",nx); }catch(e){}
+});
+
+var G=(function(H){
+  var PUB={"kty": "EC", "crv": "P-256", "x": "dd_RAcn7vNcw2otkFdNpoI6U3_RyeEOu6SawgbThnho", "y": "zjKzBb8ADm1xZQ2tioXLYUyj-bstyz4fIcvI6VBocrA"}, KID="fk1-AqEPEA", LS="fk_codes", TITLE=CFG.plainTitle, mem=null, kp=null, pending=null, timer=null;
+  var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var esc=function(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+  var st={state:"locked", exp:0, org:"", code:""};
+  var hasCrypto=!!(window.crypto&&window.crypto.subtle&&window.TextEncoder&&window.TextDecoder&&window.Promise);
+  var MSG={bad:"That code isn't valid. Check it was copied in full, or ask Frutos for a new one.",
+    scope:"That code is for another tool. Ask Frutos for a code for the "+TITLE+".",
+    expired:"That code's trial has ended. Ask Frutos for a new one.",
+    early:"That code isn't active yet. Check the date and time on this device.",
+    nocrypto:"This browser cannot check trial codes; open the link in Chrome, Safari or Firefox.",
+    revoked:"That code has been withdrawn. Ask Frutos for a new one."};
+  function now(){ return Date.now()/1000; }
+  function b2u(s){ s=String(s).replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; var bin=atob(s), a=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a; }
+  function pick(raw){ var m=String(raw||"").match(/FK1\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{40,}/); return m?m[0]:null; }
+  function key(){ if(!kp) kp=crypto.subtle.importKey("jwk",PUB,{name:"ECDSA",namedCurve:"P-256"},false,["verify"]); return kp; }
+  function all(){ try{ var v=JSON.parse(localStorage.getItem(LS)||"null"); if(v&&v.c) v=[v]; return (v&&v.length)?v:(mem||[]); }catch(e){ return mem||[]; } }
+  function find(code){ var a=all(); for(var i=0;i<a.length;i++) if(a[i]&&a[i].c===code) return a[i]; return null; }
+  function put(list){ mem=list; try{ localStorage.setItem(LS,JSON.stringify(list)); }catch(e){} }
+  function save(o){ var a=all().filter(function(x){ return x&&x.c!==o.c; }); a.unshift(o); put(a.slice(0,6)); }
+  function forget(code){ put(all().filter(function(x){ return x&&x.c!==code; })); }
+  function check(code, first){
+    if(!hasCrypto) return Promise.resolve({ok:false, why:"nocrypto"});
+    var parts=String(code).split("."), p;
+    try{ p=JSON.parse(new TextDecoder().decode(b2u(parts[1]))); }catch(e){ return Promise.resolve({ok:false, why:"bad"}); }
+    return key().then(function(k){
+      return crypto.subtle.verify({name:"ECDSA",hash:{name:"SHA-256"}},k,b2u(parts[2]),new TextEncoder().encode(parts[0]+"."+parts[1]));
+    }).then(function(good){
+      if(!good||!p||p.v!==1||p.k!==KID) return {ok:false, why:"bad"};
+      var sc=p.s||[]; if(sc.indexOf("*")<0&&sc.indexOf(CFG.slug)<0) return {ok:false, why:"scope", p:p};
+      var t=now(), exp, f=first||null;
+      if(t<(p.i||0)-600) return {ok:false, why:"early", p:p};
+      if(typeof p.e==="number") exp=p.e;
+      else if(typeof p.d==="number"&&typeof p.h==="number"){ if(!f) f=Math.floor(t); exp=Math.min(f+p.d*86400,p.h); }
+      else return {ok:false, why:"bad"};
+      if(t>=exp) return {ok:false, why:"expired", p:p, exp:exp, first:f};
+      return {ok:true, p:p, exp:exp, first:f};
+    }, function(){ return {ok:false, why:"bad"}; });
+  }
+  function left(sec){ var d=Math.floor(sec/86400), h=Math.floor(sec%86400/3600), m=Math.floor(sec%3600/60);
+    if(d>0) return d+(d===1?" day ":" days ")+h+" h left"; if(h>0) return h+" h "+m+" min left"; return Math.max(1,m)+" min left"; }
+  function when(ts){ var d=new Date(ts*1000); return d.getDate()+" "+MON[d.getMonth()]+", "+("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2); }
+  function orgName(){ var v=inst.value.trim(); return (v&&v!==CFG.defaultFor)?v:"my organisation"; }
+  function paint(){
+    var el=$("runs"), h;
+    if(!hasCrypto) h='<span class="gdot end"></span><span>'+esc(MSG.nocrypto)+'</span>';
+    else if(st.state==="ok") h='<span class="gdot ok"></span><span>Trial unlocked for <b>'+esc(st.org||"you")+'</b> · '+left(st.exp-now())+'</span><button type="button" class="glink" id="gopen">Change code</button>';
+    else if(st.state==="expired") h='<span class="gdot end"></span><span>Your 3-day trial ended on '+when(st.exp)+'</span><button type="button" class="glink" id="gopen">Enter a new code</button>';
+    else h='<span class="gdot"></span><span>Sample: free · Your own file: trial code needed</span><button type="button" class="glink" id="gopen">Enter a code</button>';
+    el.innerHTML=h; var b=$("gopen"); if(b) b.addEventListener("click",function(){ open(""); });
+  }
+  function msgEl(m){ var e=$("uerr"); if(m){ e.textContent=m; e.hidden=false; } else e.hidden=true; }
+  function open(m){
+    var u=$("unlock"); u.hidden=false; msgEl(m);
+    $("uwa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent("Muraho Frutos. Please send a 3-day trial code for the "+TITLE+" for "+orgName()+".");
+    u.scrollIntoView({behavior:"smooth",block:"center"}); setTimeout(function(){ try{ $("ucode").focus({preventScroll:true}); }catch(e){ $("ucode").focus(); } },60);
+  }
+  function close(){ $("unlock").hidden=true; }
+  function closing(scroll){ H.closing(scroll); }
+  function sha(s){ return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){ var a=new Uint8Array(b), o="";
+    for(var i=0;i<a.length;i++) o+=("0"+a[i].toString(16)).slice(-2); return o; }); }
+  function api(ev){
+    if(!CFG.api||!st.code||!window.fetch) return;
+    try{ sha(st.code).then(function(hx){
+        return fetch(CFG.api.replace(/\/+$/,"")+"/v1/event",{method:"POST",keepalive:true,headers:{"content-type":"application/json"},
+          body:JSON.stringify({kid:KID,codeHash:hx,slug:CFG.slug,event:ev,ts:Math.floor(now())})});
+      }).then(function(r){ return (r&&r.ok)?r.json():null; }).then(function(j){
+        if(j&&j.revoked){ forget(st.code); st={state:"locked",exp:0,org:"",code:""}; paint(); open(MSG.revoked); }
+      })["catch"](function(){});
+    }catch(e){}
+  }
+  function tick(){ if(timer) clearInterval(timer); timer=setInterval(function(){
+    if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); closing(false); } else paint(); },60000); }
+  function activate(code, quiet){
+    var prev=find(code), first=prev?prev.f:null;
+    return check(code, first).then(function(r){
+      if(!r.ok){
+        if(r.why==="expired"){ st={state:"expired", exp:r.exp, org:(r.p&&r.p.o)||"", code:""}; paint(); }
+        if(!quiet) msgEl(MSG[r.why]||MSG.bad);
+        return r;
+      }
+      var fresh=!prev;
+      save({c:code, f:r.first||null});
+      st={state:"ok", exp:r.exp, org:r.p.o||"", code:code};
+      var cur=inst.value.trim();
+      if(r.p.o&&(cur===""||cur===CFG.defaultFor)){ inst.value=r.p.o; $("gate-inst").textContent=H.name(); }
+      paint(); close(); $("gate").hidden=true; tick();
+      if(fresh) api("activate");
+      if(pending!==null){ var a=pending; pending=null; H.run(a); }
+      return r;
+    });
+  }
+  function init(){
+    paint();
+    if(!hasCrypto) return;
+    var qs=null, qc=null; try{ qs=new URLSearchParams(location.search); qc=qs.get("code"); }catch(e){}
+    if(qc!==null&&qs){ try{ qs["delete"]("code"); var rest=qs.toString(); history.replaceState(null,"",location.pathname+(rest?"?"+rest:"")+location.hash); }catch(e){} }
+    var list=[], fromLink=pick(qc);
+    if(qc!==null&&!fromLink){ open(MSG.bad); }
+    [fromLink].concat(all().map(function(x){ return x&&x.c; }), [CFG.preset||null]).forEach(function(c){ if(c&&list.indexOf(c)<0) list.push(c); });
+    var i=0, last=null;
+    (function next(){
+      if(i>=list.length){
+        if(last&&last.why==="expired"&&st.state==="expired") closing(false);
+        if(fromLink&&last&&!last.ok) open(MSG[last.why]||MSG.bad);
+        return; }
+      var c=list[i++];
+      activate(c, true).then(function(r){ last=r; if(!r.ok) next(); });
+    })();
+  }
+  $("uform").addEventListener("submit",function(e){ e.preventDefault(); var c=pick($("ucode").value);
+    if(!hasCrypto){ msgEl(MSG.nocrypto); return; } if(!c){ msgEl(MSG.bad); return; } activate(c,false); });
+  $("ucode").addEventListener("keydown",function(e){ if(e.key==="Escape"||e.keyCode===27) close(); });
+  $("uclose").addEventListener("click",close);
+  return {
+    ok:function(){ if(st.state==="ok"&&now()>=st.exp){ st.state="expired"; paint(); } return st.state==="ok"; },
+    ask:function(arr){ pending=arr;
+      if(st.state==="expired"){ open("Your 3-day trial ended on "+when(st.exp)+". Enter a new code, or ask Frutos for one."); closing(false); }
+      else open(""); },
+    ran:function(){ api("run"); },
+    init:init
+  };
+})({
+  name:function(){ return name(); },
+  run:function(a){ isSample=false; go(a); },
+  closing:function(scroll){ var v=name(); $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+    $("gate-inst").textContent=v; $("gate").hidden=false; if(scroll) $("gate").scrollIntoView({behavior:"smooth",block:"center"}); }
+});
+
+function name(){ return inst.value.trim()||CFG.defaultFor; }
+try{ var qf=new URLSearchParams(location.search).get("for"); if(qf){ inst.value=qf.slice(0,60); } }catch(e){}
+$("gate-inst").textContent=name();
+inst.addEventListener("input",function(){ $("gate-inst").textContent=name(); });
+function inputs(){ var o={}; document.querySelectorAll("[data-in]").forEach(function(el){ o[el.getAttribute("data-in")]=el.value; }); return o; }
+function showErr(m){ errEl.textContent=m; errEl.hidden=false; }
+
+function readInto(i,f){ var r=new FileReader();
+  r.onload=function(){ texts[i]=String(r.result); var fn=$("fn"+i); if(fn) fn.textContent=f.name;
+    if(CFG.files===1){ isSample=false; go([texts[0]]); } else { $("runbtn").disabled=!(texts[0]&&texts[1]); } };
+  r.onerror=function(){ showErr("Could not read that file."); }; r.readAsText(f); }
+for(var i=0;i<CFG.files;i++)(function(i){
+  var d=$("drop"+i), p=$("pick"+i), fi=$("file"+i);
+  p.addEventListener("click",function(){ fi.click(); });
+  fi.addEventListener("change",function(e){ var f=e.target.files&&e.target.files[0]; if(f) readInto(i,f); });
+  ["dragenter","dragover"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.add("over"); }); });
+  ["dragleave","drop"].forEach(function(ev){ d.addEventListener(ev,function(e){ e.preventDefault(); d.classList.remove("over"); }); });
+  d.addEventListener("drop",function(e){ var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) readInto(i,f); });
+})(i);
+if(CFG.files===2){ $("runbtn").addEventListener("click",function(){ isSample=false; go([texts[0],texts[1]]); }); }
+$("sample").addEventListener("click",function(){ isSample=true; go(SAMPLES); });
+
+function go(arr){
+  errEl.hidden=true;
+  if(!isSample&&!G.ok()){ G.ask(arr); return; }
+  var ps=[], R;
+  try{ arr.forEach(function(t,ix){ var p=U.parseCSV(t); if(!p||!p.rows.length) throw (CFG.files===2?(CFG.fileLabels[ix]+": "):"")+"I couldn't find any rows in that file."; ps.push(p); });
+       R=TOOL.analyse(ps, inputs(), U); }
+  catch(e){ showErr(typeof e==="string"?e:"That file couldn't be read."); return; }
+  lastParsed=ps; draw(R); if(!isSample) G.ran();
+}
+document.querySelectorAll("[data-in]").forEach(function(el){ el.addEventListener("change",function(){
+  if(!lastParsed) return; try{ draw(TOOL.analyse(lastParsed, inputs(), U)); }catch(e){} }); });
+
+function draw(R){
+  var out=TOOL.render(R, inputs(), U, {name:name(), sample:isSample});
+  var H='<div class="verdict"><p class="vh">What the data shows'+(isSample?' · illustrative sample, not your data':'')+'</p><p>'+out.verdict+'</p></div>';
+  if(out.tiles&&out.tiles.length) H+='<div class="tiles">'+out.tiles.join("")+'</div>';
+  (out.sections||[]).forEach(function(s){ H+='<div class="card"><h3>'+U.esc(s.title)+'</h3>'+(s.cap?'<p class="cap">'+U.esc(s.cap)+'</p>':'')+s.html+'</div>'; });
+  H+='<div class="summary"><div class="summary-h"><h3>'+U.esc(CFG.summaryTitle)+'</h3><span class="acts"><button class="copy pdf" id="pdf" type="button">Save PDF</button><button class="copy" id="copy" type="button">Copy</button></span></div><pre id="smtext">'+U.esc(out.summary)+'</pre></div>';
+  var rep=$("report"); rep.innerHTML=H; rep.hidden=false;
+  var cp=$("copy"); cp.addEventListener("click",function(){ var t=$("smtext").textContent;
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ cp.textContent="Copied"; cp.classList.add("done"); }); } });
+  $("pdf").addEventListener("click",function(){ window.print(); });
+  rep.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function gate(){
+  var v=name();
+  $("gate-wa").href="https://wa.me/"+CFG.wa+"?text="+encodeURIComponent(CFG.waMsg.replace("{name}",v));
+  $("gate-inst").textContent=v; $("gate").hidden=false;
+  $("gate").scrollIntoView({behavior:"smooth",block:"center"});
+}
+$("foot").textContent=CFG.foot;
+G.init();
+})();
+</script>
+
+</body>
+</html>
